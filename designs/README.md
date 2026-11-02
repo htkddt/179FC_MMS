@@ -58,7 +58,7 @@ The exports do not include a source Figma link or export date; record those when
 | `Tabs` | Accessible tab list with an active underline. Keeps its selected value in the page URL, supports keyboard navigation, and becomes horizontally scrollable rather than wrapping on narrow screens. | Posts, Settings |
 | `Avatar` | Renders an image or colored-initials fallback. | Header, cards, organization nodes |
 | User menu | Toggleable account popover implemented within `TopBar`, with Profile, Settings, Help center, and Log out actions. Closes on outside click, Escape, and navigation. | `TopBar` |
-| `AssistantLauncher` | Persistent “Ask 179 Assist” launcher and expandable chat panel with a close action, message history, prompt suggestion, and submit input. | `AppShell` |
+| `AssistantLauncher` | Persistent icon button with an accessible name, plus an expandable chat panel with a close action, message history, prompt suggestion, and submit input. The launcher tooltip has been removed. | `AppShell` |
 | Loading, empty, and error states | States absent from the mockups but required for API integration; the shared `EmptyState` component and page-level states cover these cases. | Per feature |
 
 ### Sign-in
@@ -76,11 +76,19 @@ The exports do not include a source Figma link or export date; record those when
 
 ### Employees
 
-`EmployeesPage` includes `MemberSearch` (search by name or role), `AddMemberButton`, and `EmployeeGrid`. Each `EmployeeCard` contains an avatar, team, name, role, and “View profile” link. A card/link click should navigate to the placeholder route `/employees/:memberId`; do not implement the profile UI until a design is available.
+`EmployeesPage` includes search, sorting, member statistics, and `EmployeeGrid`. Each `EmployeeCard` contains an avatar, team, name, role, and profile link to `/employees/:memberId`. The implemented profile supports avatar, team, birth date, and phone edits in browser storage. `useMembers` supplies the same current member records to Employees and Organization, including saved profile edits.
 
 ### Organization
 
-`OrganizationPage` displays a short description and `OrganizationChart`. The chart receives an `OrganizationMember` tree instead of hard-coded coordinates from the image. `OrganizationNode` renders the avatar and name; `OrgConnector` only renders the connecting lines. On smaller screens, the chart should become an indented tree/list or horizontally scrollable region rather than being forced into the viewport.
+The [Organization reference](Organization/Organization.png) is the visual starting point. The interaction refinements reviewed on **2026-11-02** supersede its older toolbar/diagram details: the Search field now spans the space before the team filter; view tabs, dotted grid, Team connections caption, title subtitle and application right-click behavior are removed. The supplied PNG is retained; its export date and Figma source URL are unknown.
+
+`OrganizationPage` owns the shared member subscription, filtering, per-team preferences and expanded canvas. `OrganizationChart` composes `OrganizationTeam` frames, individually movable `OrganizationNode` cards and SVG membership connections. Each team header reserves separate title and control rows above its connectors; the Club Admin appears in the Management frame like every other team member. Current records do not define a reporting hierarchy.
+
+Per-team controls zoom card size (75–125%), collapse/expand members, hide/restore the frame, or open an enlarged focused chart. The sidebar eye buttons and Show chips restore hidden teams. Global zoom/fit/expand and Reset layout remain available. Layout and team views are personal browser preferences; neither hiding nor resetting changes employee membership.
+
+Member actions open only from the ellipsis button, including keyboard activation. `OrganizationMemberMenu` offers Profile, View team, Move to team and Reset position. Profile opens `/employees/:memberId`. Dragging onto another team or choosing a destination in the menu invokes the shared `membersApi.transferMemberTeam` mutation. A valid drop highlights the target; collapsed and empty teams are supported. Success updates both teams, the Employees card/profile and counts, preserves unrelated profile/role fields and reveals the destination. Failed saves retain the old membership and display feedback. Team catalog entries remain available when empty.
+
+The chart has a plain background, readable adaptive columns, independent scrolling, responsive panels and motion for arrival/reflow/scale/popup feedback. Pointer dragging stays direct; reduced-motion preferences disable optional animation. See [Organization UX](Organization/Organization.md) for detailed interactions and [the frontend backend handoff](../frontend/README.md#organization-backend-integration-contract-proposed-not-implemented) for the proposed canonical membership and personal-view APIs. Export/Add member from the PNG remain outside this implementation.
 
 ### Posts (tabbed page)
 
@@ -214,13 +222,17 @@ frontend/
 |   |   |   |   +-- DashboardPage.jsx
 |   |   |   +-- dashboardStore.js
 |   |   |-- employees/
+|   |   |   |-- api/
+|   |   |   |   +-- membersApi.js
 |   |   |   |-- components/
 |   |   |   |   |-- EmployeeCard.jsx
 |   |   |   |   |-- EmployeeGrid.jsx
 |   |   |   |   +-- MemberSearch.jsx
-|   |   |   +-- pages/
-|   |   |       |-- EmployeeProfilePage.jsx
-|   |   |       +-- EmployeesPage.jsx
+|   |   |   |-- pages/
+|   |   |   |   |-- EmployeeProfilePage.jsx
+|   |   |   |   +-- EmployeesPage.jsx
+|   |   |   |-- memberProfileStore.js
+|   |   |   +-- useMembers.js
 |   |   |-- help/
 |   |   |   |-- api/
 |   |   |   |   +-- helpApi.js
@@ -229,9 +241,12 @@ frontend/
 |   |   |-- organization/
 |   |   |   |-- components/
 |   |   |   |   |-- OrganizationChart.jsx
-|   |   |   |   +-- OrganizationNode.jsx
-|   |   |   +-- pages/
-|   |   |       +-- OrganizationPage.jsx
+|   |   |   |   |-- OrganizationMemberMenu.jsx
+|   |   |   |   |-- OrganizationNode.jsx
+|   |   |   |   +-- OrganizationTeam.jsx
+|   |   |   |-- pages/
+|   |   |   |   +-- OrganizationPage.jsx
+|   |   |   +-- organizationLayout.js
 |   |   |-- posts/
 |   |   |   |-- api/
 |   |   |   |   +-- postsApi.js
@@ -256,11 +271,11 @@ frontend/
 |   |   |-- dashboard.js
 |   |   |-- help.js
 |   |   |-- members.js
-|   |   |-- organization.js
 |   |   |-- posts.js
 |   |   +-- settings.js
 |   |-- styles/
 |   |   |-- globals.css
+|   |   |-- organization.css
 |   |   |-- post-workflow.css
 |   |   +-- tokens.css
 |   |-- App.jsx
@@ -287,7 +302,7 @@ The frontend uses feature-based folders under `src/features/`; shared layout and
 
 ## Current implementation and remaining integration
 
-The shell, demo sign-in, Dashboard, post list and workflow, Settings, Employees, Organization, Help, and Assistant have frontend implementations. Several supporting routes, including password and session management, help articles, and member profiles, remain placeholders. The following work is still needed:
+The shell, demo sign-in, Dashboard, post list and workflow, Settings, Employees and member profiles, Organization, Help, and Assistant have frontend implementations. Several supporting routes, including password and session management and help articles, remain placeholders. The following work is still needed:
 
 1. Replace demo authentication and browser-only storage with server-authorized accounts, APIs, and persistence.
 2. Connect post visibility, activity metrics, uploads, and scheduled publishing to backend services; keep Create and Edit aligned when changing their shared component.
