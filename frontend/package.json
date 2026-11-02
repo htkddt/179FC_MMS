@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test ../tests/frontend/portal.test.mjs ../tests/frontend/organization.test.mjs",
+    "test:browser": "playwright test --config ../tests/frontend/playwright.config.mjs"
   },
   "engines": {
     "node": ">=20.19.0 || >=22.12.0"
@@ -17,6 +19,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@vitejs/plugin-react": "latest",
     "vite": "latest"
   }

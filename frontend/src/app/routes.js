@@ -22,7 +22,7 @@ export const PAGE_META = {
   [ROUTES.dashboard]: { title: 'Dashboard' },
   [ROUTES.posts]: { title: 'Posts' },
   [ROUTES.employees]: { title: 'Employees' },
-  [ROUTES.organization]: { title: 'Organization', subtitle: 'Monday, 13 October 2026' },
+  [ROUTES.organization]: { title: 'Organization' },
   [ROUTES.settings]: { title: 'Settings', subtitle: 'Manage your account, workspace, and notifications.' },
   [ROUTES.help]: { title: 'Help Center', subtitle: 'Find answers, guides, and support for your workspace.' },
   [ROUTES.assistant]: { title: '179 Assist - Expanded', subtitle: 'Monday, 13 October 2026' },

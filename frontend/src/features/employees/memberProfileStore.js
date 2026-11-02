@@ -17,11 +17,17 @@ export function applyMemberProfile(member, overrides = loadMemberProfileOverride
   return saved && typeof saved === 'object' ? { ...member, ...saved } : member;
 }
 
-export function saveMemberProfile(memberId, profile, storage = getStorage()) {
+export function saveMemberProfile(memberId, profile, storage = getStorage(), { requirePersistence = false } = {}) {
   const overrides = loadMemberProfileOverrides(storage);
-  const savedProfile = Object.fromEntries(editableFields.filter((field) => typeof profile[field] === 'string').map((field) => [field, profile[field]]));
+  const merged = { ...overrides[memberId], ...profile };
+  const savedProfile = Object.fromEntries(editableFields.filter((field) => typeof merged[field] === 'string').map((field) => [field, merged[field]]));
   const next = { ...overrides, [memberId]: savedProfile };
-  try { storage?.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next)); } catch { /* Storage can be unavailable in private browsing. */ }
+  try {
+    if (!storage && requirePersistence) throw new Error('Storage unavailable');
+    storage?.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    if (requirePersistence) throw new Error('Unable to save the team change. Please enable browser storage and try again.');
+  }
   if (typeof window !== 'undefined') window.dispatchEvent(new Event('179fc-member-profile-changed'));
   return next;
 }

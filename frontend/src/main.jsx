@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './app/App.jsx';
 import './styles/globals.css';
 import './styles/post-workflow.css';
+import './styles/organization.css';
 
 const rootElement = document.getElementById('root');
 

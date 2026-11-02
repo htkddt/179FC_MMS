@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '../../../components/ui/Button.jsx';
 import { EmptyState } from '../../../components/ui/states/EmptyState.jsx';
-import { members } from '../../../mocks/members.js';
 import { EmployeeGrid } from '../components/EmployeeGrid.jsx';
 import { MemberSearch } from '../components/MemberSearch.jsx';
-import { applyMemberProfile, loadMemberProfileOverrides } from '../memberProfileStore.js';
+import { useMembers } from '../useMembers.js';
+import { memberTeams } from '../api/membersApi.js';
 
 const memberCollator = new Intl.Collator('en', { sensitivity: 'base' });
 
@@ -22,13 +22,7 @@ export function EmployeesPage() {
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('name-asc');
   const [notice, setNotice] = useState('');
-  const [profileOverrides, setProfileOverrides] = useState(() => loadMemberProfileOverrides());
-  useEffect(() => {
-    const refreshProfiles = () => setProfileOverrides(loadMemberProfileOverrides());
-    window.addEventListener('179fc-member-profile-changed', refreshProfiles);
-    return () => window.removeEventListener('179fc-member-profile-changed', refreshProfiles);
-  }, []);
-  const directoryMembers = useMemo(() => members.map((member) => applyMemberProfile(member, profileOverrides)), [profileOverrides]);
+  const directoryMembers = useMembers();
   const filteredMembers = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase();
     if (!normalizedQuery) return directoryMembers;
@@ -39,7 +33,7 @@ export function EmployeesPage() {
     { label: 'Total', value: directoryMembers.length, tone: 'total' },
     { label: 'Online', value: directoryMembers.filter((member) => member.availability === 'online').length, tone: 'online' },
     { label: 'Offline', value: directoryMembers.filter((member) => member.availability === 'offline').length, tone: 'offline' },
-    { label: 'Teams', value: new Set(directoryMembers.map((member) => member.team)).size, tone: 'teams' },
+    { label: 'Teams', value: memberTeams.length, tone: 'teams' },
   ], [directoryMembers]);
 
   return <section className="employees-page">
