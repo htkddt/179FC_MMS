@@ -23,7 +23,7 @@
 | Web client | React, React Router, JavaScript, JSX, CSS, Vite | Feature development |
 | API | NestJS, TypeScript | Initial scaffold |
 | Virtual assistant | Python, FastAPI | Planned |
-| Testing | Component-specific test suites under `tests/` | Planned |
+| Testing | Node logic checks and Playwright Organization flows under `tests/frontend/` | Initial coverage |
 | Automation | PowerShell and/or Node.js scripts | Planned |
 
 ## References
@@ -34,6 +34,16 @@
 - [FastAPI documentation](https://fastapi.tiangolo.com/)
 
 ## Operations
+
+### Organization workspace
+
+- `/organization` has a full-width Search field beside the team filter, a plain chart canvas, per-team headers/controls, overview counts and a Teams panel. The two view tabs, Team connections caption, dotted grid, subtitle and application right-click menu are removed.
+- Every member is a draggable component. The ellipsis button opens **Profile**, **View team**, **Move to team**, and **Reset position**. Profile opens `/employees/:memberId`.
+- Each team supports card zoom, collapse/expand, hide/show and an enlarged focused chart. Global zoom/fit/expand and Reset layout are also available. Hidden/collapsed teams retain their members and counts; empty teams remain valid destinations.
+- Dropping a member on a different team or choosing Move to team updates the shared member record. Organization, Employees and Employee profile read that same `team`, including across open directory tabs. Other profile fields and the role/job title are preserved. A failed save leaves the old team intact and shows an error. Dragging within the same team changes only chart placement.
+- Current persistence is browser-local: canonical profile/team fields, chart offsets and personal team-view preferences are stored separately. Resetting/hiding/zooming the chart never reverses membership changes. The assistant remains a labelled icon and chat panel without a launcher tooltip.
+- The [Organization implementation and proposed backend contracts](frontend/README.md#organization-implementation) document all interactions, state keys, the shared transfer adapter, proposed APIs, concurrency/error handling and required cache updates for future integration. No membership API has been implemented on the backend yet.
+- Run `npm test` and `npm run test:browser` from `frontend/`. See [frontend test setup](tests/frontend/README.md) and [Organization UX](designs/Organization/Organization.md).
 
 ### Temporary frontend demo access
 
@@ -124,12 +134,12 @@
 
 | Workstream | Planning | Foundation | Feature Development | Test Coverage | Current Result |
 | --- | --- | --- | --- | --- | --- |
-| Frontend | Complete | Complete | In progress | Planned | Responsive React portal with temporary bypassed demo sign-in, protected routes, dashboard, member directory, organization, posts, settings, help, and 179 Assist |
+| Frontend | Complete | Complete | In progress | Initial coverage | Responsive React portal with temporary demo sign-in, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
 | Backend | Complete | Complete | Not started | Planned | NestJS API shell with `GET /health` |
 | Chatbot | Complete | Not started | Not started | Planned | FastAPI delivery plan |
 | Designs | Complete | Not started | Not started | Not started | Asset and handoff plan |
 | Scripts | Complete | Not started | Not started | Not started | Automation plan and component folders |
-| Tests | Complete | Not started | Not started | Not started | Centralized test-suite structure |
+| Tests | Complete | In progress | In progress | Initial coverage | Centralized Node logic checks and Playwright Organization/profile interaction coverage |
 
 ## Next Actions
 
