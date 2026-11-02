@@ -14,9 +14,15 @@ tests/
 └── frontend/   # React component, interaction, and end-to-end tests
 ~~~
 
-## Plan
+## Implemented frontend checks
 
-1. Select the test runner and coverage policy for each component.
+- From `frontend/`, run `npm test` for Node-based post, settings, dashboard, and Organization logic checks.
+- Run `npm run test:browser` for Playwright coverage of Organization, Employees profile synchronization, responsive layouts, keyboard interactions, and the assistant launcher. The configuration starts Vite on port 5180 and uses installed Edge on Windows by default.
+- Test source and configuration remain under `tests/frontend/`; browser artifacts go to the operating system's temporary directory. See [frontend runner setup and scope](frontend/README.md).
+
+## Remaining plan
+
+1. Select backend, chatbot, and database runners and define the coverage policy for each component.
 2. Establish shared test-data, fixture, and environment conventions without coupling suites to production data.
 3. Add smoke tests for frontend availability and backend `GET /health`.
 4. Add feature tests as member-management flows are implemented.

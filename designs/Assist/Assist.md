@@ -6,7 +6,7 @@ Receive quick, contextual help without leaving the current task.
 
 ## Core experience
 
-- The floating **Ask 179FC Assist** control opens a compact chat panel.
+- The floating icon button opens a compact chat panel. It retains an accessible **Open 179 Assist** / **Close 179 Assist** name, without a visible tooltip or text pill (updated with the Organization redesign on 2026-11-02).
 - A short welcome asks what the user needs help with and offers a suggested prompt.
 - The user enters a question in the message field and sends it with the send icon.
 - The panel should preserve the current page context so answers can point to relevant actions or help articles.
