@@ -46,6 +46,20 @@ npm run start:dev
 3. Integrate persistence, request validation, observability, and OpenAPI documentation.
 4. Expose an authenticated integration boundary for the chatbot service.
 
+## Organization and Employees integration handoff
+
+The frontend now supports cross-team member transfers from the Organization canvas and the member ellipsis menu. Both use the async `transferMemberTeam({ memberId, targetTeam })` adapter in `frontend/src/features/employees/api/membersApi.js`. It currently writes a partial team update to the shared browser profile store; this backend still exposes only its health/scaffold endpoint.
+
+The full [proposed contracts and client synchronization sequence](../frontend/README.md#organization-backend-integration-contract-proposed-not-implemented) define future team/member reads, `PATCH /v1/members/:memberId/team`, and personal chart preferences. These are proposed endpoints, not implemented routes.
+
+Implementation requirements:
+
+1. Return a stable team catalog including empty teams. Use team IDs in persisted membership and API payloads instead of mutable display names.
+2. Authorize and validate transfers on the server, check the expected record revision, and atomically update membership, source/destination counts, revision, timestamps and an audit entry. Return the authoritative member and affected team counts. Preserve avatar, phone, birth date, role and unrelated fields; a transfer is a partial mutation.
+3. Have Organization, Employees and Employee profile consume the same canonical member store. Invalidate/update list/detail/team/group caches after success and broadcast/refetch changes for other active clients. Reject stale profile saves rather than silently overwriting a newer transfer.
+4. Keep personal chart positions, scale/collapse/hidden preferences and Reset layout separate from membership. Hiding/collapsing/resetting the diagram must never delete a team, remove members or revert a transfer.
+5. Support idempotent retries, invalid/deleted destination handling, failed-write rollback and conflict refetch. Add transaction, authorization, concurrency, preserved-field, empty-team and response-consistency tests under `tests/backend/`.
+
 ## Test Location
 
 Do not add test source to this directory. All backend unit, integration, and end-to-end tests must be created in `../tests/backend/`.
