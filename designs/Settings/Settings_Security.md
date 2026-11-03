@@ -1,37 +1,24 @@
-# Settings — Security UX Description
+# Settings — Security UX
 
-Design revision: **179MMS-6, 2026-11-03**. Read with [Security PNG](Settings_Security.png), [responsive references](Settings_Responsive.png), [interaction states](Settings_States.png), and the [handoff](Settings_Handoff.md). Proposed UI; real security services are not implemented.
+Read with [Settings_Security.png](Settings_Security.png), [Settings_Change_Password.md](Settings_Change_Password.md), [Settings_Two_Factor.md](Settings_Two_Factor.md), and [Settings_Sessions.md](Settings_Sessions.md).
 
-## User goal
+## Security tab
 
-See accurate security capabilities and access verified account-security flows when available.
+- Route: `/settings?tab=security`. Keep the shared Settings heading, tabs, Account card, and no subtitle or descriptive copy beneath row titles.
+- Password, Two-factor authentication, and Active sessions have enabled buttons. They open their UI-only destinations instead of appearing permanently disabled.
+- The visible notice makes the boundary explicit: no local preference write changes a password, enrollment, session list, or revoke action. Two-factor remains `Not set up` until a server verifies enrollment.
+- The Security tab has no Settings Save footer. Sensitive actions are individual transactions and never report a local success.
 
-## Layout and current capability
+## Destinations
 
-- Route `/settings?tab=security`; one Settings heading without subtitle, shared tabs, Security card and canonical Account card.
-- Keep Password, Two-factor authentication and Active sessions icon rows. Remove the small descriptions beneath titles and the fabricated browser/location string.
-- Show a separate functional notice: Account security is not connected in this preview. These actions are unavailable.
-- Disable Change password, Set up and Manage sessions until real account APIs exist. Two-factor status is Not connected, never an unverified On/Off switch. Legacy local `twoFactor: true` cannot establish enrollment.
-- Omit Save changes: password, enrollment and revocation are separate authenticated transactions. Never show security success after a `localStorage` write.
+| Row | Destination | UI-only behavior |
+| --- | --- | --- |
+| Change password | `/settings/password` | Opens validation and service-boundary UI; no password is stored in browser settings. |
+| Two-factor authentication | `/settings/two-factor` | Opens method selection and an explicit unconnected outcome. |
+| Active sessions | `/settings/sessions` | Opens loading, empty, and error/retry UI without inventing a device or location. |
 
-## Future connected flows — contracts only
+Buttons, links, notices, and any dialog must work by pointer and keyboard, show focus, restore focus on Back/Cancel, and stack at narrow widths. Use the common page transition and reduced-motion rule in `Settings_General.md`.
 
-These define integration with existing destinations when backend work is authorized; they do not expand this design ticket into authentication implementation.
+## Source
 
-| Action | Required behavior |
-| --- | --- |
-| Change password | `/settings/password`, real account ID, fresh authentication, server validation and returned session policy; no password storage in browser preferences. |
-| Set up two-factor | Fresh authentication, enrollment challenge, valid-factor confirmation and recovery-code handling before showing server-confirmed enrollment. Cancel/error preserves verified state; disabling an enrolled factor needs a separate authenticated confirmation. |
-| Manage sessions | `/settings/sessions`, actual server sessions, explicit current-session identification, empty/error/retry states. Do not infer location from display time zone or a mock user agent. |
-| Revoke session | Identify session in confirmation, lock duplicate requests, refresh authoritative list on success, preserve list on failure. Revoking the current session signs out through shared auth. |
-
-## Shared data, accessibility and motion
-
-- Account identity matches General/Notifications, header/sidebar and canonical profile. Enrollment and sessions come from auth/security services, not member fields or settings storage.
-- Keep dirty-navigation protection for staged preferences. Connected sensitive actions reuse shared session-expiration handling and fresh server authorization.
-- Explain availability visibly and associate disabled actions with the notice. Narrow layouts stack actions below labels; buttons stay ≥44 px high and Account moves below Security.
-- Panel entrance 180 ms; future dialogs may use short opacity transitions. Focus opens immediately, Escape cancels, and closing restores trigger focus independent of animations. Reduced motion removes optional transitions. Do not animate status before confirmation.
-
-## Source and export
-
-Design artifacts are PNG references and Markdown UX only, per the owner's request on **2026-11-03**. Images were exported from a local browser rendering on that date using synthetic identity; authoring/export scripts are not retained. The old reference's Figma source/export date were unknown; no Figma edits are claimed. Review the PNG together with this UX; interactive verification uses the implemented React page.
+Exported locally with synthetic identity on 2026-11-03. The reference specifies frontend UI only; authentication, fresh verification, session authority, and notification delivery need a backend integration.

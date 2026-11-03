@@ -21,8 +21,11 @@ This directory contains desktop design references and their accompanying UX desc
 | Settings: General | [PNG](Settings/Settings_General.png) | [UX](Settings/Settings_General.md) | `/settings?tab=general` |
 | Settings: Notifications | [PNG](Settings/Settings_Notifications.png) | [UX](Settings/Settings_Notifications.md) | `/settings?tab=notifications` |
 | Settings: Security | [PNG](Settings/Settings_Security.png) | [UX](Settings/Settings_Security.md) | `/settings?tab=security` |
-| Settings: responsive | [PNG](Settings/Settings_Responsive.png) | [Handoff](Settings/Settings_Handoff.md) | All tabs at 390 px; General at 768/1024 px |
-| Settings: interaction states | [PNG](Settings/Settings_States.png) | [UX/Handoff](Settings/Settings_Handoff.md) | Load/save/error/empty/conflict/confirmation states |
+| Settings: Change password | [PNG](Settings/Settings_Change_Password.png) | [UX](Settings/Settings_Change_Password.md) | `/settings/password` |
+| Settings: Two-factor authentication | [PNG](Settings/Settings_Two_Factor.png) | [UX](Settings/Settings_Two_Factor.md) | `/settings/two-factor` |
+| Settings: Active sessions | [PNG](Settings/Settings_Sessions.png) | [UX](Settings/Settings_Sessions.md) | `/settings/sessions` |
+| Settings: responsive | [PNG](Settings/Settings_Responsive.png) | [UX](Settings/Settings_Responsive.md) | General, Security, Change password at 390 px |
+| Settings: interaction states | [PNG](Settings/Settings_States.png) | [UX](Settings/Settings_States.md) | Draft, validation, unconnected/error, loading/empty/retry |
 | Help | [PNG](Help/Help.png) | [UX](Help/Help.md) | `/help` |
 | Assist | [PNG](Assist/Assist.png) | [UX](Assist/Assist.md) | Shared assistant panel, no dedicated route |
 
@@ -36,16 +39,16 @@ designs/
 |-- Posts/            Post_All, Post_Published, Post_Drafts,
 |                     Post_Details, Post_Creations, Post_Editor (.png and .md)
 |-- Settings/         Settings_General, Settings_Notifications,
-|                     Settings_Security (.png and .md)
-|                     Settings_Handoff.md,
-|                     Settings_Responsive.png, Settings_States.png
+|                     Settings_Security, Settings_Change_Password,
+|                     Settings_Two_Factor, Settings_Sessions,
+|                     Settings_Responsive, Settings_States (.png and .md)
 |-- Sign-in/          Sign-in.png, Sign-in.md
 +-- README.md
 ```
 
 The Posts and Settings tab files represent states of their respective pages, not separate sidebar destinations. The active tab must be represented in the URL so that refresh, browser navigation, and a copied link restore the same view. Post details, creation, and editing are separate screens reached from the posts list or details page.
 
-Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from a local browser rendering on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. Per the owner's request, `Settings/` retains UI references as `.png` and UX/handoff as `.md` only; authoring/export scripts are not retained. Other PNGs remain desktop references. Read design intent alongside the frontend README for actual implementation status.
+Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from a local browser rendering on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. Per the owner's request, `Settings/` retains only `.png` UI references and `.md` UX documents; authoring/export scripts and separate handoff documents are not retained. Other PNGs remain desktop references. Read design intent alongside the frontend README for actual implementation status.
 
 ## UI and component overview
 
@@ -127,23 +130,20 @@ Both Create and Edit are implemented in [`PostEditorPage.jsx`](../frontend/src/f
 
 Post operations currently use a mock adapter and this browser's `localStorage`: data is not shared between users or devices, and visibility is not enforced by a server. Existing drafts auto-save; a new post is saved through its action buttons. Scheduled items remain drafts until the post collection is next read after the chosen time, rather than being published by a background service. Server authorization, audience enforcement, persistent storage, and real scheduled publishing remain integration work.
 
-### Settings (tabbed page)
+### Settings (tabbed page and security subpages)
 
-The **179MMS-6 design revision (2026-11-03)** is retained as PNG UI references and Markdown UX/handoff only. Read each updated PNG with its UX and the [Settings handoff](Settings/Settings_Handoff.md). The images use synthetic identity and describe design intent; [frontend implementation notes](../frontend/README.md#settings-implementation--179mms-6) describe current application behavior and limitations.
+The **179MMS-6 design update (2026-11-03)** is retained as PNG UI references with matching Markdown UX only. The references use synthetic identity and describe the required UI direction; [frontend implementation notes](../frontend/README.md#settings-implementation--179mms-6) distinguish the current build from this update.
 
-Use `/settings?tab=general|notifications|security`, defaulting invalid/missing tab values to General. Show Settings without its subtitle and remove small descriptions beneath section/preference titles. Keep actual profile data, labels, field validation, time examples and functional availability/save feedback. Retain the shared burgundy shell; Account reads the canonical authenticated profile and View profile uses its ID. User menu is closed by default.
+Settings keeps `/settings?tab=general|notifications|security`, defaulting invalid/missing tab values to General. The shared TopBar title scale is used without a Settings-only override; Settings has no subtitle. Route entry uses the common portal transition, while tab/switch feedback remains a separate and shorter animation with reduced-motion support.
 
-| Tab | Controls and requirements |
+| Area | Design requirement |
 | --- | --- |
-| General | Group Club name/language and Time zone/Compact navigation. Stage a draft, save only changed keys, then update shared brand, shell and date/locale consumers. English currently available; unsupported translation options stay unavailable until their consumers exist. |
-| Notifications | Assistant notifications and Weekly activity summary retain saved choices but show Unavailable while delivery capabilities are absent. Enable each only with a real shared consumer; manual chat remains available when reminders are off. |
-| Security | Show account service unavailable, disabled Change password/Set up/Manage sessions and Not connected enrollment. Remove fake session metadata and the security Save footer. Future authenticated actions use existing destinations and real server status. |
+| General | Club name, language, time zone, and compact navigation use one shared saved draft. English and Vietnamese are selectable UI preferences; an incomplete translation must retain a clear fallback. |
+| Notifications | Assistant and weekly-summary switches are clickable, saved with the shared Settings data, and visibly distinguish a preference from real delivery. |
+| Security | Clickable Password, Two-factor, and Sessions controls open UI-only subpages. They never claim a password/security/session transaction completed without a connected service. |
+| Subpages | [Password](Settings/Settings_Change_Password.md), [Two-factor](Settings/Settings_Two_Factor.md), and [Sessions](Settings/Settings_Sessions.md) define validation, loading, empty/error/retry, Back/Cancel/focus, and responsive behavior. |
 
-The shared saved settings source must notify shell/formatting consumers in this window and other open tabs. Dirty values never apply before persistence. Failed saves retain the draft and effective values. Confirm discard when leaving; another tab's update preserves a dirty draft with a conflict/reload state. The handoff maps ownership, consumers, capability limits, date-only values and naive club-time data explicitly.
-
-Below 1024 px move Account under the form; below 768 px use the shared drawer/single-column fields and wrap preference actions. Keep tabs internally scrollable, a normal-flow footer, native selects, visible focus and 44 px targets. Panel/underline/switch/control/saved-shell animations are short and disabled under reduced motion. [Responsive](Settings/Settings_Responsive.png) and [interaction-state](Settings/Settings_States.png) boards are part of the review.
-
-Review the PNG/Markdown pairs directly. Interactive verification uses the implemented React Settings routes and the existing product checks documented in [tests/frontend/README.md](../tests/frontend/README.md). No executable authoring/export source or dependent design-only test remains in this package; notification delivery and backend security remain unavailable.
+Read every PNG/Markdown pair directly, including the [responsive](Settings/Settings_Responsive.md) and [interaction-state](Settings/Settings_States.md) boards. Interactive verification runs against the application after implementation; no executable authoring/export source or design-only test is retained in this package.
 
 ### Help Center and 179 Assist
 

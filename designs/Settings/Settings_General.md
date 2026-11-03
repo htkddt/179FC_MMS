@@ -1,44 +1,26 @@
-# Settings — General UX Description
+# Settings — General UX
 
-Design revision: **179MMS-6, 2026-11-03**. Read with [General PNG](Settings_General.png), [responsive references](Settings_Responsive.png), [interaction states](Settings_States.png), and the [handoff](Settings_Handoff.md). This is proposed UI, not implemented product behavior.
+Read with [Settings_General.png](Settings_General.png), [responsive references](Settings_Responsive.md), and [interaction states](Settings_States.md). This is the approved UI direction for 179MMS-6; the application implementation follows in a later phase.
 
-## User goal
+## Layout and title
 
-Change workspace preferences once and see the same saved values throughout the portal.
+- Route: `/settings?tab=general`. Keep the Settings TopBar subtitle absent.
+- The Settings title uses the same shared TopBar `h1` scale as Dashboard, Posts, Employees, and Organization at desktop, mobile, and enlarged text. Do not apply a Settings-only font-size override.
+- Keep the existing shell, tabs, Account card, field labels, native selects, and visible save feedback. Do not add descriptive copy beneath section or preference headings.
 
-## Layout and copy
+## Editable controls
 
-- Retain the existing burgundy navigation, red underline, white cards, typography and shared shell. The HTML shell is illustrative; reuse `AppShell` rather than copying it.
-- Show **Settings** without its previous subtitle. Remove descriptions beneath section/preference titles, including Compact navigation. Preserve real account data, labels, errors, the formatted time example and action feedback.
-- Use icon tabs, a grouped main card and a top-aligned Account card. Workspace has Club name and Workspace language; Preferences has Time zone and Compact navigation with explicit On/Off state.
-- Field labels sit above controls. Club name is trimmed, required and proposed to have an 80-character limit. Ellipsize long names in the brand while exposing their full accessible text.
-- English is currently available; Vietnamese remains a disabled option until complete shared translation consumers exist. Preserve unsupported legacy selections with explicit fallback/availability feedback; do not silently rewrite them or claim localization works.
-- Retain `Asia/Ho_Chi_Minh` and `UTC`. The example below the control formats a synthetic instant. A display zone does not rewrite an event or scheduled post.
+- Club name, Workspace language, Time zone, and Compact navigation are a single page-owned draft. Save only changed values through the shared settings adapter; consumers change only after a successful write.
+- English and Vietnamese are selectable UI preferences. Persist the selection with the same saved snapshot; an incomplete product translation must visibly retain its safe fallback rather than imply every portal page is already translated.
+- Retain the 80-character, trimmed Club name validation; use `Asia/Ho_Chi_Minh` and `UTC` for time zone. Time zone changes formatting, never stored event instants or date-only values.
+- Preserve dirty/discard, conflict, retry, navigation guard, Back/Forward, and canonical Account behavior from the existing Settings flow.
 
-## Form and navigation
+## Motion, responsive, and accessibility
 
-1. Load the shared saved snapshot. Missing storage uses defaults; failed reads offer Retry rather than enabling a destructive default overwrite.
-2. Stage changes in a page-owned draft. Show Unsaved changes, Discard and Save changes when an editable field differs. Other pages keep using saved values.
-3. Validate on submit and focus the invalid input. Lock duplicate submissions with Saving…; patch only changed keys of this tab through `settingsApi`.
-4. Successful persistence updates the shared snapshot/consumers and shows Changes saved. Failure retains the draft and effective saved values, with Retry save.
-5. Discard, tab/route navigation, Profile, sidebar and Log out use the dirty guard. Default dialog focus is Keep editing; Escape keeps the draft and restores trigger focus. Discard changes actually resets the draft before leaving; no hidden dirty tab remains.
-6. Browser Back/Forward restore the URL tab. Refresh/close use the native unload guard. Another tab's update refreshes pristine forms; a dirty form retains input and shows a conflict with guarded Reload latest before saving.
+- Route entry follows the common portal page-transition pattern: opacity plus `translateY(9px)` for 350 ms `ease-out`, disabled under `prefers-reduced-motion`. It is separate from tab-panel and control feedback.
+- A tab panel may enter for 180 ms and switches may move for 160 ms; focus, save status, and security/delivery outcomes appear immediately. Do not let a Settings rule animate the shared sidebar, main shell, or assistant panel.
+- At 1024 px retain two columns; below it place Account after the form. At 320–390 px stack fields/footer actions and allow tabs to scroll without page overflow. Controls have 44 px targets and visible keyboard focus.
 
-## Connected data
+## Source and boundary
 
-- Club name updates the shared brand and accessible portal name throughout private routes after save; the `179` mark stays the project logo.
-- Compact navigation updates the whole `AppShell` after save. Mobile keeps full drawer labels.
-- Language/time zone use shared formatting consumers in Dashboard, Posts and genuine timestamped metadata. Date-only member data must not shift. See the handoff for naive club-time values and scheduling boundaries.
-- Account joins the authenticated user ID with the canonical member profile, also used by TopBar, Sidebar, Employees and Organization. View profile opens `/employees/:user.id`; no second editable account record.
-
-## Responsive, motion and accessibility
-
-- At ≥1024 px use two cards; below that Account follows the form. At <768 px use the existing navigation drawer and single-column fields. At constrained desktop widths stack fields before compressing controls.
-- At 320–390 px wrap preference actions and stack footer status/actions. Tabs may scroll internally; the page must not overflow. Footer stays in normal flow and remains reachable with a soft keyboard.
-- Buttons/fields are ≥44 px high; the visual switch has an extended 44 px target. Labels, errors and polite save status are programmatic; focus remains visible.
-- Tabs use Left/Right/Home/End, one roving tab stop and linked tab/panel IDs. Selects remain native.
-- Panel entrance 180 ms, switch 160 ms, controls 140 ms, saved-shell reflow 200 ms; reduced motion disables optional movement. See the handoff for all component timings and contrast.
-
-## Source and export
-
-This design is retained as PNG references and Markdown UX only, per the owner's request on **2026-11-03**. Images were exported from a local browser rendering on that date using synthetic Demo Admin identity. Authoring/export scripts are not retained. The old reference had no known Figma source URL or export date; no Figma edits are claimed. Review the images with this UX and the handoff; use the implemented React page for interactive verification.
+Exported from a local browser mock with a synthetic account on 2026-11-03. No Figma source was supplied and no Figma edit is claimed. The Settings package retains PNG UI references and Markdown UX only.
