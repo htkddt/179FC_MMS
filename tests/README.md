@@ -19,7 +19,6 @@ tests/
 - From `frontend/`, run `npm test` for Node-based post, settings, dashboard, and Organization logic checks.
 - Run `npm run test:browser` for Playwright coverage of Organization, Employees profile synchronization, responsive layouts, keyboard interactions, and the assistant launcher. The configuration starts Vite on port 5180 and uses installed Edge on Windows by default.
 - Test source and configuration remain under `tests/frontend/`; browser artifacts go to the operating system's temporary directory. See [frontend runner setup and scope](frontend/README.md).
-- From repository root, `node tests/frontend/settings-design-review.mjs` checks the offline Settings design prototype for interactions, selected contrast pairs, responsive bounds, keyboard/focus, capability states and reduced motion. This is a separate design check; it does not verify the React implementation, notification delivery, security services or CI. See [design handoff](../designs/Settings/Settings_Handoff.md).
 
 ## Remaining plan
 
@@ -42,4 +41,4 @@ Update this README and the appropriate component README whenever test strategy, 
 
 ## Settings product coverage — 179MMS-6
 
-`npm test` from `frontend/` now also runs `tests/frontend/settings.test.mjs` for persistence/conflict/validation/capability and shared date boundaries. `npm run test:browser` runs both Organization and `settings.spec.mjs`: actual React Settings navigation, failure recovery, canonical account/avatar, cross-tab shared shell/timezone consumers, responsive bounds and keyboard/reduced-motion behavior. Tests use synthetic local mock data. Backend authentication, security transactions and notification delivery are unavailable and are not tested as implemented services. The standalone HTML design checks remain separate.
+`npm test` from `frontend/` now also runs `tests/frontend/settings.test.mjs` for persistence/conflict/validation/capability and shared date boundaries. `npm run test:browser` runs both Organization and `settings.spec.mjs`: actual React Settings navigation, failure recovery, canonical account/avatar, cross-tab shared shell/timezone consumers, responsive bounds and keyboard/reduced-motion behavior. Tests use synthetic local mock data. Backend authentication, security transactions and notification delivery are unavailable and are not tested as implemented services. The dependent design-only check was removed with the executable design sources; PNG/Markdown references remain in `designs/Settings/`.

@@ -9,18 +9,6 @@ Run `npm test` (Node's built-in test runner).
 - `portal.test.mjs`: existing post, settings, and dashboard workflows.
 - `organization.test.mjs`: member slots below team headers, responsive/scaled layouts, collapse/hide/empty states, drop hit testing, normalized offsets, independent layout/view persistence, invalid storage, canonical team transfers, preserved profile fields and failed-write rejection.
 
-## Settings design prototype checks
-
-From the repository root, after installing frontend dependencies, run:
-
-```powershell
-node tests/frontend/settings-design-review.mjs
-```
-
-This opens the offline `designs/Settings/Settings_Prototype.html` in headless Edge on Windows (bundled Chromium elsewhere; `PLAYWRIGHT_CHANNEL` can override). It covers pristine/dirty/save/failure/validation/conflict flows, capability gating, compact-shell apply-after-save, manual assistant access, URL tabs/Back, keyboard/focus, selected contrast color pairs, reduced motion and all three tabs at 320/390/768/1024/1440 px. Fixtures are synthetic and in memory; no production settings or member records are written. The browser closes at completion.
-
-The prototype is proposed design, not the React Settings implementation. This command is separate from `npm test`/`npm run test:browser` and does not grant Tester QA PASS or CI PASS. Render review images with `node designs/Settings/render-settings.mjs`; details are in the [Settings handoff](../../designs/Settings/Settings_Handoff.md).
-
 ## Organization and Settings browser checks
 
 Run `npm run test:browser`. Playwright starts a local Vite server on `127.0.0.1:5180` automatically; a running server at that address is reused outside CI.
@@ -40,4 +28,4 @@ These checks cover the local mock-data workflow; they do not verify backend auth
 - The responsive case also checks enlarged root text, reduced-motion computed animation and mobile drawer focus restoration. Enlarged text/viewport automation is not a complete manual accessibility audit or browser-specific native 200% zoom audit.
 - Screenshots include General/Notifications/Security/mobile; retained traces and screenshots use the configured temporary `179fc-organization-test-results` directory for both suites. Tests close their browser/server on completion. Each case has isolated synthetic browser storage. No delivery/security/backend QA is claimed.
 
-The offline `settings-design-review.mjs` suite remains separate and checks the HTML prototype only. Product assertions are against the React routes and actual mock adapters; local self-checks do not replace Tester QA/CI on the candidate SHA.
+Design references are [PNG images with Markdown UX/handoff](../../designs/Settings/Settings_Handoff.md). Their executable authoring/export sources and dependent design-only check were removed at the owner's request; product suites remain unchanged. Product assertions run against React routes and actual mock adapters. Local self-checks do not replace Tester QA/review on the candidate SHA or any applicable CI requirement.

@@ -41,4 +41,4 @@ Change workspace preferences once and see the same saved values throughout the p
 
 ## Source and export
 
-Editable source: `Settings_Prototype.html`, local HTML/CSS/JavaScript with inline vectors and synthetic Demo Admin identity. Open `?tab=general`; saves are in memory only and do not call product adapters. PNG exported locally on **2026-11-03**. The old reference had no known Figma source URL or export date; no Figma edits are claimed.
+This design is retained as PNG references and Markdown UX only, per the owner's request on **2026-11-03**. Images were exported from a local browser rendering on that date using synthetic Demo Admin identity. Authoring/export scripts are not retained. The old reference had no known Figma source URL or export date; no Figma edits are claimed. Review the images with this UX and the handoff; use the implemented React page for interactive verification.

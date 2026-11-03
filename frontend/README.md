@@ -246,7 +246,7 @@ The code is organized as follows:
 
 ## Settings implementation — 179MMS-6
 
-`/settings?tab=general|notifications|security` implements the approved [Settings reference and UX](../designs/Settings/Settings_Handoff.md). The title subtitle and preference descriptions are removed. General groups Workspace and Preferences; all tabs share an Account card, icon tabs, responsive layouts and reduced-motion-aware panel/switch/control/dialog/shell motion. The offline HTML remains a design prototype; its capability query and synthetic account are not product inputs.
+`/settings?tab=general|notifications|security` implements the approved [Settings reference and UX](../designs/Settings/Settings_Handoff.md). The title subtitle and preference descriptions are removed. General groups Workspace and Preferences; all tabs share an Account card, icon tabs, responsive layouts and reduced-motion-aware panel/switch/control/dialog/shell motion. Design references are retained as PNG images and Markdown UX only; interactive verification uses the React application.
 
 - `SettingsProvider` supplies one saved snapshot through the shell. `settingsApi` retains `179fc-demo-settings` and emits `179fc-settings-changed` only after persistence succeeds. Same-window events, matching browser storage events (including clear) and window focus refresh consumers. Bad JSON/types and unavailable storage show Retry and prevent saving; missing storage uses defaults.
 - `SettingsPage` owns the draft, validation, feedback and navigation guard; presentational controls, Account and discard dialog receive data/callbacks. Only changed General keys are patched. Club name is trimmed, required and limited to 80 characters. Duplicate submits and conflicting navigation are locked while saving; failures retain the draft and last effective values. Discard resets the draft. Tab/route/Profile/sidebar/Log out changes open a native modal focused on Keep editing; Escape cancels and restores focus. Refresh/close use the native unload guard.
@@ -266,7 +266,7 @@ Display preferences never rewrite stored events or scheduled publication instant
 
 ### Verification
 
-From `frontend/`, run `npm ci`, `npm test`, `npm run test:browser` and `npm run build`. Logic checks include settings validation/persistence/conflict/date boundaries. Playwright covers actual Settings flows and shared consumers as well as Organization regressions; see [test scope and setup](../tests/frontend/README.md). Prototype-only checks remain `node tests/frontend/settings-design-review.mjs` from repository root, with optional exports via `node designs/Settings/render-settings.mjs`. Local self-checks are separate from Tester QA and CI.
+From `frontend/`, run `npm ci`, `npm test`, `npm run test:browser` and `npm run build`. Logic checks include settings validation/persistence/conflict/date boundaries. Playwright covers actual Settings flows and shared consumers as well as Organization regressions; see [test scope and setup](../tests/frontend/README.md). Authoring/export sources and their dependent design-only test were removed when the design package was restricted to PNG/Markdown; product tests remain unchanged. Local self-checks are separate from Tester QA and CI.
 
 ## Planned integration
 

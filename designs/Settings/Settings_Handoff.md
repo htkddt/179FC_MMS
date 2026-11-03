@@ -1,21 +1,18 @@
 # Settings design handoff — 179MMS-6
 
-Revision: **2026-11-03**. Phase: **DESIGN_REVIEW**, Designer → Leader. This package changes designs and guidance only. Product implementation, Tester QA, push, PR and CI remain later phases on this ticket.
+Revision: **2026-11-03**. Artifact format: **PNG UI references and Markdown UX only**, as requested by the owner. This handoff records design intent and acceptance criteria; current implementation and verification commands are documented in `frontend/README.md` and `tests/frontend/README.md`.
 
 ## Package and provenance
 
 | File | Purpose |
 | --- | --- |
-| `Settings_Prototype.html` | Editable offline HTML/CSS/JavaScript; inline SVG icons; synthetic account; no product reads/writes. |
 | `Settings_General.png` + `.md` | General desktop reference and UX. |
 | `Settings_Notifications.png` + `.md` | Notification capability/choice reference and UX. |
 | `Settings_Security.png` + `.md` | Unconnected security reference and future action contracts. |
 | `Settings_Responsive.png` | All tabs at 390 px; General at 768/1024 px. |
 | `Settings_States.png` | Dirty, save error, invalid input, loading, load error, empty, conflict, confirmation, saving and saved. |
-| `render-settings.mjs` | Repeatable browser exports from the source. |
-| `tests/frontend/settings-design-review.mjs` | Prototype checks, not product QA. |
 
-The original three PNGs/UX files and current React UI at 1440 px were read together. Old PNGs had no Figma URL or known export date. Replacement PNGs were exported locally from the HTML on **2026-11-03**; no Figma edits are claimed. The HTML, rather than PNGs alone, is the editable source.
+The original three PNGs/UX files and React UI at 1440 px were read together. Old PNGs had no Figma URL or known export date. Replacement PNGs were exported from a local browser rendering on **2026-11-03** using synthetic account data; no Figma edits are claimed. Only the five PNG references and four Markdown UX/handoff files are retained in this folder. Authoring/export scripts and their dependent design-only check were removed at the owner's request; product tests remain under `tests/frontend/`.
 
 ## Acceptance mapping
 
@@ -28,7 +25,7 @@ The original three PNGs/UX files and current React UI at 1440 px were read toget
 
 ## Reuse and boundaries
 
-Use existing `AppShell`, `Sidebar`, `TopBar`, `Tabs`, `Card`, `Avatar`, `Button`, `Icon`, `useUrlTab`, `useAuth`, member adapters/hooks and `settingsApi`. The prototype's shell, icons, fixture account, fake navigation, synthetic time, ready-capability query and 650 ms in-memory timer are illustrative. Do not copy them as independent React infrastructure.
+Use existing `AppShell`, `Sidebar`, `TopBar`, `Tabs`, `Card`, `Avatar`, `Button`, `Icon`, `useUrlTab`, `useAuth`, member adapters/hooks and `settingsApi`. The images' shell, fixture account and time example are illustrative. Read identity and effective capabilities from the application's canonical sources; do not introduce independent React infrastructure or synthetic product inputs.
 
 `SettingsPage` owns draft, saved snapshot, validation, load/save states and navigation coordination. Presentational fields/preference/account components receive data/callbacks and never fetch. The feature adapter owns persistence/validation; a shared hook/provider supplies **saved** settings and subscriptions to consumers. Preserve React, JavaScript/JSX/CSS and the feature layout.
 
@@ -60,7 +57,7 @@ Baseline persistence is browser-local mock storage. Keep `179fc-demo-settings` a
 2. Patch only changed supported keys in the active tab; exclude `twoFactor`. Preserve unrelated fields from the latest snapshot. Failed persistence must not emit success events or update effective shell values.
 3. Same-window custom events and cross-window `storage` events refresh shared consumers. Refresh pristine forms; preserve dirty drafts and show a conflict/reload notice. Guard Reload latest with discard confirmation. Save must not blindly overwrite a newer snapshot: compare a snapshot/revision, with future ETag/version handling for backend APIs.
 4. Keep one mutation in flight; lock controls/duplicate actions that could be overwritten by its result. Restore editing on failure and retain draft. Explicit Discard restores the saved snapshot; cancelling navigation changes neither draft nor effective values.
-5. Capability availability is separate from the saved preference. Disabled notification switches retain persisted checked values but say Unavailable. Security enrollment stays Not connected. Capability flags come from implemented services/adapters, never a design URL parameter. Do not silently add backend scope.
+5. Capability availability is separate from the saved preference. Disabled notification switches retain persisted checked values but say Unavailable. Security enrollment stays Not connected. Capability flags come from implemented services/adapters. Do not silently add backend scope.
 
 ## Responsive and visual values
 
@@ -90,32 +87,15 @@ Keep the assistant as a labelled icon without a launcher tooltip. Reserve bottom
 | Loading | Optional 1400 ms opacity pulse; Loading settings label + `aria-busy`. | Static skeleton/status. |
 | Save feedback | Persistent inline text/icon; no disappearing-only toast, shake or forced scroll. | Same feedback. |
 
-## Review and reproduce
+## Review static references and verify the application
 
-Open `Settings_Prototype.html` locally. It uses synthetic in-memory data and no storage writes. Relevant queries:
+Read each desktop PNG with its corresponding UX file. `Settings_Responsive.png` covers all tabs at 390 px and General at 768/1024 px. `Settings_States.png` covers dirty, validation, load/save error, empty, conflict, confirmation and saved/saving states. The consumer map and motion table above remain part of the UX contract; a static image alone does not demonstrate those behaviors.
 
-| Query | State |
-| --- | --- |
-| `?tab=general`, `notifications`, `security` | Replace the tab value for each main state. |
-| `?tab=general&state=dirty` | Draft / Discard / enabled Save. |
-| `?tab=general&failSave=1` | Submit an edit to demonstrate save failure/retry. |
-| `?tab=general&state=loading` | Also supports `load-error`, `empty`, `validation`, `save-error`. |
-| `?tab=general&state=confirm` | Native dirty-navigation modal. |
-| `?tab=general&state=conflict` | External change, blocked save, guarded reload. |
-| `?tab=notifications&capabilities=ready` | Illustrative future interactive choices; not real delivery. |
-
-From repo root after `npm ci` in `frontend/`:
-
-```powershell
-node tests/frontend/settings-design-review.mjs
-node designs/Settings/render-settings.mjs
-```
-
-Windows uses installed Microsoft Edge; other platforms need bundled Chromium. `PLAYWRIGHT_CHANNEL` selects another installed channel. Renderer accepts an optional output-directory argument. Both commands close their browser before returning; no service remains running. Tests/fixtures remain under `tests/frontend/`; renderer contains export logic only.
+For interactive checks, use the actual React routes `/settings?tab=general`, `/settings?tab=notifications` and `/settings?tab=security`. Product checks are `npm test`, `npm run test:browser` and `npm run build` from `frontend/` after `npm ci`, as documented in the frontend/test READMEs. Browser tests use synthetic data and installed Edge on Windows; they do not verify unavailable backend services. No executable design source, export command or design-only test is distributed with these references.
 
 ## Handoff checklist
 
-- Leader reviews images together with UX, subtitle removal, capability treatment and consumer map, then assigns this same ticket to Developer. No new ticket is required.
-- Developer creates one implementation branch and carries this design candidate into it (cherry-pick/equivalent). Update frontend/test READMEs for actual implemented behavior/coverage; do not mark the proposal as implemented prematurely.
+- Leader reviews images together with UX, subtitle removal, capability treatment and consumer map on the current ticket candidate. No new ticket is required.
+- Continue on the ticket's existing implementation branch and PR, including this artifact cleanup. Keep frontend/test READMEs aligned with actual behavior/coverage.
 - Tester checks the exact implementation candidate: tabs/URL, validation, save/failure, discard/cancel, unavailable services, storage conflicts, cross-page/cross-tab club/compact/date/profile consistency, keyboard/focus, mobile/200% zoom and reduced motion. Delivery tests require a real authorized consumer.
-- Designer self-check is not QA PASS, CI PASS or merge approval. Later phases retain exact-SHA QA/CI and user approval gates.
+- Designer self-check is not Tester QA PASS or merge approval. Recheck and review the exact new head after cleanup; retain the owner's ticket-specific CI exception and final user approval gate.

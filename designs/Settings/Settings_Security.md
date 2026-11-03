@@ -34,4 +34,4 @@ These define integration with existing destinations when backend work is authori
 
 ## Source and export
 
-Editable `Settings_Prototype.html` is local HTML/CSS/JavaScript using synthetic identity. Exported locally on **2026-11-03**. The old reference's Figma source/export date were unknown; no Figma edits are claimed.
+Design artifacts are PNG references and Markdown UX only, per the owner's request on **2026-11-03**. Images were exported from a local browser rendering on that date using synthetic identity; authoring/export scripts are not retained. The old reference's Figma source/export date were unknown; no Figma edits are claimed. Review the PNG together with this UX; interactive verification uses the implemented React page.

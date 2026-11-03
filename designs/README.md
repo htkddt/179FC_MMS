@@ -22,7 +22,7 @@ This directory contains desktop design references and their accompanying UX desc
 | Settings: Notifications | [PNG](Settings/Settings_Notifications.png) | [UX](Settings/Settings_Notifications.md) | `/settings?tab=notifications` |
 | Settings: Security | [PNG](Settings/Settings_Security.png) | [UX](Settings/Settings_Security.md) | `/settings?tab=security` |
 | Settings: responsive | [PNG](Settings/Settings_Responsive.png) | [Handoff](Settings/Settings_Handoff.md) | All tabs at 390 px; General at 768/1024 px |
-| Settings: interaction states | [PNG](Settings/Settings_States.png) | [Editable HTML](Settings/Settings_Prototype.html) | Load/save/error/empty/conflict/confirmation states |
+| Settings: interaction states | [PNG](Settings/Settings_States.png) | [UX/Handoff](Settings/Settings_Handoff.md) | Load/save/error/empty/conflict/confirmation states |
 | Help | [PNG](Help/Help.png) | [UX](Help/Help.md) | `/help` |
 | Assist | [PNG](Assist/Assist.png) | [UX](Assist/Assist.md) | Shared assistant panel, no dedicated route |
 
@@ -37,16 +37,15 @@ designs/
 |                     Post_Details, Post_Creations, Post_Editor (.png and .md)
 |-- Settings/         Settings_General, Settings_Notifications,
 |                     Settings_Security (.png and .md)
-|                     Settings_Prototype.html, Settings_Handoff.md,
-|                     Settings_Responsive.png, Settings_States.png,
-|                     render-settings.mjs
+|                     Settings_Handoff.md,
+|                     Settings_Responsive.png, Settings_States.png
 |-- Sign-in/          Sign-in.png, Sign-in.md
 +-- README.md
 ```
 
 The Posts and Settings tab files represent states of their respective pages, not separate sidebar destinations. The active tab must be represented in the URL so that refresh, browser navigation, and a copied link restore the same view. Post details, creation, and editing are separate screens reached from the posts list or details page.
 
-Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from its editable local HTML on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. Other PNGs remain desktop references. Design proposals do not imply their responsive/interactive behavior is implemented in the frontend.
+Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from a local browser rendering on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. Per the owner's request, `Settings/` retains UI references as `.png` and UX/handoff as `.md` only; authoring/export scripts are not retained. Other PNGs remain desktop references. Read design intent alongside the frontend README for actual implementation status.
 
 ## UI and component overview
 
@@ -130,7 +129,7 @@ Post operations currently use a mock adapter and this browser's `localStorage`: 
 
 ### Settings (tabbed page)
 
-The **179MMS-6 design revision (2026-11-03)** is proposed, not yet implemented. Read each updated PNG with its UX and the [Settings handoff](Settings/Settings_Handoff.md). The [editable local HTML](Settings/Settings_Prototype.html) replaces the old PNG-only source for these three tabs. It uses synthetic, in-memory fixtures and is not application code.
+The **179MMS-6 design revision (2026-11-03)** is retained as PNG UI references and Markdown UX/handoff only. Read each updated PNG with its UX and the [Settings handoff](Settings/Settings_Handoff.md). The images use synthetic identity and describe design intent; [frontend implementation notes](../frontend/README.md#settings-implementation--179mms-6) describe current application behavior and limitations.
 
 Use `/settings?tab=general|notifications|security`, defaulting invalid/missing tab values to General. Show Settings without its subtitle and remove small descriptions beneath section/preference titles. Keep actual profile data, labels, field validation, time examples and functional availability/save feedback. Retain the shared burgundy shell; Account reads the canonical authenticated profile and View profile uses its ID. User menu is closed by default.
 
@@ -144,7 +143,7 @@ The shared saved settings source must notify shell/formatting consumers in this 
 
 Below 1024 px move Account under the form; below 768 px use the shared drawer/single-column fields and wrap preference actions. Keep tabs internally scrollable, a normal-flow footer, native selects, visible focus and 44 px targets. Panel/underline/switch/control/saved-shell animations are short and disabled under reduced motion. [Responsive](Settings/Settings_Responsive.png) and [interaction-state](Settings/Settings_States.png) boards are part of the review.
 
-From repo root after frontend dependencies are installed: `node tests/frontend/settings-design-review.mjs` checks the prototype, and `node designs/Settings/render-settings.mjs` re-exports the images. Windows uses installed Edge. These commands do not verify product implementation, notification delivery or backend security.
+Review the PNG/Markdown pairs directly. Interactive verification uses the implemented React Settings routes and the existing product checks documented in [tests/frontend/README.md](../tests/frontend/README.md). No executable authoring/export source or dependent design-only test remains in this package; notification delivery and backend security remain unavailable.
 
 ### Help Center and 179 Assist
 
