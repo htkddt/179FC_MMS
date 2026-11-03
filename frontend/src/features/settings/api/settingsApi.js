@@ -2,8 +2,7 @@ import { initialSettings } from '../../../mocks/settings.js';
 
 export const settingsStorageKey = '179fc-demo-settings';
 export const settingsChangedEvent = '179fc-settings-changed';
-export const settingsCapabilities = Object.freeze({ assistant: false, summary: false, security: false });
-export const generalSettingKeys = ['clubName', 'language', 'timeZone', 'compactNavigation'];
+export const generalSettingKeys = ['clubName', 'language', 'timeZone', 'compactNavigation', 'assistant', 'summary'];
 
 function validateStored(settings) {
   if (!settings || typeof settings !== 'object' || Array.isArray(settings)) throw new Error('Invalid settings');
@@ -34,7 +33,7 @@ export async function saveSettingsSnapshot(changes, { expectedRevision } = {}) {
   if (!changes || Object.keys(changes).some(key => !generalSettingKeys.includes(key))) throw new Error('This preference is unavailable.');
   if ('clubName' in changes && (typeof changes.clubName !== 'string' || !changes.clubName.trim())) throw new Error('Club name is required.');
   if ('clubName' in changes && changes.clubName.trim().length > 80) throw new Error('Club name must be 80 characters or fewer.');
-  if ('language' in changes && changes.language !== 'English') throw new Error('This language is not available yet.');
+  if ('language' in changes && !['English', 'Vietnamese'].includes(changes.language)) throw new Error('Choose an available workspace language.');
   const latest = readSettingsSnapshot();
   if (expectedRevision !== undefined && expectedRevision !== latest.revision) {
     const error = new Error('Settings changed in another tab. Reload the latest values before saving.');

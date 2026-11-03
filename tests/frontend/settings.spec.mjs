@@ -17,7 +17,9 @@ test.afterEach(async ({ page }) => { expect(errorsByPage.get(page)).toEqual([]);
 
 test('draft values apply to shared shell only after save and survive navigation and reload', async ({ page }) => {
   await expect(page.locator('.top-bar p')).toHaveCount(0);
-  await expect(page.getByRole('option', { name: 'Vietnamese — unavailable' })).toHaveJSProperty('disabled', true);
+  await page.getByLabel('Workspace language').selectOption('Vietnamese');
+  await expect(page.getByText(/remains in English/)).toBeVisible();
+  await page.getByLabel('Workspace language').selectOption('English');
   await page.getByLabel('Club name').fill('  Sample Club  ');
   await page.getByRole('switch', { name: 'Compact navigation' }).click();
   await expect(brand(page)).toHaveAttribute('aria-label', '179FC member portal');
@@ -95,22 +97,51 @@ test('keyboard tabs and browser Back/Forward restore the URL and active panel', 
   await page.keyboard.press('Home');
 });
 
-test('notification choices are retained while unavailable and security never claims local enrollment', async ({ page }) => {
+test('notification preferences are saved without delivery claims and security flows stay UI-only', async ({ page }) => {
   await page.getByRole('tab', { name: 'Notifications' }).click();
-  await expect(page.getByRole('switch', { name: 'Assistant notifications' })).toBeDisabled();
   await expect(page.getByRole('switch', { name: 'Assistant notifications' })).toHaveAttribute('aria-checked', 'true');
-  await expect(page.getByRole('switch', { name: 'Weekly activity summary' })).toBeDisabled();
-  await expect(save(page)).toBeDisabled();
+  await page.getByRole('switch', { name: 'Assistant notifications' }).click();
+  await page.getByRole('switch', { name: 'Weekly activity summary' }).click();
+  await expect(page.getByRole('switch', { name: 'Assistant notifications' })).toHaveAttribute('aria-checked', 'false');
+  await expect(page.getByRole('switch', { name: 'Weekly activity summary' })).toHaveAttribute('aria-checked', 'true');
+  await expect(save(page)).toBeEnabled();
+  await save(page).click();
+  await expect(page.getByRole('status')).toHaveText('Changes saved.');
+  await expect(page.getByText(/does not send reminders/)).toBeVisible();
   await page.getByRole('button', { name: 'Open 179 Assist', exact: true }).click();
   await expect(page.getByLabel('Ask 179 Assist')).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Open 179 Assist', exact: true })).toBeFocused();
   await page.screenshot({ path: test.info().outputPath('settings-notifications.png'), fullPage: true });
   await page.getByRole('tab', { name: 'Security' }).click();
-  for (const name of ['Change password', 'Set up', 'Manage sessions']) await expect(page.getByRole('button', { name, exact: true })).toBeDisabled();
-  await expect(page.getByText('Not connected', { exact: true })).toBeVisible();
+  for (const name of ['Change password', 'Set up', 'Manage sessions']) await expect(page.getByRole('button', { name, exact: true })).toBeEnabled();
+  await expect(page.getByText('Not set up', { exact: true })).toBeVisible();
   await expect(save(page)).toHaveCount(0);
   await page.screenshot({ path: test.info().outputPath('settings-security.png'), fullPage: true });
+  await page.getByRole('button', { name: 'Change password', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/password$/);
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(page.getByText('Enter your current password.')).toBeVisible();
+  await expect(page.getByLabel('Current password')).toBeFocused();
+  await page.getByLabel('Current password').fill('synthetic-current');
+  await page.locator('input[autocomplete="new-password"]').first().fill('synthetic-new-password');
+  await page.locator('input[autocomplete="new-password"]').last().fill('synthetic-new-password');
+  await page.getByRole('button', { name: 'Continue', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('No password was changed or stored.');
+  await page.getByRole('button', { name: 'Back to Security', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Change password', exact: true })).toBeFocused();
+  await page.getByRole('button', { name: 'Set up', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/two-factor$/);
+  await page.getByRole('radio', { name: /Security key/ }).check();
+  await page.getByRole('button', { name: 'Start setup', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('No factor was enrolled.');
+  await page.getByRole('button', { name: 'Back to Security', exact: true }).click();
+  await page.getByRole('button', { name: 'Manage sessions', exact: true }).click();
+  await expect(page).toHaveURL(/\/settings\/sessions$/);
+  await expect(page.getByRole('alert')).toContainText('cannot show or revoke sessions');
+  await page.getByRole('button', { name: 'Retry', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Loading verified sessions');
+  await expect(page.getByRole('alert')).toContainText('cannot show or revoke sessions');
 });
 
 test('failed writes keep draft and effective settings; retry persists and explicit Discard resets', async ({ page }) => {
@@ -237,17 +268,17 @@ test('Post Create labels its input zone and Post Edit refreshes display without 
   await editor.close();
 });
 
-test('legacy unsupported language is preserved with explicit English fallback', async ({ page }) => {
+test('Vietnamese preference is persisted with an explicit English fallback', async ({ page }) => {
   await page.evaluate(() => localStorage.setItem('179fc-demo-settings', JSON.stringify({ language: 'Vietnamese' })));
   await page.reload();
   await expect(page.getByLabel('Workspace language')).toHaveValue('Vietnamese');
-  await expect(page.getByText(/The portal uses English/)).toBeVisible();
+  await expect(page.getByText(/remains in English/)).toBeVisible();
   await page.getByLabel('Club name').fill('Legacy Club');
   await save(page).click();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('179fc-demo-settings')).language)).toBe('Vietnamese');
   await page.getByLabel('Workspace language').selectOption('English');
   await save(page).click();
-  await expect(page.getByText(/The portal uses English/)).toHaveCount(0);
+  await expect(page.getByText(/remains in English/)).toHaveCount(0);
 });
 
 test('all tabs fit mobile/tablet/desktop, enlarged text and reduced motion with accessible drawer', async ({ page }) => {
@@ -277,5 +308,5 @@ test('all tabs fit mobile/tablet/desktop, enlarged text and reduced motion with 
   await page.screenshot({ path: test.info().outputPath('settings-mobile.png'), fullPage: true });
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.getByRole('tab', { name: 'Notifications' }).click();
-  await expect(page.locator('.settings-panel')).toHaveCSS('animation-name', 'settings-arrive');
+  await expect(page.locator('.settings-panel')).toHaveCSS('animation-name', 'settings-panel-arrive');
 });

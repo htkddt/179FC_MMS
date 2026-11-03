@@ -11,7 +11,10 @@ import { PostDetailsPage } from '../features/posts/pages/PostDetailsPage.jsx';
 import { PostEditorPage } from '../features/posts/pages/PostEditorPage.jsx';
 import { OrganizationPage } from '../features/organization/pages/OrganizationPage.jsx';
 import { PlaceholderPage } from '../features/shared/pages/PlaceholderPage.jsx';
+import { PasswordSettingsPage } from '../features/settings/pages/PasswordSettingsPage.jsx';
 import { SettingsPage } from '../features/settings/pages/SettingsPage.jsx';
+import { SessionsSettingsPage } from '../features/settings/pages/SessionsSettingsPage.jsx';
+import { TwoFactorSettingsPage } from '../features/settings/pages/TwoFactorSettingsPage.jsx';
 import { ROUTES } from './routes.js';
 
 function ProtectedRoute() {
@@ -41,8 +44,9 @@ export const router = createBrowserRouter([
         { path: '/employees/:memberId', element: <EmployeeProfilePage /> },
         { path: ROUTES.organization, element: <OrganizationPage /> },
         { path: ROUTES.settings, element: <SettingsPage /> },
-        { path: '/settings/password', element: <PlaceholderPage title="Change password" description="This flow requires a server-authorized account service." /> },
-        { path: '/settings/sessions', element: <PlaceholderPage title="Manage sessions" description="This flow requires a server-authorized account service." /> },
+        { path: '/settings/password', element: <PasswordSettingsPage /> },
+        { path: '/settings/two-factor', element: <TwoFactorSettingsPage /> },
+        { path: '/settings/sessions', element: <SessionsSettingsPage /> },
         { path: ROUTES.help, element: <HelpPage /> },
         { path: '/help/articles/:articleId', element: <PlaceholderPage title="Help article" description="Article content will be available when the help service is connected." /> },
         { path: '/help/support', element: <PlaceholderPage title="Contact support" description="The support channel will be available when the service is connected." /> },

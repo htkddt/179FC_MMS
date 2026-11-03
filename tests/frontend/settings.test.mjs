@@ -36,20 +36,25 @@ test('settings trim patches, preserve legacy choices and unrelated keys, and rej
   } finally { delete globalThis.localStorage; delete globalThis.window; }
 });
 
-test('unavailable settings and invalid types never persist or publish success', async () => {
+test('interactive UI preferences persist while invalid or security-only changes never publish success', async () => {
   globalThis.localStorage = storageFixture();
   let events = 0;
   globalThis.window = { dispatchEvent() { events++; } };
   try {
-    for (const changes of [{ clubName: ' ' }, { clubName: 'a'.repeat(81) }, { clubName: 9 }, { language: 'Vietnamese' }, { timeZone: 'Mars' }, { compactNavigation: 'true' }, { assistant: false }, { summary: true }, { twoFactor: false }]) {
+    const saved = await saveSettingsSnapshot({ language: 'Vietnamese', assistant: false, summary: true });
+    assert.equal(saved.settings.language, 'Vietnamese');
+    assert.equal(saved.settings.assistant, false);
+    assert.equal(saved.settings.summary, true);
+    assert.equal(events, 1);
+    for (const changes of [{ clubName: ' ' }, { clubName: 'a'.repeat(81) }, { clubName: 9 }, { language: 'Klingon' }, { timeZone: 'Mars' }, { compactNavigation: 'true' }, { assistant: 'false' }, { summary: 'true' }, { twoFactor: false }]) {
       await assert.rejects(saveSettingsSnapshot(changes));
     }
-    assert.equal(events, 0);
-    assert.equal(readSettingsSnapshot().revision, null);
+    assert.equal(events, 1);
+    assert.equal(readSettingsSnapshot().settings.language, 'Vietnamese');
     globalThis.localStorage.setItem = () => { throw new Error('quota'); };
     await assert.rejects(saveSettingsSnapshot({ clubName: 'Sample Club' }), /Could not save/);
     assert.equal(readSettingsSnapshot().settings.clubName, initialSettings.clubName);
-    assert.equal(events, 0);
+    assert.equal(events, 1);
   } finally { delete globalThis.localStorage; delete globalThis.window; }
 });
 

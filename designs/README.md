@@ -132,18 +132,18 @@ Post operations currently use a mock adapter and this browser's `localStorage`: 
 
 ### Settings (tabbed page and security subpages)
 
-The **179MMS-6 design update (2026-11-03)** is retained as PNG UI references with matching Markdown UX only. The references use synthetic identity and describe the required UI direction; [frontend implementation notes](../frontend/README.md#settings-implementation--179mms-6) distinguish the current build from this update.
+The **179MMS-6 design update (2026-11-03)** is retained as PNG UI references with matching Markdown UX only. The references use synthetic identity; the current frontend implements their Settings UI and explicitly retains the described backend/security/delivery boundary. See [frontend implementation notes](../frontend/README.md#settings-implementation--179mms-6).
 
 Settings keeps `/settings?tab=general|notifications|security`, defaulting invalid/missing tab values to General. The shared TopBar title scale is used without a Settings-only override; Settings has no subtitle. Route entry uses the common portal transition, while tab/switch feedback remains a separate and shorter animation with reduced-motion support.
 
-| Area | Design requirement |
+| Area | Implemented UI and boundary |
 | --- | --- |
 | General | Club name, language, time zone, and compact navigation use one shared saved draft. English and Vietnamese are selectable UI preferences; an incomplete translation must retain a clear fallback. |
 | Notifications | Assistant and weekly-summary switches are clickable, saved with the shared Settings data, and visibly distinguish a preference from real delivery. |
 | Security | Clickable Password, Two-factor, and Sessions controls open UI-only subpages. They never claim a password/security/session transaction completed without a connected service. |
 | Subpages | [Password](Settings/Settings_Change_Password.md), [Two-factor](Settings/Settings_Two_Factor.md), and [Sessions](Settings/Settings_Sessions.md) define validation, loading, empty/error/retry, Back/Cancel/focus, and responsive behavior. |
 
-Read every PNG/Markdown pair directly, including the [responsive](Settings/Settings_Responsive.md) and [interaction-state](Settings/Settings_States.md) boards. Interactive verification runs against the application after implementation; no executable authoring/export source or design-only test is retained in this package.
+Read every PNG/Markdown pair directly, including the [responsive](Settings/Settings_Responsive.md) and [interaction-state](Settings/Settings_States.md) boards. Interactive verification runs against the application; no executable authoring/export source or design-only test is retained in this package.
 
 ### Help Center and 179 Assist
 

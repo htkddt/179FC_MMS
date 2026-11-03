@@ -23,8 +23,9 @@ export function TopBar({ onMenuClick }) {
   }, [menuOpen]);
   const meta = PAGE_META[pathname] || (pathname === '/posts/new' ? { title: 'Create post', subtitle: 'Post creation' }
     : pathname.startsWith('/posts/') ? { title: pathname.endsWith('/edit') ? 'Edit draft' : 'Post details', subtitle: 'Club updates' }
-    : pathname === '/settings/password' ? { title: 'Change password', subtitle: 'Account security' }
-    : pathname === '/settings/sessions' ? { title: 'Manage sessions', subtitle: 'Account security' }
+    : pathname === '/settings/password' ? { title: 'Change password' }
+    : pathname === '/settings/two-factor' ? { title: 'Two-factor authentication' }
+    : pathname === '/settings/sessions' ? { title: 'Manage sessions' }
     : pathname.startsWith('/help/') ? { title: pathname === '/help/support' ? 'Contact support' : 'Help article', subtitle: 'Help Center' }
     : { title: 'Employee profile', subtitle: 'Member details' });
   const go = (to) => { setMenuOpen(false); navigate(to); };
