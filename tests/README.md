@@ -39,3 +39,7 @@ tests/
 ## Documentation Rule
 
 Update this README and the appropriate component README whenever test strategy, commands, coverage policy, or test scope changes. Update the root README when CI or repository-wide quality requirements change.
+
+## Settings product coverage — 179MMS-6
+
+`npm test` from `frontend/` now also runs `tests/frontend/settings.test.mjs` for persistence/conflict/validation/capability and shared date boundaries. `npm run test:browser` runs both Organization and `settings.spec.mjs`: actual React Settings navigation, failure recovery, canonical account/avatar, cross-tab shared shell/timezone consumers, responsive bounds and keyboard/reduced-motion behavior. Tests use synthetic local mock data. Backend authentication, security transactions and notification delivery are unavailable and are not tested as implemented services. The standalone HTML design checks remain separate.

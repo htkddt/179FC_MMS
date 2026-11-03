@@ -151,3 +151,9 @@
 | 4 | Frontend | Remove the temporary demo sign-in bypass, then connect the portal to backend/database authentication and member APIs; add the approved profile and administration designs and connect the mock post workflows. | Usable member-management web experience with real access control and live data. |
 | 5 | Tests and CI | Add component test runners, smoke tests, member-flow coverage, API contracts, and CI reporting under `tests/`. | Repeatable quality checks with centralized test source. |
 | 6 | Chatbot | Create the FastAPI service, integrate it with authenticated backend APIs, and add guardrails, audit logging, and observability. | Secure virtual-assistant capability. |
+
+## Shared Settings preferences
+
+Settings now shares saved club name/compact navigation with the portal shell, canonical account/profile data with Employees/Organization, and display-time formatting with Posts/Dashboard. Persistence remains a browser-local mock; writes must succeed before consumers change. Dirty drafts and cross-tab conflicts are guarded. Notification delivery and security actions remain unavailable, and English is the only complete UI language. Existing offset-free event/post timestamps are interpreted as Ho Chi Minh City wall-clock time; date-only fields and publication schedules are preserved. See [implemented behavior and boundaries](frontend/README.md#settings-implementation--179mms-6).
+
+Run `npm test`, `npm run test:browser` and `npm run build` from `frontend/`. The browser suite includes Settings and Organization, using synthetic local data; it does not verify backend services.

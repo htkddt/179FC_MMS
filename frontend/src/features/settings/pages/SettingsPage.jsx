@@ -1,41 +1,156 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useBlocker } from 'react-router-dom';
-import { Avatar } from '../../../components/ui/Avatar.jsx';
+import { useBlocker } from 'react-router-dom';
 import { Button } from '../../../components/ui/Button.jsx';
 import { Card } from '../../../components/ui/Card.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { Tabs } from '../../../components/ui/Tabs.jsx';
 import { useUrlTab } from '../../../hooks/useUrlTab.js';
-import { getSettings, saveSettings } from '../api/settingsApi.js';
+import { useCurrentAccount } from '../../auth/CurrentAccountProvider.jsx';
+import { formatTimestamp } from '../../shared/dateFormat.js';
+import { useSavedSettings } from '../SettingsProvider.jsx';
+import { generalSettingKeys, saveSettingsSnapshot, settingsCapabilities } from '../api/settingsApi.js';
+import { AccountCard, PreferenceRow, SettingsSwitch } from '../components/SettingsControls.jsx';
+import { DiscardDialog } from '../components/DiscardDialog.jsx';
 
-const tabs = [{ value: 'general', label: 'General' }, { value: 'notifications', label: 'Notifications' }, { value: 'security', label: 'Security' }];
-const keys = { general: ['clubName', 'language', 'timeZone', 'compactNavigation'], notifications: ['assistant', 'summary'], security: ['twoFactor'] };
-function Switch({ label, checked, onChange }) { return <button className={'switch' + (checked ? ' switch--on' : '')} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={() => onChange(!checked)}><span /></button>; }
-function PreferenceRow({ icon, tone = 'pink', title, description, children, highlighted = false }) { return <div className={'settings-preference settings-preference--divider' + (highlighted ? ' settings-preference--highlighted' : '')}><span className={'settings-preference__icon settings-preference__icon--' + tone}><Icon name={icon} size={25} /></span><div className="settings-preference__copy"><h3>{title}</h3><p>{description}</p></div>{children}</div>; }
+const tabs = [
+  { value: 'general', label: <><Icon name="settings" size={18} />General</> },
+  { value: 'notifications', label: <><Icon name="bell" size={18} />Notifications</> },
+  { value: 'security', label: <><Icon name="shield" size={18} />Security</> },
+];
+const titles = { general: 'General settings', notifications: 'Notification preferences', security: 'Security' };
+const icons = { general: 'settings', notifications: 'bell', security: 'shield' };
+const toModel = snapshot => ({ saved: snapshot.settings, revision: snapshot.revision, draft: { ...snapshot.settings } });
+
 export function SettingsPage() {
-  const allowSignOut = useRef(false);
+  const shared = useSavedSettings();
+  const account = useCurrentAccount();
   const [tab, setTab] = useUrlTab(tabs.map(item => item.value), 'general');
-  const [saved, setSaved] = useState(null);
-  const [form, setForm] = useState(null);
-  const [message, setMessage] = useState('');
+  const [model, setModel] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const [validation, setValidation] = useState('');
   const [saving, setSaving] = useState(false);
-  const [loadError, setLoadError] = useState(false);
-  const [attempt, setAttempt] = useState(0);
-  useEffect(() => { let active = true; setLoadError(false); getSettings().then(data => { if (active) { setSaved(data); setForm(data); } }).catch(() => { if (active) setLoadError(true); }); return () => { active = false; }; }, [attempt]);
-  const dirty = !!form && !!saved && Object.keys(form).some(key => form[key] !== saved[key]);
-  const tabDirty = !!form && !!saved && keys[tab].some(key => form[key] !== saved[key]);
-  const blocker = useBlocker(({ currentLocation, nextLocation }) => dirty && !allowSignOut.current && (currentLocation.pathname !== nextLocation.pathname || currentLocation.search !== nextLocation.search));
-  useEffect(() => { if (blocker.state === 'blocked') { if (window.confirm('You have unsaved changes. Continue?')) blocker.proceed(); else blocker.reset(); } }, [blocker]);
-  useEffect(() => { const warn = event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } }; window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn); }, [dirty]);
-  useEffect(() => { const guard = event => { if (dirty && !window.confirm('You have unsaved changes. Log out anyway?')) event.preventDefault(); else allowSignOut.current = true; }; window.addEventListener('179fc-before-signout', guard); return () => window.removeEventListener('179fc-before-signout', guard); }, [dirty]);
-  function update(key, value) { setForm(current => ({ ...current, [key]: value })); setMessage(''); }
-  async function save(event) { event.preventDefault(); if (!form.clubName.trim() && tab === 'general') { setMessage('Club name is required.'); return; } setSaving(true); setMessage(''); try { const changes = Object.fromEntries(keys[tab].filter(key => form[key] !== saved[key]).map(key => [key, form[key]])); const result = await saveSettings(changes); setSaved(result); setForm(current => ({ ...current, ...Object.fromEntries(keys[tab].map(key => [key, result[key]])) })); setMessage('Changes saved.'); } catch (error) { setMessage(error.message || 'Unable to save changes. Please try again.'); } finally { setSaving(false); } }
-  return <section className="settings-page"><Tabs items={tabs} value={tab} onChange={setTab} label="Settings sections" /><div className="settings-layout"><Card className="settings-card" id={'panel-' + tab} role="tabpanel" aria-labelledby={'tab-' + tab}>
-    {loadError ? <div role="alert">Could not load settings. <button onClick={() => setAttempt(value => value + 1)}>Retry</button></div> : !form ? <div role="status">Loading settings?</div> : <form onSubmit={save}>
-      {tab === 'general' && <><h2>General settings</h2><div className="settings-group"><h3>Workspace</h3><label className="settings-field"><span>Club name</span><input value={form.clubName} onChange={event => update('clubName', event.target.value)} aria-invalid={!form.clubName.trim()} required /></label><label className="settings-field"><span>Workspace language</span><select value={form.language} onChange={event => update('language', event.target.value)}><option>English</option><option>Vietnamese</option></select></label></div><div className="settings-group"><h3>Preferences</h3><label className="settings-field"><span>Time zone</span><select value={form.timeZone} onChange={event => update('timeZone', event.target.value)}><option value="Asia/Ho_Chi_Minh">(GMT+07:00) Ho Chi Minh City</option><option value="UTC">(GMT+00:00) UTC</option></select></label><div className="settings-field"><span><strong>Compact navigation</strong><small>Use a condensed sidebar layout.</small></span><Switch label="Compact navigation" checked={form.compactNavigation} onChange={value => update('compactNavigation', value)} /></div></div></>}
-      {tab === 'notifications' && <><h2>Notification preferences</h2><PreferenceRow icon="bell" title="Assistant notifications" description="Receive relevant reminders from 179 Assist."><Switch label="Assistant notifications" checked={form.assistant} onChange={value => update('assistant', value)} /></PreferenceRow><PreferenceRow icon="chart" tone="gray" title="Weekly activity summary" description="Get a weekly update about your club."><Switch label="Weekly activity summary" checked={form.summary} onChange={value => update('summary', value)} /></PreferenceRow></>}
-      {tab === 'security' && <><h2>Security</h2><p className="security-demo-note">Demo only: these settings do not change account security.</p><PreferenceRow icon="lock" title="Password" description="Use a strong password to keep your account secure."><Link className="button button--outline" to="/settings/password">Change password</Link></PreferenceRow><PreferenceRow icon="shield" tone="gray" title="Two-factor authentication" description="Add an extra layer of protection to your account."><Switch label="Two-factor authentication" checked={form.twoFactor} onChange={value => update('twoFactor', value)} /></PreferenceRow><PreferenceRow icon="monitor" title="Active sessions" description="Chrome on Windows ? Ho Chi Minh City" highlighted><Link className="button button--outline" to="/settings/sessions">Manage sessions</Link></PreferenceRow></>}
-      <div className="settings-card__footer"><span role="status">{message}</span><Button type="submit" className="button--primary settings-save" disabled={!tabDirty || saving}>{saving ? 'Saving?' : 'Save changes'}</Button></div>
-    </form>}
-  </Card><Card className="account-card"><h2>Account</h2><div className="account-card__profile"><Avatar initials="TK" tone="orange" size="xl" /><div><strong>Tuan Kiet</strong><span>Club Admin</span></div></div><div className="account-card__email">tuankiet@179fc.com</div></Card></div></section>;
+  const [pending, setPending] = useState(null);
+  const inFlight = useRef(false);
+  const signingOut = useRef(false);
+  const clubInput = useRef(null);
+  const dirty = !!model && generalSettingKeys.some(key => model.draft[key] !== model.saved[key]);
+  const conflict = !!model && model.revision !== shared.revision;
+
+  useEffect(() => {
+    if (!shared.loading && !shared.error && !saving && (!model || (!dirty && conflict))) {
+      setModel(toModel(shared));
+      setFeedback(null);
+    }
+  }, [shared.settings, shared.revision, shared.loading, shared.error, saving, model, dirty, conflict]);
+
+  const blocker = useBlocker(({ currentLocation, nextLocation }) =>
+    (dirty || inFlight.current) && !signingOut.current &&
+    (currentLocation.pathname !== nextLocation.pathname || currentLocation.search !== nextLocation.search));
+  useEffect(() => {
+    if (blocker.state !== 'blocked') return;
+    if (inFlight.current) blocker.reset();
+    else setPending({ kind: 'navigation' });
+  }, [blocker]);
+  useEffect(() => {
+    const warn = event => {
+      if (dirty || inFlight.current) { event.preventDefault(); event.returnValue = ''; }
+    };
+    const signOut = event => {
+      if (inFlight.current) { event.preventDefault(); return; }
+      if (dirty) { event.preventDefault(); setPending({ kind: 'signout', proceed: event.detail?.proceed }); }
+    };
+    window.addEventListener('beforeunload', warn);
+    window.addEventListener('179fc-before-signout', signOut);
+    return () => { window.removeEventListener('beforeunload', warn); window.removeEventListener('179fc-before-signout', signOut); };
+  }, [dirty]);
+
+  function update(key, value) {
+    if (inFlight.current) return;
+    setModel(current => ({ ...current, draft: { ...current.draft, [key]: value } }));
+    setFeedback(null);
+    if (key === 'clubName') setValidation('');
+  }
+  function discard() {
+    setModel(toModel(shared));
+    setValidation('');
+    setFeedback(null);
+  }
+  function keepEditing() {
+    setPending(null);
+    if (blocker.state === 'blocked') blocker.reset();
+  }
+  function confirmDiscard() {
+    const action = pending;
+    discard();
+    setPending(null);
+    if (action?.kind === 'navigation' && blocker.state === 'blocked') blocker.proceed();
+    if (action?.kind === 'signout') { signingOut.current = true; action.proceed?.(); }
+  }
+  async function save(event) {
+    event.preventDefault();
+    if (inFlight.current || !dirty || conflict || shared.error || tab !== 'general') return;
+    const name = model.draft.clubName.trim();
+    if (!name || name.length > 80) {
+      setValidation(!name ? 'Enter a club name.' : 'Use 80 characters or fewer.');
+      clubInput.current?.focus();
+      return;
+    }
+    inFlight.current = true;
+    setSaving(true);
+    setFeedback(null);
+    try {
+      const changes = Object.fromEntries(generalSettingKeys.filter(key => model.draft[key] !== model.saved[key]).map(key => [key, model.draft[key]]));
+      const snapshot = await saveSettingsSnapshot(changes, { expectedRevision: model.revision });
+      setModel(toModel(snapshot));
+      setFeedback({ text: 'Changes saved.', error: false });
+    } catch (error) {
+      if (error.code === 'SETTINGS_CONFLICT') shared.refresh();
+      setFeedback({ text: error.message || 'Could not save settings. Please try again.', error: true });
+    } finally { inFlight.current = false; setSaving(false); }
+  }
+
+  const form = model?.draft;
+  const status = saving ? 'Saving changes…' : feedback?.text || (dirty ? 'Unsaved changes' : tab === 'notifications' ? 'No changes to save' : 'All changes saved');
+  return <section className="settings-page">
+    <Tabs items={tabs} value={tab} onChange={setTab} label="Settings sections" disabled={saving} />
+    <div className="settings-layout">
+      <Card key={tab} className="settings-panel" id={'panel-' + tab} role="tabpanel" aria-labelledby={'tab-' + tab} aria-busy={shared.loading || saving}>
+        <header className="settings-panel__heading"><span><Icon name={icons[tab]} size={23} /></span><h2>{titles[tab]}</h2></header>
+        {shared.error && <div className="settings-notice settings-notice--error" role="alert">{shared.error}<Button className="button--outline" onClick={shared.refresh} disabled={saving}>Retry</Button></div>}
+        {shared.loading || (!form && !shared.error) ? <div className="settings-loading" role="status">Loading settings…<span /><span /><span /></div> : form && <form onSubmit={save} noValidate>
+          {conflict && <div className="settings-notice" role="alert"><span>Settings changed in another tab. Reload the latest values before saving.</span><Button className="button--outline" disabled={saving || !!shared.error} onClick={() => dirty ? setPending({ kind: 'reload' }) : discard()}>Reload latest</Button></div>}
+          <fieldset disabled={saving}>
+            {tab === 'general' && <>
+              <div className="settings-section"><h3>Workspace</h3><div className="settings-field-grid">
+                <label className="settings-control"><span>Club name</span><input ref={clubInput} value={form.clubName} onChange={event => update('clubName', event.target.value)} required maxLength={80} aria-invalid={!!validation} aria-describedby={validation ? 'club-name-error' : undefined} />{validation && <small id="club-name-error" className="settings-error">{validation}</small>}</label>
+                <label className="settings-control"><span>Workspace language</span><select value={form.language} onChange={event => update('language', event.target.value)} aria-describedby={form.language !== 'English' ? 'language-unavailable' : undefined}><option value="English">English</option><option value="Vietnamese" disabled>Vietnamese — unavailable</option>{!['English', 'Vietnamese'].includes(form.language) && <option value={form.language} disabled>{form.language} — unavailable</option>}</select></label>
+              </div>{form.language !== 'English' && <p className="settings-hint" id="language-unavailable">Saved language {form.language} is not available yet. The portal uses English until you choose an available language.</p>}</div>
+              <div className="settings-section"><h3>Preferences</h3>
+                <label className="settings-control"><span>Time zone</span><select value={form.timeZone} onChange={event => update('timeZone', event.target.value)}><option value="Asia/Ho_Chi_Minh">(GMT+07:00) Ho Chi Minh City</option><option value="UTC">(GMT+00:00) UTC</option></select></label>
+                <p className="settings-hint">Example: {formatTimestamp('2026-11-03T02:00:00Z', form, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</p>
+                <PreferenceRow icon="monitor" title="Compact navigation"><span>{form.compactNavigation ? 'On' : 'Off'}</span><SettingsSwitch label="Compact navigation" checked={form.compactNavigation} onChange={value => update('compactNavigation', value)} /></PreferenceRow>
+              </div>
+            </>}
+            {tab === 'notifications' && <div className="settings-section">
+              <p className="settings-notice" id="notifications-unavailable">Notifications are not available yet. Your saved preferences will be kept.</p>
+              <PreferenceRow icon="bell" title="Assistant notifications"><span>Unavailable</span><SettingsSwitch label="Assistant notifications" checked={form.assistant} disabled={!settingsCapabilities.assistant} describedBy="notifications-unavailable" /></PreferenceRow>
+              <PreferenceRow icon="chart" title="Weekly activity summary"><span>Unavailable</span><SettingsSwitch label="Weekly activity summary" checked={form.summary} disabled={!settingsCapabilities.summary} describedBy="notifications-unavailable" /></PreferenceRow>
+            </div>}
+            {tab === 'security' && <div className="settings-section">
+              <p className="settings-notice" id="security-unavailable">Account security is not connected in this preview. These actions are unavailable.</p>
+              <PreferenceRow icon="lock" title="Password"><Button className="button--outline" disabled aria-describedby="security-unavailable">Change password</Button></PreferenceRow>
+              <PreferenceRow icon="shield" title="Two-factor authentication"><span className="settings-badge">Not connected</span><Button className="button--outline" disabled aria-describedby="security-unavailable">Set up</Button></PreferenceRow>
+              <PreferenceRow icon="monitor" title="Active sessions"><Button className="button--outline" disabled aria-describedby="security-unavailable">Manage sessions</Button></PreferenceRow>
+            </div>}
+          </fieldset>
+          {tab !== 'security' && <footer className="settings-footer">
+            <span className={feedback?.error ? 'settings-error' : ''} role="status"><Icon name="check" size={16} />{status}</span>
+            <div>{dirty && <Button className="button--outline" disabled={saving || !!shared.error} onClick={discard}>Discard</Button>}<Button type="submit" className="button--primary" disabled={!dirty || saving || conflict || !!shared.error || tab !== 'general'}>{saving ? 'Saving…' : feedback?.error ? 'Retry save' : 'Save changes'}</Button></div>
+          </footer>}
+        </form>}
+      </Card>
+      <AccountCard account={account} />
+    </div>
+    <DiscardDialog open={!!pending} onKeep={keepEditing} onDiscard={confirmDiscard} />
+  </section>;
 }
