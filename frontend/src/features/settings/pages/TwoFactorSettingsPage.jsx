@@ -28,18 +28,24 @@ export function TwoFactorSettingsPage() {
 
   return <section className="settings-subpage settings-route">
     <button className="settings-back" type="button" onClick={returnToSecurity}>Back to Security</button>
-    <Card className="settings-security-panel">
-      <header className="settings-security-panel__heading"><h2>Set up two-factor authentication</h2><span className="settings-badge">Not set up</span></header>
-      <form className="settings-security-form" onSubmit={submit}>
-        <p className="settings-security-boundary">Choose a method to preview the setup UI. This preview never creates a QR code, recovery code, or enrolled factor.</p>
-        <fieldset className="settings-methods" disabled={checking}><legend>Verification method</legend>
-          <label className="settings-method"><input type="radio" name="two-factor-method" value="authenticator" checked={method === 'authenticator'} onChange={event => setMethod(event.target.value)} /> <span><strong>Authenticator app</strong><small>Use a time-based code after server verification is connected.</small></span></label>
-          <label className="settings-method"><input type="radio" name="two-factor-method" value="security-key" checked={method === 'security-key'} onChange={event => setMethod(event.target.value)} /> <span><strong>Security key</strong><small>Use a registered security key after server verification is connected.</small></span></label>
-        </fieldset>
-        {checking && <p className="settings-security-status" role="status">Checking the two-factor setup service...</p>}
-        {outcome && <p className="settings-security-status settings-security-status--error" role="alert">{outcome}</p>}
-        <footer className="settings-security-footer"><Button className="button--outline" onClick={returnToSecurity} disabled={checking}>Cancel</Button><Button type="submit" className="button--primary" disabled={checking}>{checking ? 'Checking...' : 'Start setup'}</Button></footer>
-      </form>
-    </Card>
+    <div className="settings-subpage__content">
+      <Card className="settings-security-panel">
+        <header className="settings-security-panel__heading"><h2>Set up two-factor authentication</h2><span className="settings-badge">Not set up</span></header>
+        <form className="settings-security-form" onSubmit={submit}>
+          <p className="settings-security-boundary">Choose a method to preview the setup UI. This preview never creates a QR code, recovery code, or enrolled factor.</p>
+          <fieldset className="settings-methods" disabled={checking}><legend>Verification method</legend>
+            <label className="settings-method"><input type="radio" name="two-factor-method" value="authenticator" checked={method === 'authenticator'} onChange={event => setMethod(event.target.value)} /> <span><strong>Authenticator app</strong><small>Use a time-based code after server verification is connected.</small></span></label>
+            <label className="settings-method"><input type="radio" name="two-factor-method" value="security-key" checked={method === 'security-key'} onChange={event => setMethod(event.target.value)} /> <span><strong>Security key</strong><small>Use a registered security key after server verification is connected.</small></span></label>
+          </fieldset>
+          {checking && <p className="settings-security-status" role="status">Checking the two-factor setup service...</p>}
+          {outcome && <p className="settings-security-status settings-security-status--error" role="alert">{outcome}</p>}
+          <footer className="settings-security-footer"><Button className="button--outline" onClick={returnToSecurity} disabled={checking}>Cancel</Button><Button type="submit" className="button--primary" disabled={checking}>{checking ? 'Checking...' : 'Start setup'}</Button></footer>
+        </form>
+      </Card>
+      <aside className="settings-security-context" aria-labelledby="two-factor-boundary-heading">
+        <h2 id="two-factor-boundary-heading">What happens next</h2>
+        <p>The connected flow must require fresh authentication, verification, and recovery-code handling before confirming enrollment.</p>
+      </aside>
+    </div>
   </section>;
 }

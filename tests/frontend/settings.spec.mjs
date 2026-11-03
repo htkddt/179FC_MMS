@@ -5,6 +5,18 @@ const errorsByPage = new WeakMap();
 const save = page => page.getByRole('button', { name: 'Save changes', exact: true });
 const brand = page => page.locator('.sidebar .brand');
 
+async function expectSecuritySubpageLayout(page, contextHeading) {
+  await expect(page.locator('.settings-security-context')).toHaveCount(1);
+  await expect(page.locator('.settings-security-context h2')).toHaveText(contextHeading);
+  const actionHeights = await page.locator('.settings-subpage button').evaluateAll(buttons => buttons.map(button => button.getBoundingClientRect().height));
+  expect(actionHeights).not.toHaveLength(0);
+  expect(actionHeights.every(height => height >= 44)).toBe(true);
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  }
+}
+
 test.beforeEach(async ({ page, context }) => {
   const errors = [];
   errorsByPage.set(page, errors);
@@ -120,6 +132,7 @@ test('notification preferences are saved without delivery claims and security fl
   await page.screenshot({ path: test.info().outputPath('settings-security.png'), fullPage: true });
   await page.getByRole('button', { name: 'Change password', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/password$/);
+  await expectSecuritySubpageLayout(page, 'Before you continue');
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(page.getByText('Enter your current password.')).toBeVisible();
   await expect(page.getByLabel('Current password')).toBeFocused();
@@ -132,12 +145,14 @@ test('notification preferences are saved without delivery claims and security fl
   await expect(page.getByRole('button', { name: 'Change password', exact: true })).toBeFocused();
   await page.getByRole('button', { name: 'Set up', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/two-factor$/);
+  await expectSecuritySubpageLayout(page, 'What happens next');
   await page.getByRole('radio', { name: /Security key/ }).check();
   await page.getByRole('button', { name: 'Start setup', exact: true }).click();
   await expect(page.getByRole('alert')).toContainText('No factor was enrolled.');
   await page.getByRole('button', { name: 'Back to Security', exact: true }).click();
   await page.getByRole('button', { name: 'Manage sessions', exact: true }).click();
   await expect(page).toHaveURL(/\/settings\/sessions$/);
+  await expectSecuritySubpageLayout(page, 'Connected behavior');
   await expect(page.getByRole('alert')).toContainText('cannot show or revoke sessions');
   await page.getByRole('button', { name: 'Retry', exact: true }).click();
   await expect(page.getByRole('status')).toContainText('Loading verified sessions');

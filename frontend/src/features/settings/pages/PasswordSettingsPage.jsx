@@ -49,17 +49,24 @@ export function PasswordSettingsPage() {
 
   return <section className="settings-subpage settings-route">
     <button className="settings-back" type="button" onClick={returnToSecurity}>Back to Security</button>
-    <Card className="settings-security-panel">
-      <header className="settings-security-panel__heading"><h2>Update password</h2></header>
-      <form className="settings-security-form" onSubmit={submit} noValidate>
-        <p className="settings-security-boundary">This is a UI-only form. A connected account service must require fresh authentication before changing a password.</p>
-        <label className="settings-control"><span>Current password</span><input ref={node => { inputs.current.current = node; }} type="password" autoComplete="current-password" value={form.current} onChange={event => update('current', event.target.value)} aria-invalid={!!errors.current} aria-describedby={errors.current ? 'current-password-error' : undefined} />{errors.current && <small id="current-password-error" className="settings-error">{errors.current}</small>}</label>
-        <label className="settings-control"><span>New password</span><input ref={node => { inputs.current.next = node; }} type="password" autoComplete="new-password" value={form.next} onChange={event => update('next', event.target.value)} aria-invalid={!!errors.next} aria-describedby={errors.next ? 'new-password-error' : undefined} />{errors.next && <small id="new-password-error" className="settings-error">{errors.next}</small>}</label>
-        <label className="settings-control"><span>Confirm new password</span><input ref={node => { inputs.current.confirmation = node; }} type="password" autoComplete="new-password" value={form.confirmation} onChange={event => update('confirmation', event.target.value)} aria-invalid={!!errors.confirmation} aria-describedby={errors.confirmation ? 'confirm-password-error' : undefined} />{errors.confirmation && <small id="confirm-password-error" className="settings-error">{errors.confirmation}</small>}</label>
-        {checking && <p className="settings-security-status" role="status">Checking the password-change service...</p>}
-        {outcome && <p className="settings-security-status settings-security-status--error" role="alert">{outcome}</p>}
-        <footer className="settings-security-footer"><Button className="button--outline" onClick={returnToSecurity} disabled={checking}>Cancel</Button><Button type="submit" className="button--primary" disabled={checking}>{checking ? 'Checking...' : 'Continue'}</Button></footer>
-      </form>
-    </Card>
+    <div className="settings-subpage__content">
+      <Card className="settings-security-panel">
+        <header className="settings-security-panel__heading"><h2>Update password</h2></header>
+        <form className="settings-security-form" onSubmit={submit} noValidate>
+          <p className="settings-security-boundary">This is a UI-only form. A connected account service must require fresh authentication before changing a password.</p>
+          <label className="settings-control"><span>Current password</span><input ref={node => { inputs.current.current = node; }} type="password" autoComplete="current-password" value={form.current} onChange={event => update('current', event.target.value)} aria-invalid={!!errors.current} aria-describedby={errors.current ? 'current-password-error' : undefined} />{errors.current && <small id="current-password-error" className="settings-error">{errors.current}</small>}</label>
+          <label className="settings-control"><span>New password</span><input ref={node => { inputs.current.next = node; }} type="password" autoComplete="new-password" value={form.next} onChange={event => update('next', event.target.value)} aria-invalid={!!errors.next} aria-describedby={errors.next ? 'new-password-error' : undefined} />{errors.next && <small id="new-password-error" className="settings-error">{errors.next}</small>}</label>
+          <label className="settings-control"><span>Confirm new password</span><input ref={node => { inputs.current.confirmation = node; }} type="password" autoComplete="new-password" value={form.confirmation} onChange={event => update('confirmation', event.target.value)} aria-invalid={!!errors.confirmation} aria-describedby={errors.confirmation ? 'confirm-password-error' : undefined} />{errors.confirmation && <small id="confirm-password-error" className="settings-error">{errors.confirmation}</small>}</label>
+          {checking && <p className="settings-security-status" role="status">Checking the password-change service...</p>}
+          {outcome && <p className="settings-security-status settings-security-status--error" role="alert">{outcome}</p>}
+          <footer className="settings-security-footer"><Button className="button--outline" onClick={returnToSecurity} disabled={checking}>Cancel</Button><Button type="submit" className="button--primary" disabled={checking}>{checking ? 'Checking...' : 'Continue'}</Button></footer>
+        </form>
+      </Card>
+      <aside className="settings-security-context" aria-labelledby="password-boundary-heading">
+        <h2 id="password-boundary-heading">Before you continue</h2>
+        <p>In a connected flow, your current password is verified before a new password can be saved.</p>
+        <p>This screen never stores a password in browser settings.</p>
+      </aside>
+    </div>
   </section>;
 }
