@@ -244,6 +244,16 @@ The code is organized as follows:
 - Desktop retains the burgundy sidebar and floating 179 Assist launcher, both sized relative to the viewport.
 - The layout changes structure only when necessary: the dashboard column collapses, the sidebar becomes an accessible drawer, grids adapt to their available width, and the organization chart remains horizontally scrollable on narrow screens rather than clipping content.
 
+## Settings design revision — proposed, not implemented
+
+The **179MMS-6** package in [`designs/Settings/`](../designs/Settings/Settings_Handoff.md) updates all three Settings PNG/UX pairs, adds an editable offline HTML prototype and responsive/interaction-state boards. This revision changes design/documentation only; the current React behavior described above remains the baseline.
+
+The implementation handoff requires removing the Settings title subtitle and row descriptions, reusing the existing shell/components, and keeping a single saved settings source with same-window and cross-tab subscriptions. Club name/compact navigation apply through the shell after successful save; date/timezone formatting must use shared consumers and preserve date-only and scheduling semantics. Account/header/sidebar must resolve the authenticated user and the same canonical member profile rather than separate hardcoded identities.
+
+The proposal also makes unavailable functionality explicit: Vietnamese stays unavailable until complete localization exists, notification toggles require actual reminder/summary consumers, and security actions remain unavailable until real account services exist. Legacy local `twoFactor` is not enrollment proof. This handoff does not implement translation, notification delivery, security APIs or a backend scheduler.
+
+From repository root after `npm ci` in `frontend/`, run `node tests/frontend/settings-design-review.mjs` for prototype-only checks and `node designs/Settings/render-settings.mjs` for repeatable exports. Both use installed Edge on Windows and close it when finished. See [design behavior, consumer map and reproduction](../designs/Settings/Settings_Handoff.md); Developer must update this section when the actual implementation is delivered.
+
 ## Planned integration
 
 1. Replace demo access and browser storage with backend authentication, account settings, session validation, and the finalized permission model before production. The current flow does not protect real data.

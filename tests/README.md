@@ -19,6 +19,7 @@ tests/
 - From `frontend/`, run `npm test` for Node-based post, settings, dashboard, and Organization logic checks.
 - Run `npm run test:browser` for Playwright coverage of Organization, Employees profile synchronization, responsive layouts, keyboard interactions, and the assistant launcher. The configuration starts Vite on port 5180 and uses installed Edge on Windows by default.
 - Test source and configuration remain under `tests/frontend/`; browser artifacts go to the operating system's temporary directory. See [frontend runner setup and scope](frontend/README.md).
+- From repository root, `node tests/frontend/settings-design-review.mjs` checks the offline Settings design prototype for interactions, selected contrast pairs, responsive bounds, keyboard/focus, capability states and reduced motion. This is a separate design check; it does not verify the React implementation, notification delivery, security services or CI. See [design handoff](../designs/Settings/Settings_Handoff.md).
 
 ## Remaining plan
 
