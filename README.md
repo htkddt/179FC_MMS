@@ -73,6 +73,13 @@
    npm run build
    ~~~
 
+### Frontend CI/CD and GitHub Pages
+
+- `.github/workflows/frontend-pages.yml` runs only for pull requests targeting `main` (opened, synchronized, reopened, and closed).
+- The workflow has sequential **Build**, **Test**, and **Deploy** jobs. Test requires a successful Build. Deploy requires successful Build and Test, and is eligible only when the PR is closed as merged; this keeps GitHub Pages publishing on the default-branch revision while retaining pull-request-only workflow triggers.
+- Build installs from `frontend/package-lock.json`, receives the repository-aware base path from `actions/configure-pages`, builds `frontend/dist`, and uploads it as the GitHub Pages artifact. Test runs `npm test`, installs Playwright Chromium, then runs `npm run test:browser`.
+- The deploy job publishes the Pages artifact through the `github-pages` environment. The repository Pages source must remain set to **GitHub Actions**. A non-merged PR never receives a production deployment.
+
 - Backend
 
    ~~~powershell
@@ -104,6 +111,8 @@
    npm run preview -- --host 127.0.0.1 --port 4173
    ~~~
    Open: `http://127.0.0.1:4173/`
+
+   The CI workflow also runs `npm test` and `npm run test:browser` after Build succeeds.
 
 - Backend
 
