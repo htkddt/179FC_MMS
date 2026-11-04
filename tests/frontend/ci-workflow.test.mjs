@@ -7,8 +7,14 @@ const workflowUrl = new URL(
   import.meta.url,
 );
 
+function normalizeWorkflowLineEndings(source) {
+  return source.replace(/\r\n/g, "\n");
+}
+
 test("deploys GitHub Pages after Build and Test for an active pull request", async () => {
-  const workflow = await readFile(workflowUrl, "utf8");
+  const workflow = normalizeWorkflowLineEndings(
+    await readFile(workflowUrl, "utf8"),
+  );
   const deployJob = workflow.split("\n  deploy:")[1];
 
   assert.match(
@@ -19,4 +25,16 @@ test("deploys GitHub Pages after Build and Test for an active pull request", asy
   assert.match(deployJob, /name: Deploy\n    needs: \[build, test\]/);
   assert.match(deployJob, /uses: actions\/deploy-pages@v4/);
   assert.doesNotMatch(workflow, /github\.event\.pull_request\.merged/);
+});
+
+test("reads workflow rules from CRLF source files", async () => {
+  const source = await readFile(workflowUrl, "utf8");
+  const workflow = normalizeWorkflowLineEndings(
+    source.replace(/\r?\n/g, "\r\n"),
+  );
+
+  assert.match(
+    workflow,
+    /\n  deploy:\n    name: Deploy\n    needs: \[build, test\]/,
+  );
 });
