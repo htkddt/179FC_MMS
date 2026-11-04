@@ -144,6 +144,12 @@ Use npm run build for a production build and npm run preview to preview it local
 
 The application requires Node.js 20.19 or newer (or Node.js 22.12 or newer).
 
+## Environments and GitHub Pages base path
+
+- **LocalHost**: `npm run dev` serves the application from `/`. `vite.config.js` always uses this root path outside Production, so the local Vite and Playwright URLs remain `http://127.0.0.1:<port>/`.
+- **Production**: `npm run build` uses `VITE_BASE_PATH` when set. The GitHub Actions workflow receives the repository-aware value from `actions/configure-pages`, which produces a GitHub Pages-compatible build for this project site. The router uses Vite's `BASE_URL` as its basename, so app routes stay relative to that production path.
+- Copy the documented value in `.env.example` only when a local production build needs to emulate the GitHub Pages subpath. Do not commit an environment file containing credentials or other secrets.
+
 ## Implemented routes and flow
 
 - `/sign-in` uses an explicit demo-access flow. Any sign-in creates a mock Club Admin session in `sessionStorage`; credentials are neither validated nor sent. The session survives refresh in the same browser tab and is cleared on logout.
