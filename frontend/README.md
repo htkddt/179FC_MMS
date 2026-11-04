@@ -148,11 +148,12 @@ The application requires Node.js 20.19 or newer (or Node.js 22.12 or newer).
 
 - **LocalHost**: `npm run dev` serves the application from `/`. `vite.config.js` always uses this root path outside Production, so the local Vite and Playwright URLs remain `http://127.0.0.1:<port>/`.
 - **Production**: `npm run build` uses `VITE_BASE_PATH` when set. The GitHub Actions workflow receives the repository-aware value from `actions/configure-pages`, which produces a GitHub Pages-compatible build for this project site, then deploys it after Build and Test succeed for a qualifying pull request. The router uses Vite's `BASE_URL` as its basename, so app routes stay relative to that production path.
+- **Public GitHub Pages demo**: `https://htkddt.github.io/Vibe_Coding/` hosts the static demo/preview build. “Production” in the Vite build mode and base-path configuration does not mean this public demo has production authentication, authorization, backend persistence, or real-data safeguards.
 - Copy the documented value in `.env.example` only when a local production build needs to emulate the GitHub Pages subpath. Do not commit an environment file containing credentials or other secrets.
 
 ## Implemented routes and flow
 
-- `/sign-in` uses an explicit demo-access flow. Any sign-in creates a mock Club Admin session in `sessionStorage`; credentials are neither validated nor sent. The session survives refresh in the same browser tab and is cleared on logout.
+- `/sign-in` uses an explicit demo-access flow. Any sign-in creates a mock Club Admin session in `sessionStorage`; credentials are neither validated nor sent. The session survives refresh in the same browser tab and is cleared on logout. This is also true on the public GitHub Pages demo, so it must not be used with real account credentials or member/personal data.
 - `/dashboard`, `/employees`, `/organization`, `/posts`, `/settings`, and `/help` use the authenticated shell.
 - `/employees` is a responsive directory of 30 mock members. It has Total, Online, Offline, and Team summary statistics; instant search across name, role, team, and email; and sorting by name, team, or most recently joined. Each member card has an accessible profile link plus entrance and hover motion that respects the user's reduced-motion preference.
 - `/employees/:memberId` provides a working member profile. Users can upload or remove a PNG, JPG, or WebP avatar (up to 1.5 MB), select a team, and edit date of birth and phone number. Changes are stored only in the current browser's `localStorage` and are reflected in the directory; they are mock data, not server-side member records.
@@ -252,13 +253,13 @@ The code is organized as follows:
 
 ## Planned integration
 
-1. Replace demo access and browser storage with backend authentication, account settings, session validation, and the finalized permission model before production. The current flow does not protect real data.
+1. Replace demo access and browser storage with backend authentication, account settings, session validation, and the finalized permission model before operational production use or processing real data. The current flow does not protect real data.
 2. Connect server-authorized post, settings, help, support, assistant, and member-profile APIs, including server-side visibility and scheduled publication. Replace browser-backed profile edits with validated, permission-aware member records once the contracts are approved.
 3. Extend the Organization browser interaction checks to the other features and add broader accessibility and visual regression coverage across desktop and mobile viewports.
 
 ## Temporary demo-access workaround
 
-Clicking Sign in to 179FC creates a mock Club Admin session without checking credentials. The session is stored in the browser tab's `sessionStorage` and is not an authentication or authorization boundary. Replace it before using real accounts or member data.
+Clicking Sign in to 179FC creates a mock Club Admin session without checking credentials. The session is stored in the browser tab's `sessionStorage` and is not an authentication or authorization boundary. The public GitHub Pages URL is a demo/preview host only: do not enter real credentials, member records, or other personal/sensitive data. Replace this flow with real authentication, authorization, server-side persistence, and data protections before operational production use.
 
 ## Test Location
 
