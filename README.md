@@ -75,10 +75,10 @@
 
 ### Frontend CI/CD and GitHub Pages
 
-- `.github/workflows/frontend-pages.yml` runs only for pull requests targeting `main` (opened, synchronized, reopened, and closed).
-- The workflow has sequential **Build**, **Test**, and **Deploy** jobs. Test requires a successful Build. Deploy requires successful Build and Test, and is eligible only when the PR is closed as merged; this keeps GitHub Pages publishing on the default-branch revision while retaining pull-request-only workflow triggers.
+- `.github/workflows/frontend-pages.yml` runs only for active pull requests targeting `main` (opened, synchronized, and reopened).
+- The workflow has sequential **Build**, **Test**, and **Deploy** jobs. Test requires a successful Build; Deploy requires successful Build and Test and then publishes the qualifying pull-request revision to GitHub Pages. Its `github-pages` environment exposes the production URL from `steps.deployment.outputs.page_url` in the workflow run.
 - Build installs from `frontend/package-lock.json`, receives the repository-aware base path from `actions/configure-pages`, builds `frontend/dist`, and uploads it as the GitHub Pages artifact. Test runs `npm test`, installs Playwright Chromium, then runs `npm run test:browser`.
-- The deploy job publishes the Pages artifact through the `github-pages` environment. The repository Pages source must remain set to **GitHub Actions**. A non-merged PR never receives a production deployment.
+- The deploy job publishes the Pages artifact through the `github-pages` environment. The repository Pages source must remain set to **GitHub Actions**. Each passed qualifying PR refreshes the default GitHub Pages production URL.
 
 - Backend
 

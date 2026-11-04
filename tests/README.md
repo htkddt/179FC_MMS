@@ -18,7 +18,7 @@ tests/
 
 - From `frontend/`, run `npm test` for Node-based post, settings, dashboard, and Organization logic checks.
 - Run `npm run test:browser` for Playwright coverage of Organization, Employees profile synchronization, responsive layouts, keyboard interactions, and the assistant launcher. The configuration starts Vite on port 5180 and uses installed Edge on Windows by default.
-- Pull requests to `main` run these checks in the **Test** job after the frontend **Build** job succeeds. The GitHub Actions runner installs Playwright Chromium before browser checks; GitHub Pages deployment is allowed only after both jobs succeed and the pull request is merged.
+- Pull requests to `main` run these checks in the **Test** job after the frontend **Build** job succeeds. The GitHub Actions runner installs Playwright Chromium before browser checks; the **Deploy** job publishes to GitHub Pages only after both jobs succeed.
 - Test source and configuration remain under `tests/frontend/`; browser artifacts go to the operating system's temporary directory. See [frontend runner setup and scope](frontend/README.md).
 
 ## Remaining plan

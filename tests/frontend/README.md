@@ -9,6 +9,7 @@ Run `npm test` (Node's built-in test runner).
 - `portal.test.mjs`: existing post, settings, and dashboard workflows.
 - `organization.test.mjs`: member slots below team headers, responsive/scaled layouts, collapse/hide/empty states, drop hit testing, normalized offsets, independent layout/view persistence, invalid storage, canonical team transfers, preserved profile fields and failed-write rejection.
 - `vite-config.test.mjs`: LocalHost root-path behavior and Production GitHub Pages base-path normalization.
+- `ci-workflow.test.mjs`: active pull-request trigger, Build → Test → Deploy dependency, and GitHub Pages deploy action configuration.
 
 ## Organization browser checks
 
