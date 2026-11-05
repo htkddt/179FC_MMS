@@ -47,10 +47,10 @@
 
 ### Temporary frontend demo access
 
-- The frontend currently bypasses account authentication so a reviewer without an account can enter the portal. 
-- Clicking Sign in to 179FC creates a mock Club Admin session in the browser tab?s `sessionStorage`; email and password values are not validated or transmitted.
-- This is a local frontend-preview workaround only, not a security feature. 
-- Before backend/database integration or any production deployment, replace it with real account lookup, credential verification, session handling, authorization, and role/permission enforcement.
+- The GitHub Pages URL is a public static **demo/preview** of the frontend, not an operational production service.
+- The frontend currently bypasses account authentication so a reviewer without an account can enter the portal. Clicking Sign in to 179FC creates a mock Club Admin session in the browser tab?s `sessionStorage`; email and password values are not validated or transmitted.
+- The Pages demo has no real authentication, authorization, backend persistence, or access boundary. Do not enter real account credentials, member data, or other personal/sensitive information there.
+- Before using the application operationally or with real accounts/member data, replace demo access with real account lookup, credential verification, session handling, authorization, role/permission enforcement, and server-side persistence.
 
 ### Where Post Create is implemented
 
@@ -72,6 +72,14 @@
    npm ci
    npm run build
    ~~~
+
+### Frontend CI/CD and GitHub Pages
+
+- `.github/workflows/frontend-pages.yml` runs only for active pull requests targeting `main` (opened, synchronized, and reopened).
+- The workflow has sequential **Build**, **Test**, and **Deploy** jobs. Test requires a successful Build; Deploy requires successful Build and Test and then publishes the qualifying pull-request revision to the public GitHub Pages demo. Its `github-pages` environment exposes the Pages URL from `steps.deployment.outputs.page_url` in the workflow run.
+- Build installs from `frontend/package-lock.json`, receives the repository-aware base path from `actions/configure-pages`, builds `frontend/dist`, and uploads it as the GitHub Pages artifact. Test runs `npm test`, installs Playwright Chromium, then runs `npm run test:browser`.
+- The deploy job publishes the Pages artifact through the `github-pages` environment. The repository Pages source must remain set to **GitHub Actions**. Each passed qualifying PR refreshes the default public Pages demo URL; hosting a build there does not make the mock authentication or browser-local data production-ready.
+- The current public Pages demo URL is `https://htkddt.github.io/179FC_MMS/`. Its project-site base path is supplied to CI by `actions/configure-pages`; do not substitute the former `/Vibe_Coding/` path in workflow configuration.
 
 - Backend
 
@@ -104,6 +112,8 @@
    npm run preview -- --host 127.0.0.1 --port 4173
    ~~~
    Open: `http://127.0.0.1:4173/`
+
+   The CI workflow also runs `npm test` and `npm run test:browser` after Build succeeds.
 
 - Backend
 
