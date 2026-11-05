@@ -4,6 +4,7 @@ import App from './app/App.jsx';
 import './styles/globals.css';
 import './styles/post-workflow.css';
 import './styles/organization.css';
+import './styles/settings.css';
 
 const rootElement = document.getElementById('root');
 
