@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test ../tests/frontend/portal.test.mjs ../tests/frontend/organization.test.mjs ../tests/frontend/vite-config.test.mjs ../tests/frontend/ci-workflow.test.mjs",
+    "test": "node --test ../tests/frontend/portal.test.mjs ../tests/frontend/organization.test.mjs ../tests/frontend/settings.test.mjs ../tests/frontend/vite-config.test.mjs ../tests/frontend/ci-workflow.test.mjs",
     "test:browser": "playwright test --config ../tests/frontend/playwright.config.mjs"
   },
   "engines": {

@@ -9,11 +9,13 @@ import { PostStatus } from '../../../mocks/posts.js';
 import { getPosts } from '../api/postsApi.js';
 import { filterPosts } from '../postFilters.js';
 import { formatPostDate } from '../postFormat.js';
+import { useSavedSettings } from '../../settings/SettingsProvider.jsx';
 
 const tabs = [{ value: 'all', label: 'All posts' }, { value: 'published', label: 'Published' }, { value: 'drafts', label: 'Drafts' }];
 const headings = { all: 'All posts', published: 'Published posts', drafts: 'Draft posts' };
 
 export function PostsPage() {
+  const { settings } = useSavedSettings();
   const [tab, setTab] = useUrlTab(tabs.map(item => item.value), 'all');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('newest');
@@ -54,7 +56,7 @@ export function PostsPage() {
       {error ? <div className="posts-state" role="alert">Could not load posts. <button onClick={() => setAttempt(value => value + 1)}>Retry</button></div> : !data ? <div className="posts-state" role="status">Loading posts…</div> : !visible.length ? <div className="posts-state"><p>{query ? 'No posts match your search.' : tab === 'drafts' ? 'You have no drafts yet.' : 'There are no posts to show.'}</p>{!query && <Link to="/posts/new">Create post</Link>}</div> : <div className="posts-list">{visible.map((post, index) => <article className="posts-item" key={post.id} style={{ '--post-index': Math.min(index, 5) }}>
         <Link className="posts-item__link" to={'/posts/' + post.id} state={{ returnTo }}>
           <span className="posts-item__icon"><Icon name={post.type} size={24} /></span>
-          <span className="posts-item__body"><span className="posts-item__title">{post.title}</span><span className="posts-item__excerpt">{post.excerpt}</span><span className="posts-item__author"><Avatar initials={post.author.split(' ').map(name => name[0]).join('').slice(0, 2)} size="sm" /><strong>{post.author}</strong><span aria-hidden="true">·</span><time dateTime={post.updatedAt}>{formatPostDate(post.updatedAt)}</time></span></span>
+          <span className="posts-item__body"><span className="posts-item__title">{post.title}</span><span className="posts-item__excerpt">{post.excerpt}</span><span className="posts-item__author"><Avatar initials={post.author.split(' ').map(name => name[0]).join('').slice(0, 2)} size="sm" /><strong>{post.author}</strong><span aria-hidden="true">·</span><time dateTime={post.updatedAt}>{formatPostDate(post.updatedAt, settings)}</time></span></span>
         </Link>
         <div className="posts-item__actions"><span className={'post-status post-status--' + post.status}>{post.status === PostStatus.published ? 'Published' : post.scheduledAt ? 'Scheduled' : 'Draft'}</span>{post.status === PostStatus.draft && <Link className="post-icon-button post-edit" to={'/posts/' + post.id + '/edit'} state={{ returnTo }} aria-label={'Edit ' + post.title}><Icon name="pen" size={18} /></Link>}<Icon name="arrow" size={17} className="posts-item__arrow" /></div>
       </article>)}</div>}

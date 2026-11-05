@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PAGE_META, ROUTES } from '../../app/routes.js';
 import { useAuth } from '../../features/auth/authStore.jsx';
+import { useCurrentAccount } from '../../features/auth/CurrentAccountProvider.jsx';
 import { Avatar } from '../ui/Avatar.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
@@ -9,6 +10,7 @@ export function TopBar({ onMenuClick }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const account = useCurrentAccount();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -21,8 +23,9 @@ export function TopBar({ onMenuClick }) {
   }, [menuOpen]);
   const meta = PAGE_META[pathname] || (pathname === '/posts/new' ? { title: 'Create post', subtitle: 'Post creation' }
     : pathname.startsWith('/posts/') ? { title: pathname.endsWith('/edit') ? 'Edit draft' : 'Post details', subtitle: 'Club updates' }
-    : pathname === '/settings/password' ? { title: 'Change password', subtitle: 'Account security' }
-    : pathname === '/settings/sessions' ? { title: 'Manage sessions', subtitle: 'Account security' }
+    : pathname === '/settings/password' ? { title: 'Change password' }
+    : pathname === '/settings/two-factor' ? { title: 'Two-factor authentication' }
+    : pathname === '/settings/sessions' ? { title: 'Manage sessions' }
     : pathname.startsWith('/help/') ? { title: pathname === '/help/support' ? 'Contact support' : 'Help article', subtitle: 'Help Center' }
     : { title: 'Employee profile', subtitle: 'Member details' });
   const go = (to) => { setMenuOpen(false); navigate(to); };
@@ -32,14 +35,17 @@ export function TopBar({ onMenuClick }) {
       <div className="top-bar__title"><button className="menu-toggle" aria-label="Open navigation" onClick={onMenuClick}><Icon name="menu" /></button><div><h1>{meta.title}</h1>{meta.subtitle && <p>{meta.subtitle}</p>}</div></div>
       <div className="top-bar__actions">
       <div className="user-menu-wrap" ref={menuRef}>
-        <button className="user-trigger" aria-expanded={menuOpen} aria-label="Open user menu" onClick={() => setMenuOpen((current) => !current)}><Avatar initials="TK" tone="orange" size="sm" label="Tuan Kiet" /><Icon name="chevronDown" size={14} /></button>
+        <button className="user-trigger" aria-expanded={menuOpen} aria-label="Open user menu" onClick={() => setMenuOpen((current) => !current)}><Avatar initials={account.initials} tone={account.tone} image={account.avatar} size="sm" label={account.name} /><Icon name="chevronDown" size={14} /></button>
         {menuOpen ? <div className="user-menu">
-          <div className="user-menu__identity"><Avatar initials="TK" tone="orange" size="sm" /><span><strong>Tuan Kiet</strong><small>Club Admin</small></span></div>
+          <div className="user-menu__identity"><Avatar initials={account.initials} tone={account.tone} image={account.avatar} size="sm" /><span><strong>{account.name || 'Account'}</strong><small>{account.role || 'Member'}</small></span></div>
           <div className="user-menu__divider" />
-          <button onClick={() => go('/employees/tuan-kiet')}>Profile</button>
+          <button disabled={!account.id} onClick={() => go('/employees/' + account.id)}>Profile</button>
           <button onClick={() => go(ROUTES.settings)}>Settings</button>
           <button onClick={() => go(ROUTES.help)}>Help center</button>
-          <button className="user-menu__logout" onClick={() => { if (!window.dispatchEvent(new Event('179fc-before-signout', { cancelable: true }))) return; signOut(); navigate(ROUTES.signIn); }}>Log out</button>
+          <button className="user-menu__logout" onClick={() => {
+            const proceed = () => { signOut(); navigate(ROUTES.signIn); };
+            if (window.dispatchEvent(new CustomEvent('179fc-before-signout', { cancelable: true, detail: { proceed } }))) proceed();
+          }}>Log out</button>
         </div> : null}
       </div></div>
     </header>

@@ -21,6 +21,11 @@ This directory contains desktop design references and their accompanying UX desc
 | Settings: General | [PNG](Settings/Settings_General.png) | [UX](Settings/Settings_General.md) | `/settings?tab=general` |
 | Settings: Notifications | [PNG](Settings/Settings_Notifications.png) | [UX](Settings/Settings_Notifications.md) | `/settings?tab=notifications` |
 | Settings: Security | [PNG](Settings/Settings_Security.png) | [UX](Settings/Settings_Security.md) | `/settings?tab=security` |
+| Settings: Change password | [PNG](Settings/Settings_Change_Password.png) | [UX](Settings/Settings_Change_Password.md) | `/settings/password` |
+| Settings: Two-factor authentication | [PNG](Settings/Settings_Two_Factor.png) | [UX](Settings/Settings_Two_Factor.md) | `/settings/two-factor` |
+| Settings: Active sessions | [PNG](Settings/Settings_Sessions.png) | [UX](Settings/Settings_Sessions.md) | `/settings/sessions` |
+| Settings: responsive | [PNG](Settings/Settings_Responsive.png) | [UX](Settings/Settings_Responsive.md) | General, Security, Change password at 390 px |
+| Settings: interaction states | [PNG](Settings/Settings_States.png) | [UX](Settings/Settings_States.md) | Draft, validation, unconnected/error, loading/empty/retry |
 | Help | [PNG](Help/Help.png) | [UX](Help/Help.md) | `/help` |
 | Assist | [PNG](Assist/Assist.png) | [UX](Assist/Assist.md) | Shared assistant panel, no dedicated route |
 
@@ -34,14 +39,16 @@ designs/
 |-- Posts/            Post_All, Post_Published, Post_Drafts,
 |                     Post_Details, Post_Creations, Post_Editor (.png and .md)
 |-- Settings/         Settings_General, Settings_Notifications,
-|                     Settings_Security (.png and .md)
+|                     Settings_Security, Settings_Change_Password,
+|                     Settings_Two_Factor, Settings_Sessions,
+|                     Settings_Responsive, Settings_States (.png and .md)
 |-- Sign-in/          Sign-in.png, Sign-in.md
 +-- README.md
 ```
 
 The Posts and Settings tab files represent states of their respective pages, not separate sidebar destinations. The active tab must be represented in the URL so that refresh, browser navigation, and a copied link restore the same view. Post details, creation, and editing are separate screens reached from the posts list or details page.
 
-The exports do not include a source Figma link or export date; record those when they become available. The images are desktop references, while responsive layouts are implemented in the frontend.
+Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from a local browser rendering on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. Per the owner's request, `Settings/` retains only `.png` UI references and `.md` UX documents; authoring/export scripts and separate handoff documents are not retained. Other PNGs remain desktop references. Read design intent alongside the frontend README for actual implementation status.
 
 ## UI and component overview
 
@@ -53,13 +60,13 @@ The exports do not include a source Figma link or export date; record those when
 | --- | --- | --- |
 | `AppShell` | Composes `Sidebar`, `TopBar`, page content, and the assistant launcher; handles shared responsive/layout behavior. | Every private page |
 | `Sidebar` | Brand/logo, `NavItem`s, bottom user summary, and the active navigation state derived from the URL. | `AppShell` |
-| `TopBar` | Page title, date/context subtitle, and avatar-based `UserMenu`. The open menu visible in several references is an interaction state, not a permanently visible card. | `AppShell` |
+| `TopBar` | Page title, optional context, and avatar-based `UserMenu`. Settings revision removes its subtitle. Open menus in historical references are interaction states, not permanent cards. | `AppShell` |
 | `PageHeader` | Standardizes titles, subtitles, and page actions. | Private pages |
 | `Tabs` | Accessible tab list with an active underline. Keeps its selected value in the page URL, supports keyboard navigation, and becomes horizontally scrollable rather than wrapping on narrow screens. | Posts, Settings |
 | `Avatar` | Renders an image or colored-initials fallback. | Header, cards, organization nodes |
 | User menu | Toggleable account popover implemented within `TopBar`, with Profile, Settings, Help center, and Log out actions. Closes on outside click, Escape, and navigation. | `TopBar` |
 | `AssistantLauncher` | Persistent icon button with an accessible name, plus an expandable chat panel with a close action, message history, prompt suggestion, and submit input. The launcher tooltip has been removed. | `AppShell` |
-| Loading, empty, and error states | States absent from the mockups but required for API integration; the shared `EmptyState` component and page-level states cover these cases. | Per feature |
+| Loading, empty, and error states | Required for integration; Settings now includes a state board. Use shared `EmptyState` and appropriate page-level states. | Per feature |
 
 ### Sign-in
 
@@ -123,21 +130,20 @@ Both Create and Edit are implemented in [`PostEditorPage.jsx`](../frontend/src/f
 
 Post operations currently use a mock adapter and this browser's `localStorage`: data is not shared between users or devices, and visibility is not enforced by a server. Existing drafts auto-save; a new post is saved through its action buttons. Scheduled items remain drafts until the post collection is next read after the chosen time, rather than being published by a background service. Server authorization, audience enforcement, persistent storage, and real scheduled publishing remain integration work.
 
-### Settings (tabbed page)
+### Settings (tabbed page and security subpages)
 
-`SettingsPage` is a single settings surface with the same URL rule: `/settings?tab=general` is the default, with `notifications` and `security` as the other valid values. Changing tab must not discard unsaved input silently: retain unsaved form state while data is loaded; before navigating away from a dirty page or tab, request confirmation or save/discard explicitly.
+The **179MMS-6 design update (2026-11-03)** is retained as PNG UI references with matching Markdown UX only. The references use synthetic identity; the current frontend implements their Settings UI and explicitly retains the described backend/security/delivery boundary. See [frontend implementation notes](../frontend/README.md#settings-implementation--179mms-6).
 
-The desktop layout has a main settings card and a right-side `AccountSummary` card. The summary contains the current user's avatar/initials, name, role, and email, and remains identical across tabs. On the reference captures, the profile popover is open; implement it through the shared `UserMenu` and do not include it as permanent page content.
+Settings keeps `/settings?tab=general|notifications|security`, defaulting invalid/missing tab values to General. The shared TopBar title scale is used without a Settings-only override; Settings has no subtitle. Route entry uses the common portal transition, while tab/switch feedback remains a separate and shorter animation with reduced-motion support.
 
-| Tab | Controls and requirements |
+| Area | Implemented UI and boundary |
 | --- | --- |
-| General | `Club name` text input; `Workspace language` select; `Time zone` select; `Compact navigation` switch and supporting text; one `Save changes` action. Validate the club name, submit only changed values, and apply compact navigation through `AppShell` after a successful save. |
-| Notifications | `Assistant notifications` and `Weekly activity summary` switches, each with icon, title, and explanatory copy. Both fields are persisted by the single `Save changes` action; a switch should update local form state immediately but not imply the request has succeeded. |
-| Security | Password row with `Change password`; `Two-factor authentication` switch; highlighted `Active sessions` row showing current device/location plus `Manage sessions`; one `Save changes` action for settings stored on this screen. Password and session-management actions open their dedicated flows and must not be treated as simple toggles. |
+| General | Club name, language, time zone, and compact navigation use one shared saved draft. English and Vietnamese are selectable UI preferences; an incomplete translation must retain a clear fallback. |
+| Notifications | Assistant and weekly-summary switches are clickable, saved with the shared Settings data, and visibly distinguish a preference from real delivery. |
+| Security | Clickable Password, Two-factor, and Sessions controls open UI-only subpages. They never claim a password/security/session transaction completed without a connected service. |
+| Subpages | [Password](Settings/Settings_Change_Password.md), [Two-factor](Settings/Settings_Two_Factor.md), and [Sessions](Settings/Settings_Sessions.md) define validation, loading, empty/error/retry, Back/Cancel/focus, and responsive behavior. |
 
-Use native controls with visible labels; the visual switch needs an accessible checkbox/switch name and current state. Save buttons are disabled only when the form is pristine or a request is in progress, show progress during submission, show a success/error message near the action, and preserve typed values after an error. Security-sensitive actions must require a fresh server-side authorization check; the UI alone is not a permission boundary.
-
-At narrow widths, retain the tab list above the content, move `AccountSummary` below the active settings panel, and stack the row action under its description when it no longer fits. The save action remains visible after a long form; use a sticky footer only if it does not obscure an active control or keyboard.
+Read every PNG/Markdown pair directly, including the [responsive](Settings/Settings_Responsive.md) and [interaction-state](Settings/Settings_States.md) boards. Interactive verification runs against the application; no executable authoring/export source or design-only test is retained in this package.
 
 ### Help Center and 179 Assist
 

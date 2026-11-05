@@ -3,8 +3,11 @@ import { Avatar } from '../../../components/ui/Avatar.jsx';
 import { Card } from '../../../components/ui/Card.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
 import { SessionDetails } from './SessionDetails.jsx';
+import { useSavedSettings } from '../../settings/SettingsProvider.jsx';
+import { formatTimestamp } from '../../shared/dateFormat.js';
 
 export function PostCard({ post, session, onLike, onComment }) {
+  const { settings } = useSavedSettings();
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [comment, setComment] = useState('');
 
@@ -18,7 +21,7 @@ export function PostCard({ post, session, onLike, onComment }) {
 
   return (
     <Card className="post-card">
-      <div className="post-card__author"><Avatar initials={post.initials} tone={post.tone} size="sm" /><span><strong>{post.author}</strong><small>{post.time} · {post.team}</small></span></div>
+      <div className="post-card__author"><Avatar initials={post.initials} tone={post.tone} size="sm" /><span><strong>{post.author}</strong><small>{post.createdAt ? formatTimestamp(post.createdAt, settings) : post.time} · {post.team}</small></span></div>
       <p className="post-card__content">{post.content}</p>
       {session && <SessionDetails event={session} />}
       <div className="post-card__footer">

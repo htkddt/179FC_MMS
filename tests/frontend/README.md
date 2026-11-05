@@ -11,7 +11,7 @@ Run `npm test` (Node's built-in test runner).
 - `vite-config.test.mjs`: LocalHost root-path behavior and Production GitHub Pages base-path normalization.
 - `ci-workflow.test.mjs`: active pull-request trigger, Build → Test → Deploy dependency, GitHub Pages deploy action configuration, and LF/CRLF-compatible workflow parsing.
 
-## Organization browser checks
+## Organization and Settings browser checks
 
 Run `npm run test:browser`. Playwright starts a local Vite server on `127.0.0.1:5180` automatically; a running server at that address is reused outside CI.
 
@@ -22,3 +22,12 @@ Run `npm run test:browser`. Playwright starts a local Vite server on `127.0.0.1:
 - Screenshots and failure traces are written to `179fc-organization-test-results` under the operating system's temporary directory. Successful screenshot cases include desktop, member menu, and mobile layouts. Open a retained trace with `npx playwright show-trace <path-to-trace.zip>`.
 
 These checks cover the local mock-data workflow; they do not verify backend authorization or shared persistence. Extend coverage when those contracts become available.
+
+## Settings product checks
+
+- `settings.test.mjs` is included in `npm test`: absent versus malformed/denied storage, typed patches, name normalization, saved Vietnamese/notification preferences, unrelated/legacy key preservation, snapshot conflicts, failed writes without success events, timezone conversion, event rollover and date-only stability.
+- `settings.spec.mjs` is included alongside Organization in `npm run test:browser`: save-before-shell-update, route/reload persistence, validation/focus, tab/Profile/sidebar/logout dirty guards, Escape/discard, Back/Forward, saved notification switches and manual assistant, Password/Two-factor/Sessions UI-only routes with companion boundary panels and 44 px action targets, unavailable-service outcomes without false success, failed read/write recovery, cross-tab pristine refresh/conflict, shared Posts/Dashboard time formatting, canonical avatar/ID, Post Create/Edit timezone labels and schedule preservation, Vietnamese fallback and responsive bounds at 320/390/768/1024/1440 px.
+- The responsive case also checks enlarged root text, reduced-motion computed animation and mobile drawer focus restoration. Enlarged text/viewport automation is not a complete manual accessibility audit or browser-specific native 200% zoom audit.
+- Screenshots include General/Notifications/Security/mobile; retained traces and screenshots use the configured temporary `179fc-organization-test-results` directory for both suites. Tests close their browser/server on completion. Each case has isolated synthetic browser storage. No delivery/security/backend QA is claimed.
+
+Design references are paired [PNG images and Markdown UX](../../designs/Settings/Settings_General.md), including the Settings subpages and state boards. Their executable authoring/export sources and dependent design-only check were removed at the owner's request. Product assertions run against React routes and actual mock adapters. Local self-checks do not replace Tester QA/review on the candidate SHA or any applicable CI requirement.

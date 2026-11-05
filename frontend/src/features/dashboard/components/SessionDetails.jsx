@@ -1,7 +1,9 @@
 import { googleMapsUrl } from '../dashboardStore.js';
+import { useSavedSettings } from '../../settings/SettingsProvider.jsx';
+import { eventInstant, formatTimestamp } from '../../shared/dateFormat.js';
 
 export function SessionDetails({ event, compact = false }) {
-  const date = new Date(`${event.date}T12:00:00`);
+  const { settings } = useSavedSettings();
   const mapUrl = googleMapsUrl(event);
 
   return (
@@ -12,7 +14,7 @@ export function SessionDetails({ event, compact = false }) {
       </figure>}
       <div className="session-details__body">
         <strong>{event.title}</strong>
-        <span className="session-details__date">{compact ? event.time : `${date.toLocaleDateString('en', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} · ${event.time}`}</span>
+        <span className="session-details__date">{formatTimestamp(eventInstant(event), settings)} ({settings.timeZone === 'UTC' ? 'UTC' : 'GMT+07:00'})</span>
         <span className="session-details__venue">{event.location}</span>
         {event.address && <span className="session-details__address">{event.address}</span>}
         {mapUrl && <a className="session-details__map" href={mapUrl} target="_blank" rel="noopener noreferrer" aria-label={`Open ${event.location} in Google Maps (opens in a new tab)`}>View on Google Maps ↗</a>}

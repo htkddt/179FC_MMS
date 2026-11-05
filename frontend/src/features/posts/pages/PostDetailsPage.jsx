@@ -7,6 +7,7 @@ import { PostStatus } from '../../../mocks/posts.js';
 import { getPosts, unpublishPost } from '../api/postsApi.js';
 import { sanitizePostHtml } from '../postContent.js';
 import { formatPostDate } from '../postFormat.js';
+import { useSavedSettings } from '../../settings/SettingsProvider.jsx';
 
 function PerformanceChart({ performance }) {
   const values = performance?.dailyViews;
@@ -21,6 +22,7 @@ function PerformanceChart({ performance }) {
 }
 
 export function PostDetailsPage() {
+  const { settings } = useSavedSettings();
   const { postId } = useParams();
   const location = useLocation();
   const [post, setPost] = useState(null);
@@ -51,7 +53,7 @@ export function PostDetailsPage() {
         <Card className="post-detail__card">
           <span className={'post-status post-status--' + post.status}>{post.status === PostStatus.published ? 'Published' : post.scheduledAt ? 'Scheduled' : 'Draft'}</span>
           <h2>{post.title}</h2>
-          <div className="post-detail__meta"><Avatar initials={post.author.split(' ').map(name => name[0]).join('').slice(0, 2)} size="md" /><span><strong>{post.author}</strong><small><time dateTime={post.publishedAt || post.updatedAt}>{formatPostDate(post.publishedAt || post.updatedAt)}</time></small></span></div>
+          <div className="post-detail__meta"><Avatar initials={post.author.split(' ').map(name => name[0]).join('').slice(0, 2)} size="md" /><span><strong>{post.author}</strong><small><time dateTime={post.publishedAt || post.updatedAt}>{formatPostDate(post.publishedAt || post.updatedAt, settings)}</time></small></span></div>
           {post.image && <img className="post-detail__image" src={post.image} alt={post.imageName || 'Post illustration'} />}
           {post.contentHtml ? <div className="post-detail__content post-rich-content" dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.contentHtml) }} /> : <div className="post-detail__content"><p>{post.content || post.excerpt}</p></div>}
           <div className="post-detail__stats"><span><Icon name="eye" size={19} /> <strong>{metrics.views || 0}</strong> views</span><span><Icon name="heart" size={19} /> <strong>{metrics.reactions || 0}</strong> reactions</span></div>
@@ -59,7 +61,7 @@ export function PostDetailsPage() {
         <aside className="post-detail__rail">
           <Card className="post-panel post-actions"><h2>Post actions</h2><Link className="button post-button--outline" to={'/posts/' + post.id + '/edit'} state={{ returnTo }}><Icon name="pen" size={16} /> Edit {post.status === PostStatus.draft ? 'draft' : 'post'}</Link>{post.status === PostStatus.published && <button className="post-link-button" onClick={unpublish}>Unpublish</button>}</Card>
           <Card className="post-panel"><h2>Post performance</h2><div className="post-performance__metrics">{[['Views', metrics.views], ['Reactions', metrics.reactions], ['Comments', metrics.comments]].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value || 0}</strong></div>)}</div><PerformanceChart performance={post.performance} /></Card>
-          <Card className="post-panel"><h2>Recent activity</h2>{post.activity?.length ? <ul className="post-activity">{post.activity.map((item, index) => <li key={index}><span className={'post-activity__avatar post-activity__avatar--' + index}>{item.initials}</span><span><strong>{item.name}</strong> {item.action}</span><time dateTime={item.date}>{formatPostDate(item.date)}</time></li>)}</ul> : <p className="post-performance__empty">No recent activity yet.</p>}</Card>
+          <Card className="post-panel"><h2>Recent activity</h2>{post.activity?.length ? <ul className="post-activity">{post.activity.map((item, index) => <li key={index}><span className={'post-activity__avatar post-activity__avatar--' + index}>{item.initials}</span><span><strong>{item.name}</strong> {item.action}</span><time dateTime={item.date}>{formatPostDate(item.date, settings)}</time></li>)}</ul> : <p className="post-performance__empty">No recent activity yet.</p>}</Card>
         </aside>
       </div>
     </>}
