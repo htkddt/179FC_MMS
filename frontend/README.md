@@ -151,7 +151,7 @@ The application requires Node.js 20.19 or newer (or Node.js 22.12 or newer).
 
 - **LocalHost**: `npm run dev` serves the application from `/`. `vite.config.js` always uses this root path outside Production, so the local Vite and Playwright URLs remain `http://127.0.0.1:<port>/`.
 - **Production**: `npm run build` uses `VITE_BASE_PATH` when set. The GitHub Actions workflow receives the repository-aware value from `actions/configure-pages`, which produces a GitHub Pages-compatible build for this project site, then deploys it after Build and Test succeed for a qualifying pull request. The router uses Vite's `BASE_URL` as its basename, so app routes stay relative to that production path.
-- **Public GitHub Pages demo**: `https://htkddt.github.io/Vibe_Coding/` hosts the static demo/preview build. “Production” in the Vite build mode and base-path configuration does not mean this public demo has production authentication, authorization, backend persistence, or real-data safeguards.
+- **Public GitHub Pages demo**: `https://htkddt.github.io/179FC_MMS/` hosts the static demo/preview build. Its current project-site subpath is `/179FC_MMS/`; CI obtains that path from `actions/configure-pages` rather than hard-coding it in the workflow. “Production” in the Vite build mode and base-path configuration does not mean this public demo has production authentication, authorization, backend persistence, or real-data safeguards.
 - Copy the documented value in `.env.example` only when a local production build needs to emulate the GitHub Pages subpath. Do not commit an environment file containing credentials or other secrets.
 
 ## Implemented routes and flow
