@@ -11,8 +11,8 @@ Read with `Help_Invite_Members.png`.
 
 ## Article structure
 
-- Use the common article template from `Help.md`: breadcrumb; simple white header; narrow **On this page** card; numbered step card; callout; full-width two-row related card; Back.
-- The TOC anchors exactly match the steps: **Open Employees** (`#open-employees`), **Prepare member details** (`#prepare-member-details`), and **Review the invitation** (`#review-the-invitation`). The active target has `aria-current="location"` and a burgundy leading indicator.
+- Use the common article template from `Help.md`: burgundy Help Center breadcrumb; simple white header with an ordinary uppercase-gray category label; narrow **On this page** card; numbered step card with the callout inside after the last divider; full-width two-row related card; burgundy Back.
+- The TOC anchors exactly match the steps: **Open Employees** (`#open-employees`), **Prepare member details** (`#prepare-member-details`), and **Review the invitation** (`#review-the-invitation`). The shown first target has `aria-current="location"`, a pale-pink row background, and a burgundy leading indicator.
 - Related articles link to club profile and member roles in complete 44 px rows with a visible destination affordance.
 - The boundary callout reads: **Invitation delivery is not connected in this demo.** It is warning/information, not an error or a promise of an email.
 

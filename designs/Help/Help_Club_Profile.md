@@ -11,8 +11,8 @@ Read with `Help_Club_Profile.png` and `../Settings/Settings_General.md`.
 
 ## Article structure
 
-- Use the common article template from `Help.md`: breadcrumb; simple white header; narrow **On this page** card; numbered step card; callout; full-width two-row related card; Back.
-- The TOC anchors exactly match the steps: **Open Settings** (`#open-settings`), **Update club details** (`#update-club-details`), and **Save your changes** (`#save-your-changes`). Use direct, scannable copy that corresponds to the Settings General UI rather than duplicating its form. The active target has `aria-current="location"` and the common burgundy leading indicator.
+- Use the common article template from `Help.md`: burgundy Help Center breadcrumb; simple white header with an ordinary uppercase-gray category label; narrow **On this page** card; numbered step card with the callout inside after the last divider; full-width two-row related card; burgundy Back.
+- The TOC anchors exactly match the steps: **Open Settings** (`#open-settings`), **Update club details** (`#update-club-details`), and **Save your changes** (`#save-your-changes`). Use direct, scannable copy that corresponds to the Settings General UI rather than duplicating its form. The shown first target has `aria-current="location"`, a pale-pink row background, and the common burgundy leading indicator.
 - Display this honest boundary callout: **Settings are browser-local in this demo and are not shared with a server.**
 - Related links lead to invite members and member roles; their entire row/card is interactive and exposes a visible focus treatment.
 

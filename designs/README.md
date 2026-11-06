@@ -154,6 +154,8 @@ Read every PNG/Markdown pair directly, including the [responsive](Settings/Setti
 
 `HelpPage` includes a help-article search input, three quick-guide cards (create a post, find a member, manage an account), a popular-article list, and a `Contact support` call to action. Cards and articles navigate to their destination or article detail; search states need loading, no-result, and error presentations.
 
+The Help article PNG/Markdown pairs share one nested-route reference: ordinary uppercase-gray category text, **On this page** with a pale-pink current row and burgundy leading indicator, a boundary callout inside the step card, and burgundy Help Center breadcrumb/Back links. Read `Help/Help.md` with each article pair before implementation.
+
 The circular assistant trigger is present in the authenticated shell. It expands to the `AssistantPanel` reference: a header with availability message and close button, a conversation area, suggested question, and labelled text input with submit button. Opening the panel must move focus into it; closing returns focus to the launcher. Messages need their own loading/error state and must be announced accessibly.
 
 ## Minimal design system

@@ -11,8 +11,8 @@ Read with `Help_Member_Roles.png`, `../Organization/Organization.md`, and the Em
 
 ## Article structure
 
-- Use the common article template from `Help.md`: breadcrumb; simple white header; narrow **On this page** card; numbered step card; callout; full-width two-row related card; Back.
-- The TOC anchors exactly match the steps: **Review the member role** (`#review-member-role`), **Check the team context** (`#check-team-context`), and **Request a role change** (`#request-role-change`). They reference the member profile and Organization workspace but do not invent an editable role control. The active target has `aria-current="location"` and the common burgundy leading indicator.
+- Use the common article template from `Help.md`: burgundy Help Center breadcrumb; simple white header with an ordinary uppercase-gray category label; narrow **On this page** card; numbered step card with the callout inside after the last divider; full-width two-row related card; burgundy Back.
+- The TOC anchors exactly match the steps: **Review the member role** (`#review-member-role`), **Check the team context** (`#check-team-context`), and **Request a role change** (`#request-role-change`). They reference the member profile and Organization workspace but do not invent an editable role control. The shown first target has `aria-current="location"`, a pale-pink row background, and the common burgundy leading indicator.
 - The boundary callout reads: **Permissions are not connected to a server-authorized role service in this demo.**
 - Related articles link to invite members and club profile. The article title, step headings, body, and callout preserve the reduced Help type scale and clear reading rhythm.
 
