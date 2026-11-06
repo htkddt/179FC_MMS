@@ -24,6 +24,6 @@ export const PAGE_META = {
   [ROUTES.employees]: { title: 'Employees' },
   [ROUTES.organization]: { title: 'Organization' },
   [ROUTES.settings]: { title: 'Settings' },
-  [ROUTES.help]: { title: 'Help Center', subtitle: 'Find answers, guides, and support for your workspace.' },
+  [ROUTES.help]: { title: 'Help Center' },
   [ROUTES.assistant]: { title: '179 Assist - Expanded', subtitle: 'Monday, 13 October 2026' },
 };
