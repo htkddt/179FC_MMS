@@ -40,9 +40,10 @@ export function HelpPage() {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [attempt, setAttempt] = useState(0);
+  const [restoreFocusAfterRetry, setRestoreFocusAfterRetry] = useState(false);
   const searchRef = useRef(null);
   const retryRef = useRef(null);
-  const refocusAfterRetry = useRef(false);
+  const initialContentArrival = useRef(true);
 
   useEffect(() => {
     let active = true;
@@ -54,10 +55,6 @@ export function HelpPage() {
         if (!active) return;
         setData(result);
         setIsLoading(false);
-        if (refocusAfterRetry.current) {
-          refocusAfterRetry.current = false;
-          searchRef.current?.focus();
-        }
       })
       .catch(() => {
         if (!active) return;
@@ -70,22 +67,27 @@ export function HelpPage() {
   }, [attempt]);
 
   useEffect(() => {
-    if (error && !isLoading && refocusAfterRetry.current) {
-      refocusAfterRetry.current = false;
-      retryRef.current?.focus();
-    }
-  }, [error, isLoading]);
+    if (!restoreFocusAfterRetry || isLoading) return;
+    (error ? retryRef : searchRef).current?.focus();
+    setRestoreFocusAfterRetry(false);
+  }, [error, isLoading, restoreFocusAfterRetry]);
+
+  useEffect(() => {
+    if (data) initialContentArrival.current = false;
+  }, [data]);
 
   const normalized = normalizeHelpQuery(query);
   const { guides, articles } = useMemo(() => filterHelpContent(data, normalized), [data, normalized]);
   const hasResults = guides.length > 0 || articles.length > 0;
   const retry = () => {
-    refocusAfterRetry.current = true;
+    setRestoreFocusAfterRetry(true);
+    setIsLoading(true);
+    setError(false);
     setAttempt((value) => value + 1);
   };
 
   return (
-    <section className={'help-page' + (normalized ? ' help-page--filtering' : '')}>
+    <section className={'help-page' + (initialContentArrival.current ? '' : ' help-page--content-entered')}>
       <label className="help-search" htmlFor="help-search">
         <Icon name="search" size={27} />
         <span className="sr-only">Search help articles</span>

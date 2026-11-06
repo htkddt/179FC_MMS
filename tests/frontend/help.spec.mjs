@@ -61,4 +61,10 @@ test('Help is responsive and only animates when reduced motion is not requested'
   await page.getByRole('link', { name: 'Help', exact: true }).click();
   await expect(page.locator('.help-page')).toHaveCSS('animation-name', 'help-page-arrive');
   await expect(page.locator('.help-guide-card').first()).toHaveCSS('animation-name', 'help-guide-arrive');
+  const search = page.getByRole('searchbox', { name: 'Search help articles' });
+  await search.fill('member');
+  await expect(page.locator('.help-guide-card')).toHaveCSS('animation-name', 'none');
+  await search.fill('');
+  await expect(page.locator('.help-guide-card').first()).toHaveCSS('animation-name', 'none');
+  await expect(page.locator('.help-lower-grid')).toHaveCSS('animation-name', 'none');
 });

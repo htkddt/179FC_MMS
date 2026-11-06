@@ -380,8 +380,8 @@ h1, h2, h3, p { margin-top: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
   .help-page { animation: help-page-arrive 350ms cubic-bezier(.2, .7, .2, 1) both; }
-  .help-page:not(.help-page--filtering) .help-guide-card { animation: help-guide-arrive 350ms cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--help-index) * 45ms); }
-  .help-page:not(.help-page--filtering) .help-lower-grid { animation: help-lower-arrive 350ms cubic-bezier(.2, .7, .2, 1) 135ms both; }
+  .help-page:not(.help-page--content-entered) .help-guide-card { animation: help-guide-arrive 350ms cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--help-index) * 45ms); }
+  .help-page:not(.help-page--content-entered) .help-lower-grid { animation: help-lower-arrive 350ms cubic-bezier(.2, .7, .2, 1) 135ms both; }
   .help-guide-card, .popular-article-link { transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
   .help-guide-card__action, .popular-articles__arrow { transition: transform .18s ease, background .18s ease; }
   .help-skeleton-card > span, .help-skeleton-card > strong, .help-skeleton-card > small, .help-skeleton-panel > span, .help-skeleton-panel > strong, .help-skeleton-panel > small { animation: help-skeleton-pulse 1100ms ease-in-out infinite alternate; }
