@@ -82,6 +82,7 @@ frontend/
 |   |   |-- help/
 |   |   |   |-- api/
 |   |   |   |   +-- helpApi.js
+|   |   |   |-- helpFilters.js
 |   |   |   +-- pages/
 |   |   |       +-- HelpPage.jsx
 |   |   |-- organization/
@@ -166,6 +167,7 @@ The application requires Node.js 20.19 or newer (or Node.js 22.12 or newer).
 - `/posts?tab=all|published|drafts` provides URL-backed tabs, search, sorting, status counts, draft edit links, and loading/empty/error states. `/posts/:postId` displays post content, actions, and available mock performance data; `/posts/new` and `/posts/:postId/edit` provide creation and editing, image attachments, formatting, draft auto-save, review, publication, and unpublishing. The mock posts adapter stores changes and images in this browser's `localStorage`, so they are not shared across users or devices. Images are limited to 2 MB. Scheduled posts stay in drafts and are marked published when the collection is next read after the chosen time; this is not a background publishing service. Visibility is stored as a preference but is not enforced by a server.
 - `/settings?tab=general|notifications|security` provides URL-backed tabs, shared saved settings, guarded drafts/conflicts and canonical Account data. Saved club name/compact navigation update the shell; time zone updates Posts/Dashboard formatters. English and Vietnamese are selectable preferences, while the portal visibly remains English until translation is connected. Notification switches are saved preferences only; delivery remains unavailable.
 - `/settings/password`, `/settings/two-factor`, and `/settings/sessions` provide interactive UI-only security flows with validation/loading/error/retry/Back behavior. Each has an approved desktop companion boundary/help panel, stacks that panel under the main card below 1024 px, and keeps every action target at least 44 px high. They do not store a password, create an enrolled factor, invent a session/device/location, revoke a session, or claim a security action succeeded. Server-authorized operations still require backend work. Help articles and support remain placeholder routes. 179 Assist uses a mock reply adapter and keeps conversation history while the shell remains mounted. The icon button toggles the chat panel and retains its accessible label; the launcher tooltip has been removed.
+- `/help` uses the shared `TopBar` title without a subtitle, a labelled global search, three quick-guide destinations, whole-row popular-article links, and an always-available Contact support route. `HelpPage` coordinates loading, error/retry, filtering, and responsive layout; `helpFilters.js` keeps guide/article matching deterministic while `helpApi.js` remains the browser-local mock adapter. Loading uses layout-matched skeletons; errors preserve the title/search and provide Retry; no matches retain Contact support and show an explicit recovery message. Its 350 ms arrival, restrained guide stagger, and hover feedback are disabled by `prefers-reduced-motion` and are not re-applied while filtering.
 - Feature adapters isolate mock dashboard, posts, settings, help, assistant, and member-profile behavior from their UI. Member directory data is mocked in [`src/mocks/members.js`](src/mocks/members.js); [`memberProfileStore.js`](src/features/employees/memberProfileStore.js) persists the editable profile fields locally.
 
 ## Organization implementation
@@ -274,6 +276,12 @@ Existing Dashboard event date/time pairs and legacy offset-free post timestamps 
 
 Display preferences never rewrite stored events or scheduled publication instants. The Post Create datetime input retains its existing **device time zone** interpretation, now explicitly labelled; Dashboard session input is labelled Ho Chi Minh City time. Existing publication-on-next-collection-read semantics are unchanged. No schema migration, backend scheduler, auth API or notification service is implemented.
 
+## Help implementation â€” 179MMS-9
+
+The approved [Help reference](../designs/Help/Help.md) is implemented by `features/help/pages/HelpPage.jsx` and reuses the authenticated shell, shared `Card`, `Icon`, routes, and mock adapter. `PAGE_META` supplies only the **Help Center** title for `/help`; it deliberately does not reserve subtitle space. Search filters the immutable mock guide/article records locally through `helpFilters.js`; it does not call a support backend. Search is disabled only while the page cannot evaluate its initial/retry load, and every guide action, article row, and support action remains a keyboard-accessible navigation control with a 44 px minimum target.
+
+The page renders matching skeleton geometry during loading, a concise Retry state on a failed load, and the exact empty recovery message with Contact support still available. The component keeps the input stable across states and restores a predictable focus target after Retry. Page arrival uses a 350 ms opacity/9 px reveal, quick guides stagger by 45 ms in DOM order, and lower panels follow after the guides. Query changes do not trigger content entrance motion. `prefers-reduced-motion: reduce` removes Help page, card, hover, and skeleton motion while retaining focus outlines and controls.
+
 ### Verification
 
 From `frontend/`, run `npm ci`, `npm test`, `npm run test:browser` and `npm run build`. Logic checks include settings validation/persistence/conflict/date boundaries and saved UI preferences. Playwright covers Settings security subpages, notification persistence, focus restoration, reduced motion and shared consumers as well as Organization regressions. See [test scope and setup](../tests/frontend/README.md). Authoring/export sources and their dependent design-only test were removed when the design package was restricted to PNG/Markdown. Local self-checks are separate from Tester QA and CI.
@@ -290,7 +298,7 @@ Clicking Sign in to 179FC creates a mock Club Admin session without checking cre
 
 ## Test Location
 
-Do not add test source to this directory. Frontend tests live in `../tests/frontend/`. Run logic checks with `npm test`, and Settings/Organization browser checks with `npm run test:browser`. Playwright is a development dependency; its config starts Vite automatically on port 5180. Windows uses installed Microsoft Edge by default. See [runner setup and coverage](../tests/frontend/README.md).
+Do not add test source to this directory. Frontend tests live in `../tests/frontend/`. Run logic checks with `npm test`, and Help/Settings/Organization browser checks with `npm run test:browser`. Playwright is a development dependency; its config starts Vite automatically on port 5180. Windows uses installed Microsoft Edge by default. See [runner setup and coverage](../tests/frontend/README.md).
 
 ## Documentation Rule
 
