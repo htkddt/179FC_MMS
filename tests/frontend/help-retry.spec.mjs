@@ -13,6 +13,7 @@ export async function getHelp() {
   if (calls <= 2 || sessionStorage.getItem('179fc-test-help-retry-fails') === 'true') throw new Error('Synthetic help load failure');
   return { guides, articles };
 }
+export async function getHelpArticle() { return null; }
 `;
 
 async function openHelpWithMock(page, retryFails) {

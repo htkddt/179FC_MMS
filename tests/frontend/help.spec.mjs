@@ -34,6 +34,37 @@ test('Help Center omits its subtitle and keeps keyboard-accessible destinations'
   await expect(page).toHaveURL(/\/help\/articles\/invite-members$/);
 });
 
+test('Help articles use one semantic template with matching anchors and recovery', async ({ page }) => {
+  await page.getByRole('link', { name: 'How to invite new members' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Help Center' })).toBeVisible();
+  await expect(page.locator('.top-bar p')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 2, name: 'How to invite new members' })).toBeVisible();
+  const currentTarget = page.locator('.help-article__toc a[aria-current="location"]');
+  await expect(currentTarget).toHaveText('Open Employees');
+  await expect(currentTarget).toHaveAttribute('href', '#open-employees');
+  await expect(page.locator('#open-employees')).toContainText('Go to the Employees workspace from the sidebar.');
+  await expect(page.getByLabel('Demo service boundary')).toContainText('Invitation delivery is not connected in this demo.');
+  await expect(page.getByRole('link', { name: 'How to update your club profile' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Back to Help Center' })).toBeVisible();
+
+  await page.goto('/help/articles/missing-article');
+  await expect(page.getByRole('heading', { level: 2, name: 'Help article not found' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Back to Help Center' })).toBeVisible();
+});
+
+test('Contact support keeps a usable local form without inventing a submission', async ({ page }) => {
+  await page.getByRole('link', { name: 'Contact support', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Contact support' })).toBeVisible();
+  await expect(page.locator('.top-bar p')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 2, name: 'Tell us how we can help' })).toBeVisible();
+  await expect(page.getByLabel('Topic')).toBeEnabled();
+  await expect(page.getByLabel('Relevant page (optional)')).toBeEnabled();
+  await expect(page.getByLabel('What happened?')).toBeEnabled();
+  await expect(page.getByLabel('Support service boundary')).toContainText('This form will not send a request.');
+  await expect(page.getByRole('button', { name: 'Support service unavailable' })).toBeDisabled();
+  await expect(page.getByRole('link', { name: 'How to update your club profile' })).toBeVisible();
+});
+
 test('Help search filters content and preserves Contact support as empty-state recovery', async ({ page }) => {
   const search = page.getByRole('searchbox', { name: 'Search help articles' });
   await search.fill('invite');

@@ -8,7 +8,7 @@ Run `npm test` (Node's built-in test runner).
 
 - `portal.test.mjs`: existing post, settings, and dashboard workflows.
 - `organization.test.mjs`: member slots below team headers, responsive/scaled layouts, collapse/hide/empty states, drop hit testing, normalized offsets, independent layout/view persistence, invalid storage, canonical team transfers, preserved profile fields and failed-write rejection.
-- `help.test.mjs`: normalized guide/article filtering with synthetic mock content and non-mutating result handling.
+- `help.test.mjs`: normalized guide/article filtering and the isolated shared article-data contract with synthetic mock content.
 - `vite-config.test.mjs`: LocalHost root-path behavior and Production GitHub Pages base-path normalization, including the current `/179FC_MMS/` project-site sample. The workflow itself receives its path from `actions/configure-pages`, so a future repository rename does not require a workflow constant.
 - `ci-workflow.test.mjs`: active pull-request trigger, Build → Test → Deploy dependency, GitHub Pages deploy action configuration, and LF/CRLF-compatible workflow parsing.
 
@@ -20,7 +20,7 @@ Run `npm run test:browser`. Playwright starts a local Vite server on `127.0.0.1:
 - Other platforms default to bundled Chromium: install it with `npx playwright install chromium` first. To use bundled Chromium on Windows, run `$env:PLAYWRIGHT_CHANNEL='chromium'` before the test command. Use `PLAYWRIGHT_CHANNEL=chrome` for an installed Chrome browser.
 - `playwright.config.mjs` resolves dependencies from `frontend/package.json`, keeping test source out of the application directory.
 - `organization.spec.mjs` covers the simplified toolbar/plain canvas, ellipsis-only actions, search/filter, persistent team zoom/collapse/hide, expanded chart, zoom-aware positioning and cross-team drops (including collapsed targets), membership synchronization with Employees/Profile and another open tab, preserved avatar/phone, empty-team recovery, failed writes, keyboard/cancel/reset behavior, mobile bounds, reduced motion and the assistant.
-- `help.spec.mjs` covers the subtitle-free shared header, labelled search, quick-guide/article destinations, 44 px actions, filtered empty recovery with Contact support, 390 px layout/drawer bounds, and both reduced-motion and enabled page/card arrival behavior without re-entry on query changes.
+- `help.spec.mjs` covers the subtitle-free shared Help header, labelled search, quick-guide/article destinations, shared article heading/TOC/current-anchor/boundary/recovery behavior, the non-sending Support form boundary, 44 px actions, filtered empty recovery with Contact support, 390 px layout/drawer bounds, and both reduced-motion and enabled page/card arrival behavior without re-entry on query changes.
 - `help-retry.spec.mjs` uses a route-fulfilled mock adapter to cover failed Help load → Retry → successful input focus, and a repeated failure that retains Retry focus. It does not add a production test hook.
 - Screenshots and failure traces are written to `179fc-organization-test-results` under the operating system's temporary directory. Successful screenshot cases include desktop, member menu, and mobile layouts. Open a retained trace with `npx playwright show-trace <path-to-trace.zip>`.
 
