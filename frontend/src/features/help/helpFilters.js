@@ -9,6 +9,6 @@ export function filterHelpContent(source, query) {
 
   return {
     guides: guides.filter((guide) => includesQuery([guide.title, guide.description])),
-    articles: articles.filter((article) => includesQuery([article.title])),
+    articles: articles.filter((article) => includesQuery([article.title, ...(article.searchTerms || [])])),
   };
 }

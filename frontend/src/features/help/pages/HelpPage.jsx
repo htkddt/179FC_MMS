@@ -26,10 +26,10 @@ function HelpLoading() {
 function SupportCard() {
   return (
     <section className="support-card" aria-labelledby="help-support-heading">
-      <Icon name="headset" size={39} />
-      <h2 id="help-support-heading">Still need help?</h2>
-      <p>Our support team is here to help you get the most from 179FC.</p>
-      <Link className="button" to="/help/support">Contact support</Link>
+      <Icon name="headset" size={33} />
+      <h2 id="help-support-heading">Need more help?</h2>
+      <p>Contact support when an article does not resolve your question.</p>
+      <Link className="button button--outline" to="/help/support">Contact support</Link>
     </section>
   );
 }
