@@ -2,60 +2,38 @@
 
 ## Scope
 
-This revision is the approved visual reference for the authenticated `/help` page in 179MMS-9. It removes the explanatory line under the page title and aligns the Help heading with the shared page-header scale used by Dashboard, Posts, Employees, Organization, and Settings.
+`Help.png` is the revised desktop reference for authenticated `/help` in 179MMS-9. It now normalizes the full Help text hierarchy and introduces the companion article and Support references in this folder. The PNG was revised locally on 2026-11-06; no Figma source or export date was supplied.
 
-Reference asset: `Help.png` (desktop, 1587 × 991). The reference was revised locally for 179MMS-9 on 2026-11-06; no editable Figma source or Figma export date was supplied.
+## Typography and hierarchy
 
-## Layout and visual hierarchy
+- Reuse the shared `TopBar` title treatment for **Help Center** with no subtitle or Help-only hero styling. The title is visually aligned with Dashboard, Posts, Employees, Organization, and Settings.
+- At the desktop reference scale, use approximately 28–30 px for the shared page title, 20–22 px for section headings, 17–18 px for guide titles, and 14–15 px for body copy, article rows, and search text. The responsive implementation may use shared tokens/clamps but must preserve this hierarchy.
+- Keep search as the first content control; it is wide, capped, labelled, and separated from the compact title by stable whitespace.
+- Quick-guide cards, article rows, and the support card use the existing white-surface/card pattern with burgundy accents, cool-gray dividers, and readable near-black text. Do not introduce a new Help-specific visual system.
 
-- Reuse the authenticated shell without a Help-specific header treatment: the shared top-bar title is **Help Center**. It uses the existing shared `top-bar h1` typography, alignment, and responsive sizing. Do not add a Help-only oversized hero title.
-- There is no subtitle, supporting sentence, or blank replacement below **Help Center**. In the current frontend metadata this means Help must not supply `subtitle` to the shared `TopBar`.
-- Keep the search field as the first content control, directly below the compact title with the same content gutter as the page grid. At desktop it is wide but capped rather than spanning the full content canvas.
-- Preserve the existing content order: search; **Quick guides**; **Popular articles** beside **Still need help?**; persistent 179 Assist launcher.
-- Maintain the portal’s burgundy sidebar, near-black headings, white surfaces, fine cool-gray borders, blush guide icons/action buttons, and burgundy support panel. Contrast must remain readable for text, focus indicators, and icon-only actions.
+## Self-service and escalation
 
-## User goal and interaction model
+The primary Help journey is search → quick guide or popular article. **Need more help?** remains necessary as an escalation when a search/article cannot resolve an account, permission, or operational question, but it is intentionally secondary:
 
-Help people resolve common questions independently and provide a clear human-support escalation when self-service is insufficient.
+- It is a quiet white outlined card, not the previous oversized burgundy feature panel.
+- Its short copy sets the expectation that an article should be tried first; **Contact support** is the single secondary action.
+- `/help/support` is designed in `Help_Support.png` and `Help_Support.md`. The current product has no support backend, so this route must not claim a request was sent.
 
-- Global search filters guides and articles by task or keyword. The visible result must retain a clear article or destination affordance.
-- Quick guides take the user to the existing target flows: Create a post, Find a member, and Manage your account.
-- Popular article rows are complete clickable rows with a visible trailing arrow and keyboard focus state; do not make only the icon actionable.
-- **Contact support** preserves the `/help/support` destination already used by the page. If support context becomes available later, it may prefill a concise issue description; no successful support submission is implied by this reference.
+## Content, states, and navigation
 
-## States
+- Search filters the three quick guides and article records by task/keyword. Guide and article targets remain unambiguous and whole rows/actions are keyboard accessible.
+- Popular articles route to `/help/articles/invite-members`, `/help/articles/club-profile`, and `/help/articles/member-roles`. Their references are `Help_Invite_Members.*`, `Help_Club_Profile.*`, and `Help_Member_Roles.*`.
+- Loading keeps the title/search stable and uses card/row skeletons without layout shift. Search is disabled only while filtering cannot be evaluated, with a concise assistive status.
+- Empty results preserve search and the support recovery route, with: **No help articles match your search. Try another keyword or contact support.**
+- Error preserves the title/search and provides an explicit **Retry** action. Focus stays predictable: on an unsuccessful retry it returns to Retry; after a successful retry it returns to the enabled search field.
 
-### Loading
+## Responsive, motion, and accessibility
 
-- Keep the title and search field stable.
-- Replace content cards/rows with matching skeleton blocks; do not shift the shell or title while data arrives.
-- Search is disabled only while the page cannot evaluate a query; announce loading through a concise status message for assistive technology.
-
-### Filtered empty state
-
-- When no guide or article matches, retain the search field and show a polite status below the content area: **No help articles match your search. Try another keyword or contact support.**
-- Keep **Contact support** available as the recovery action.
-
-### Error
-
-- Retain the heading and search field. Replace unavailable content with a concise error message and an explicit **Retry** control.
-- Retry receives focus after activation only when the request remains unsuccessful; on success, focus stays predictable and does not jump away from the search field.
-
-## Responsive behavior
-
-- Desktop (reference): three equal quick-guide cards and a two-column lower section, with Popular articles wider than the support card.
-- Medium widths: retain the shared shell; use two guide columns and stack the lower section when it no longer has room.
-- Narrow widths: use the existing accessible sidebar drawer; stack every guide card and lower panel to one column. Search stays full available width, and the 179 Assist launcher never obscures the primary support action.
-- Preserve 44 px minimum target size for search controls, guide actions, article rows, Contact support, menu toggle, and assistant launcher.
-
-## Motion and accessibility handoff
-
-- Match the portal page-entry convention: a short 350 ms opacity/8–10 px upward reveal after navigation, with no layout movement after the first frame.
-- Reveal Quick guide cards in DOM order with a restrained 40–50 ms stagger; the lower panels may follow after the guide group. Do not animate search text or content while typing/filtering.
-- On hover-capable devices, guide cards and article rows may lift 2–3 px and show the existing subtle shadow/arrow feedback. Pressed feedback is brief and never the only state signal.
-- Honour `prefers-reduced-motion: reduce`: remove entry, stagger, hover-transform, and page-transition movement while preserving all controls and focus treatment.
-- Use visible `:focus-visible` outlines with sufficient contrast. Search has a programmatic label; icon-only guide actions and the assistant launcher must retain accessible names.
+- Desktop uses three quick-guide cards and a lower two-column section. At medium width, guides use two columns and the lower section stacks; at narrow width, the existing sidebar drawer and one-column content layout apply.
+- Interactive targets are at least 44 px. Visible `:focus-visible` treatment is required for search, guide actions, article rows, support action, menu toggle, and assistant launcher.
+- Use the portal’s 350 ms opacity/8–10 px page arrival; quick guides may enter in DOM order with a 40–50 ms stagger. Query edits must not replay entrance motion.
+- `prefers-reduced-motion: reduce` removes page, card, hover-transform, and skeleton movement without removing focus or controls.
 
 ## Implementation boundary
 
-This is a design handoff only. `Help.png` and this file describe the desired frontend presentation; the current help data is browser-local mock content, not a support backend. Developer should reuse the shared `TopBar`, card, route, and motion patterns rather than duplicating shell styles.
+These PNG and Markdown files are design references only. Help articles, invitation delivery, server-authorized roles, and support messaging require future frontend/backend work; browser-local demo state must be labelled honestly.
