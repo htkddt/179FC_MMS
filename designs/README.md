@@ -27,6 +27,10 @@ This directory contains desktop design references and their accompanying UX desc
 | Settings: responsive | [PNG](Settings/Settings_Responsive.png) | [UX](Settings/Settings_Responsive.md) | General, Security, Change password at 390 px |
 | Settings: interaction states | [PNG](Settings/Settings_States.png) | [UX](Settings/Settings_States.md) | Draft, validation, unconnected/error, loading/empty/retry |
 | Help | [PNG](Help/Help.png) | [UX](Help/Help.md) | `/help` |
+| Help: invite members article | [PNG](Help/Help_Invite_Members.png) | [UX](Help/Help_Invite_Members.md) | `/help/articles/invite-members` |
+| Help: club profile article | [PNG](Help/Help_Club_Profile.png) | [UX](Help/Help_Club_Profile.md) | `/help/articles/club-profile` |
+| Help: member roles article | [PNG](Help/Help_Member_Roles.png) | [UX](Help/Help_Member_Roles.md) | `/help/articles/member-roles` |
+| Help: Contact support | [PNG](Help/Help_Support.png) | [UX](Help/Help_Support.md) | `/help/support` |
 | Assist | [PNG](Assist/Assist.png) | [UX](Assist/Assist.md) | Shared assistant panel, no dedicated route |
 
 ```text
@@ -34,7 +38,8 @@ designs/
 |-- Assist/           Assist.png, Assist.md
 |-- Dashboard/        Dashboard.png, Dashboard.md
 |-- Employees/        Employees.png, Employees.md
-|-- Help/             Help.png, Help.md
+|-- Help/             Help.png, Help_Invite_Members, Help_Club_Profile,
+|                     Help_Member_Roles, Help_Support (.png and .md)
 |-- Organization/     Organization.png, Organization.md
 |-- Posts/            Post_All, Post_Published, Post_Drafts,
 |                     Post_Details, Post_Creations, Post_Editor (.png and .md)
@@ -320,4 +325,4 @@ The shell, demo sign-in, Dashboard, post list and workflow, Settings, Employees 
 - Keep the image and UX description for each screen or state together in its feature folder, using matching base names. Existing exports retain their current names; use English, lowercase kebab-case for new assets where practical. Use SVG for icons and vectors, and optimized PNG/WebP for raster assets.
 - Do not store credentials, real member data, or unlicensed assets.
 - When a design changes, update its image and UX description together, and record its Figma/source link, export date, and any route/component impact here when available. For a tabbed page, record every tab state and whether it changes the shared component/API contract. Also update `frontend/README.md` when the architecture, dependency set, routes, or data flow changes.
-- `Help/Help.png` and `Help/Help.md` were revised locally for **179MMS-9** on 2026-11-06. No Figma source or export date was supplied. The revision removes the Help subtitle, uses the shared page-title treatment, and documents responsive, state, motion, and accessibility behavior for `/help`.
+- The Help package was revised locally for **179MMS-9** on 2026-11-06. It now contains `Help.png` plus Invite Members, Club Profile, Member Roles, and Support references, each as a `.png` and matching `.md`. No Figma source or export date was supplied. The revision normalizes Help typography, makes Support a secondary escalation with an explicit unavailable-service boundary, and documents the article/sub-page routes, responsive behavior, states, motion, and accessibility.
