@@ -11,6 +11,14 @@
 - Keep search as the first content control; it is wide, capped, labelled, and separated from the compact title by stable whitespace.
 - Quick-guide cards, article rows, and the support card use the existing white-surface/card pattern with burgundy accents, cool-gray dividers, and readable near-black text. Do not introduce a new Help-specific visual system.
 
+## Shared nested-route contract
+
+- `Help.png`, all article references, and `Help_Support.png` reuse one identical authenticated shell: the existing sidebar width, 179FC logo, navigation/icon set, active Help item, TopBar alignment, TK avatar trigger, page gutter, and 179 Assist launcher. Nested routes change only the content region.
+- The nested article routes use one layout template: breadcrumb; simple white article header card; narrow **On this page** card; numbered step card; boundary callout; full-width two-row **Related articles** card; and **Back to Help Center**. Category, article title, steps, callout, and related routes are the only content variants.
+- Heading ownership is explicit. On `/help` and `/help/articles/*`, the shared TopBar **Help Center** is the sole page `h1`; an article title is a content `h2`. On `/help/support`, the shared TopBar **Contact support** is the sole `h1`; content starts with the `h2` **Tell us how we can help**, never a second `Contact support` heading.
+- Nested-route scale: breadcrumb 13 px; category/TOC label 12–13 px; content `h2` 22–24 px; TOC and step headings 16–17 px; body, related rows, form labels, and callouts 14 px. Related/article content must not exceed the scale of the Help overview.
+- A TOC item’s text exactly matches its target step heading. Selecting it moves to the matching anchor (for example `#open-employees`); the current target has `aria-current="location"` plus the burgundy active indicator.
+
 ## Self-service and escalation
 
 The primary Help journey is search → quick guide or popular article. **Need more help?** remains necessary as an escalation when a search/article cannot resolve an account, permission, or operational question, but it is intentionally secondary:

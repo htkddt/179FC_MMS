@@ -6,11 +6,12 @@ Read with `Help_Support.png`.
 
 - Route: `/help/support`.
 - Support is retained as a secondary escalation after search and relevant articles do not resolve an operational, account, or permission question. It must never visually compete with the Help Center’s self-service route.
-- The page uses the compact **Contact support** TopBar, **Help Center / Contact support** breadcrumb, a two-column form/guidance layout, and an explicit Back to Help Center link.
+- The page reuses the exact shared shell from `Help.png`, including sidebar/logo/nav/icon set, TopBar position, TK avatar trigger, page gutter, and 179 Assist launcher. Only the TopBar text changes to **Contact support**.
+- The compact shared **Contact support** TopBar is the sole route `h1`. The content heading is the non-duplicated `h2` **Tell us how we can help**. Breadcrumb is 13 px, content `h2` 22–24 px, card headings 18 px, and labels/supporting text/callouts/related rows 14 px.
 
 ## Form and guidance
 
-- The form asks for **Topic**, optional **Relevant page**, and **What happened?**. It advises users not to share passwords or personal/sensitive data.
+- The form asks for **Topic**, optional **Relevant page**, and **What happened?**. It advises users not to share passwords or personal/sensitive data. It explicitly calls Support a secondary escalation after self-service.
 - The adjacent guidance panel prompts users to search Help first, include the page and reproduction steps, and avoid sensitive information. Related article links remain available before escalation.
 - All labels are programmatically associated with controls. Topic is a real select, description is a labelled multiline field, and controls/actions have a 44 px minimum target.
 
