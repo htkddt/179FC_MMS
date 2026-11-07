@@ -1,5 +1,7 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Icon } from '../../../components/ui/Icon.jsx';
+import { ROUTES } from '../../../app/routes.js';
 import { useAuth } from '../authStore.jsx';
 import { SignInForm } from '../components/SignInForm.jsx';
 
@@ -9,8 +11,19 @@ function AuthBrand() {
 
 export function SignInPage() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
-  function handleSignIn() { signIn(); navigate('/dashboard', { replace: true }); }
+  const location = useLocation();
+  const { user, signIn } = useAuth();
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  function handleSignIn() {
+    const returnTo = location.state?.returnTo;
+    const destination = typeof returnTo === 'string' && returnTo.startsWith('/') && !returnTo.startsWith('//')
+      ? returnTo : ROUTES.dashboard;
+    setIsSigningIn(true);
+    signIn();
+    navigate(destination, { replace: true });
+  }
+
+  if (user && !isSigningIn) return <Navigate to={ROUTES.dashboard} replace />;
 
   return (
     <main className="auth-layout">

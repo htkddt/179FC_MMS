@@ -1,4 +1,4 @@
-import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, createBrowserRouter, useLocation } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell.jsx';
 import { useAuth } from '../features/auth/authStore.jsx';
 import { SignInPage } from '../features/auth/pages/SignInPage.jsx';
@@ -21,43 +21,46 @@ import { ROUTES } from './routes.js';
 
 function ProtectedRoute() {
   const { user } = useAuth();
-  return user ? <Outlet /> : <Navigate to={ROUTES.signIn} replace />;
+  const location = useLocation();
+  const returnTo = location.pathname + location.search + location.hash;
+  return user ? <Outlet /> : <Navigate to={ROUTES.signIn} replace state={{ returnTo }} />;
 }
 
 function PublicRoute() {
-  const { user } = useAuth();
-  return user ? <Navigate to={ROUTES.dashboard} replace /> : <Outlet />;
+  return <Outlet />;
 }
 
 export const router = createBrowserRouter([
   { element: <PublicRoute />, children: [{ path: ROUTES.signIn, element: <SignInPage /> }] },
   {
-    element: <ProtectedRoute />,
-    children: [{
-      element: <AppShell />,
-      children: [
-        { index: true, element: <Navigate to={ROUTES.dashboard} replace /> },
-        { path: ROUTES.dashboard, element: <DashboardPage /> },
-        { path: ROUTES.posts, element: <PostsPage /> },
-        { path: '/posts/new', element: <PostEditorPage /> },
-        { path: '/posts/:postId/edit', element: <PostEditorPage /> },
-        { path: '/posts/:postId', element: <PostDetailsPage /> },
+    element: <AppShell />,
+    children: [
+      { index: true, element: <Navigate to={ROUTES.dashboard} replace /> },
+      { path: ROUTES.dashboard, element: <DashboardPage /> },
+      { path: ROUTES.posts, element: <PostsPage /> },
+      { path: '/posts/new', element: <PostEditorPage /> },
+      { path: '/posts/:postId/edit', element: <PostEditorPage /> },
+      { path: '/posts/:postId', element: <PostDetailsPage /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
         { path: ROUTES.employees, element: <EmployeesPage /> },
         { path: '/employees/:memberId', element: <EmployeeProfilePage /> },
         { path: ROUTES.organization, element: <OrganizationPage /> },
-        { path: ROUTES.settings, element: <SettingsPage /> },
-        { path: '/settings/password', element: <PasswordSettingsPage /> },
-        { path: '/settings/two-factor', element: <TwoFactorSettingsPage /> },
-        { path: '/settings/sessions', element: <SessionsSettingsPage /> },
-        { path: ROUTES.help, element: <HelpPage /> },
-        { path: '/help/articles/:articleId', element: <HelpArticlePage /> },
-        { path: '/help/support', element: <HelpSupportPage /> },
-        { path: ROUTES.assistant, element: <PlaceholderPage title="179 Assist" description="Use the assistant panel to get help from 179 Assist." /> },
-        { path: '*', element: <Navigate to={ROUTES.dashboard} replace /> },
-      ],
-    }],
+        ],
+      },
+      { path: ROUTES.settings, element: <SettingsPage /> },
+      { path: '/settings/password', element: <PasswordSettingsPage /> },
+      { path: '/settings/two-factor', element: <TwoFactorSettingsPage /> },
+      { path: '/settings/sessions', element: <SessionsSettingsPage /> },
+      { path: ROUTES.help, element: <HelpPage /> },
+      { path: '/help/articles/:articleId', element: <HelpArticlePage /> },
+      { path: '/help/support', element: <HelpSupportPage /> },
+      { path: ROUTES.assistant, element: <PlaceholderPage title="179 Assist" description="Use the assistant panel to get help from 179 Assist." /> },
+      { path: '*', element: <Navigate to={ROUTES.dashboard} replace /> },
+    ],
   },
-  { path: '*', element: <Navigate to={ROUTES.signIn} replace /> },
+  { path: '*', element: <Navigate to={ROUTES.dashboard} replace /> },
 ], {
   basename: import.meta.env.BASE_URL,
 });
