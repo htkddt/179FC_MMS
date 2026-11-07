@@ -76,6 +76,48 @@ test('Help search filters content and preserves Contact support as empty-state r
   await expect(search).toBeFocused();
 });
 
+test('Help matches Organization search dimensions and animates nested routes when motion is enabled', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+
+  const helpMetrics = await page.locator('.help-search').evaluate((element) => ({
+    height: element.getBoundingClientRect().height,
+    fontSize: Number.parseFloat(getComputedStyle(element.querySelector('input')).fontSize),
+  }));
+  const overviewHeadingSize = await page.locator('.help-guides-section > h2').evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+
+  await page.getByRole('link', { name: 'Organization', exact: true }).click();
+  await expect(page.locator('.organization-search')).toBeVisible();
+  const organizationMetrics = await page.locator('.organization-search').evaluate((element) => ({
+    height: element.getBoundingClientRect().height,
+    fontSize: Number.parseFloat(getComputedStyle(element.querySelector('input')).fontSize),
+  }));
+  expect(helpMetrics.height).toBeCloseTo(organizationMetrics.height, 1);
+  expect(helpMetrics.fontSize).toBeCloseTo(organizationMetrics.fontSize, 1);
+  expect(overviewHeadingSize).toBeLessThanOrEqual(22.1);
+
+  await page.getByRole('link', { name: 'Help', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'How to invite new members' })).toBeVisible();
+  await page.getByRole('link', { name: 'How to invite new members' }).click();
+  const articlePage = page.locator('.help-article-page');
+  await expect(articlePage).toHaveClass(/help-route-transition/);
+  await expect(articlePage).toHaveCSS('animation-name', 'help-subpage-arrive');
+
+  await page.getByRole('link', { name: 'How to update your club profile' }).click();
+  await expect(page.getByRole('heading', { level: 2, name: 'How to update your club profile' })).toBeVisible();
+  await expect(articlePage).toHaveClass(/help-route-transition/);
+  await expect(articlePage).toHaveCSS('animation-name', 'help-subpage-arrive');
+
+  await page.getByRole('link', { name: 'Back to Help Center' }).click();
+  await page.getByRole('link', { name: 'Contact support', exact: true }).click();
+  const supportPage = page.locator('.help-support-page');
+  await expect(supportPage).toHaveClass(/help-route-transition/);
+  await expect(supportPage).toHaveCSS('animation-name', 'help-subpage-arrive');
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(supportPage).toHaveCSS('animation-name', 'none');
+});
+
 test('Help is responsive and only animates when reduced motion is not requested', async ({ page }) => {
   await expect(page.locator('.help-page')).toHaveCSS('animation-name', 'none');
   await page.setViewportSize({ width: 390, height: 844 });

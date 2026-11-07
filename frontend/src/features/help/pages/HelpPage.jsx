@@ -89,7 +89,7 @@ export function HelpPage() {
   return (
     <section className={'help-page' + (initialContentArrival.current ? '' : ' help-page--content-entered')}>
       <label className="help-search" htmlFor="help-search">
-        <Icon name="search" size={27} />
+        <Icon name="search" size={19} />
         <span className="sr-only">Search help articles</span>
         <input
           id="help-search"

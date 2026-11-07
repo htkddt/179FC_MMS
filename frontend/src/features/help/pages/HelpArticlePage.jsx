@@ -28,6 +28,7 @@ export function HelpArticlePage() {
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [currentStep, setCurrentStep] = useState('');
+  const [isRouteTransitioning, setIsRouteTransitioning] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -49,11 +50,19 @@ export function HelpArticlePage() {
     return () => { active = false; };
   }, [articleId, attempt]);
 
-  if (isLoading) return <section className="help-article-page"><ArticleLoading /></section>;
-  if (error) return <section className="help-article-page"><ArticleRecovery title="Could not load this help article" description="Please try again or return to Help Center." onRetry={() => setAttempt((value) => value + 1)} /></section>;
-  if (!article) return <section className="help-article-page"><ArticleRecovery title="Help article not found" description="This article may have moved or the link may be incorrect." /></section>;
+  useEffect(() => {
+    setIsRouteTransitioning(false);
+    const frame = requestAnimationFrame(() => setIsRouteTransitioning(true));
+    return () => cancelAnimationFrame(frame);
+  }, [articleId]);
 
-  return <section className="help-article-page">
+  const pageClassName = 'help-article-page' + (isRouteTransitioning ? ' help-route-transition' : '');
+
+  if (isLoading) return <section className={pageClassName}><ArticleLoading /></section>;
+  if (error) return <section className={pageClassName}><ArticleRecovery title="Could not load this help article" description="Please try again or return to Help Center." onRetry={() => setAttempt((value) => value + 1)} /></section>;
+  if (!article) return <section className={pageClassName}><ArticleRecovery title="Help article not found" description="This article may have moved or the link may be incorrect." /></section>;
+
+  return <section className={pageClassName}>
     <nav className="help-breadcrumb" aria-label="Breadcrumb"><Link to="/help">Help Center</Link><span aria-hidden="true">/</span><span>{article.breadcrumb}</span></nav>
     <Card className="help-article__header"><p>{article.category}</p><h2>{article.title}</h2><span>{article.description}</span></Card>
     <div className="help-article__body">

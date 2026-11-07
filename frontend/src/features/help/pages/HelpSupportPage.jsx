@@ -40,7 +40,7 @@ export function HelpSupportPage() {
     return () => { active = false; };
   }, [attempt]);
 
-  return <section className="help-support-page">
+  return <section className="help-support-page help-route-transition">
     <nav className="help-breadcrumb" aria-label="Breadcrumb"><Link to="/help">Help Center</Link><span aria-hidden="true">/</span><span>Contact support</span></nav>
     <header className="help-support__heading"><h2>Tell us how we can help</h2><p>Share enough context for a club administrator to understand the issue.</p></header>
     <div className="help-support__grid">
