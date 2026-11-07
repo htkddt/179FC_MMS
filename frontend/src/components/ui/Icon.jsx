@@ -36,6 +36,7 @@ const paths = {
   shield: <path d="M12 3 20 6v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-3Z" />,
   monitor: <><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M12 17v3M8 20h8" /></>,
   headset: <><path d="M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v5H5a1 1 0 0 1-1-1v-4ZM20 14h-3v5h2a1 1 0 0 0 1-1v-4ZM17 19c-.8 1.3-2.4 2-5 2" /></>,
+  alert: <><path d="M12 3 2.9 19.2a1.2 1.2 0 0 0 1.05 1.8h16.1a1.2 1.2 0 0 0 1.05-1.8L12 3Z" /><path d="M12 9v4.5M12 17h.01" /></>,
 };
 
 export function Icon({ name, size = 18, className = '', strokeWidth = 1.7 }) {

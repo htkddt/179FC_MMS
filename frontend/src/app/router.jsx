@@ -6,6 +6,8 @@ import { DashboardPage } from '../features/dashboard/pages/DashboardPage.jsx';
 import { EmployeeProfilePage } from '../features/employees/pages/EmployeeProfilePage.jsx';
 import { EmployeesPage } from '../features/employees/pages/EmployeesPage.jsx';
 import { HelpPage } from '../features/help/pages/HelpPage.jsx';
+import { HelpArticlePage } from '../features/help/pages/HelpArticlePage.jsx';
+import { HelpSupportPage } from '../features/help/pages/HelpSupportPage.jsx';
 import { PostsPage } from '../features/posts/pages/PostsPage.jsx';
 import { PostDetailsPage } from '../features/posts/pages/PostDetailsPage.jsx';
 import { PostEditorPage } from '../features/posts/pages/PostEditorPage.jsx';
@@ -48,8 +50,8 @@ export const router = createBrowserRouter([
         { path: '/settings/two-factor', element: <TwoFactorSettingsPage /> },
         { path: '/settings/sessions', element: <SessionsSettingsPage /> },
         { path: ROUTES.help, element: <HelpPage /> },
-        { path: '/help/articles/:articleId', element: <PlaceholderPage title="Help article" description="Article content will be available when the help service is connected." /> },
-        { path: '/help/support', element: <PlaceholderPage title="Contact support" description="The support channel will be available when the service is connected." /> },
+        { path: '/help/articles/:articleId', element: <HelpArticlePage /> },
+        { path: '/help/support', element: <HelpSupportPage /> },
         { path: ROUTES.assistant, element: <PlaceholderPage title="179 Assist" description="Use the assistant panel to get help from 179 Assist." /> },
         { path: '*', element: <Navigate to={ROUTES.dashboard} replace /> },
       ],
