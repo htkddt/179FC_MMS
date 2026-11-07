@@ -85,6 +85,7 @@ test('Help matches Organization search dimensions and animates nested routes whe
     fontSize: Number.parseFloat(getComputedStyle(element.querySelector('input')).fontSize),
   }));
   const overviewHeadingSize = await page.locator('.help-guides-section > h2').evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+  const desktopPopularArticleTitleSize = await page.locator('.popular-article-link strong').first().evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
 
   await page.getByRole('link', { name: 'Organization', exact: true }).click();
   await expect(page.locator('.organization-search')).toBeVisible();
@@ -95,9 +96,14 @@ test('Help matches Organization search dimensions and animates nested routes whe
   expect(helpMetrics.height).toBeCloseTo(organizationMetrics.height, 1);
   expect(helpMetrics.fontSize).toBeCloseTo(organizationMetrics.fontSize, 1);
   expect(overviewHeadingSize).toBeLessThanOrEqual(22.1);
+  expect(desktopPopularArticleTitleSize).toBeLessThanOrEqual(15.1);
 
   await page.getByRole('link', { name: 'Help', exact: true }).click();
   await expect(page.getByRole('link', { name: 'How to invite new members' })).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobilePopularArticleTitleSize = await page.locator('.popular-article-link strong').first().evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize));
+  expect(mobilePopularArticleTitleSize).toBeLessThanOrEqual(15.1);
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.getByRole('link', { name: 'How to invite new members' }).click();
   const articlePage = page.locator('.help-article-page');
   await expect(articlePage).toHaveClass(/help-route-transition/);

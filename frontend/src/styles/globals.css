@@ -632,7 +632,6 @@ a.button { text-decoration: none; }
 .popular-articles .popular-article-link { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; width: 100%; align-items: center; gap: clamp(.8rem, 1.3vw, 1.25rem); padding: clamp(.8rem, 1.2vw, 1.15rem) 0; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; }
 .popular-articles .popular-article-link:last-child { border-bottom: 0; }
 .popular-article-link > span { display: grid; width: clamp(2.3rem, 3vw, 3rem); height: clamp(2.3rem, 3vw, 3rem); place-items: center; border-radius: 50%; color: #606a7d; background: #f2f4f7; }
-.popular-article-link strong { font-size: clamp(.82rem, 1.05vw, 1rem); }
 .top-bar__actions { display: flex; align-items: center; gap: 1rem; }
 .top-bar__create { min-height: 2.6rem; padding: 0 1.2rem; background: var(--sidebar); white-space: nowrap; }
 .posts-results, .posts-overview { background: var(--surface); }
