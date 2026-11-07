@@ -6,7 +6,7 @@ Read with `Help_Member_Roles.png`, `../Organization/Organization.md`, and the Em
 
 - Route: `/help/articles/member-roles`.
 - Help readers understand where a displayed member role and team context appear, and make clear that role/permission changes require an authorized process.
-- Reuse the exact shared shell from `Help.png`, including sidebar/logo/nav/icon set, TopBar position, TK avatar trigger, page gutter, and 179 Assist launcher. Only the content region changes.
+- Reuse the exact guest-capable shared shell from `Help.png`, including sidebar/logo/nav/icon set, TopBar position, guest Sign up/Log in actions (or the avatar menu after mock sign-in), page gutter, and 179 Assist launcher. Only the content region changes.
 - The compact shared **Help Center** TopBar is the route `h1`; the article title is a content `h2`. Breadcrumb is 13 px, category/TOC label 12–13 px, article `h2` 22–24 px, step/TOC headings 16–17 px, and body/callout/related rows 14 px.
 
 ## Article structure

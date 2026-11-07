@@ -9,6 +9,16 @@ function AuthBrand() {
   return <div className="auth-brand"><span className="brand__mark">179</span><span><strong>179FC</strong><small>MEMBER MANAGEMENT PORTAL</small></span></div>;
 }
 
+function isSafeInternalReturnTo(returnTo) {
+  if (typeof returnTo !== 'string' || !returnTo.startsWith('/') || returnTo.startsWith('//') || returnTo.includes('\\')) return false;
+  try {
+    const decoded = decodeURIComponent(returnTo);
+    return !decoded.startsWith('//') && !decoded.includes('\\');
+  } catch {
+    return false;
+  }
+}
+
 export function SignInPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,8 +26,7 @@ export function SignInPage() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   function handleSignIn() {
     const returnTo = location.state?.returnTo;
-    const destination = typeof returnTo === 'string' && returnTo.startsWith('/') && !returnTo.startsWith('//')
-      ? returnTo : ROUTES.dashboard;
+    const destination = isSafeInternalReturnTo(returnTo) ? returnTo : ROUTES.dashboard;
     setIsSigningIn(true);
     signIn();
     navigate(destination, { replace: true });

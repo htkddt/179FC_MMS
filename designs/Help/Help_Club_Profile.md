@@ -6,7 +6,7 @@ Read with `Help_Club_Profile.png` and `../Settings/Settings_General.md`.
 
 - Route: `/help/articles/club-profile`.
 - Explain the existing Settings → General journey for reviewing and saving club-profile preferences without presenting browser-local persistence as a shared server update.
-- Reuse the exact shared shell from `Help.png`, including sidebar/logo/nav/icon set, TopBar position, TK avatar trigger, page gutter, and 179 Assist launcher. Only the content region changes.
+- Reuse the exact guest-capable shared shell from `Help.png`, including sidebar/logo/nav/icon set, TopBar position, guest Sign up/Log in actions (or the avatar menu after mock sign-in), page gutter, and 179 Assist launcher. Only the content region changes.
 - The compact shared **Help Center** TopBar is the route `h1`; the article title is a content `h2`. Breadcrumb is 13 px, category/TOC label 12–13 px, article `h2` 22–24 px, step/TOC headings 16–17 px, and body/callout/related rows 14 px.
 
 ## Article structure
@@ -18,7 +18,7 @@ Read with `Help_Club_Profile.png` and `../Settings/Settings_General.md`.
 
 ## States and accessibility
 
-- Loading keeps the header and document outline stable. Error/unknown-article state retains Help Center recovery and does not replace the whole authenticated shell.
+- Loading keeps the header and document outline stable. Error/unknown-article state retains Help Center recovery and does not replace the whole guest-capable shell.
 - The shared TopBar supplies the one semantic `h1`; the article title is `h2`. Use ordered instructions, an announced information callout, descriptive navigation labels, and 44 px targets for each navigational action.
 - Keep the desktop reading width comfortable; stack the article navigation, steps, boundary, and related content below tablet width. All optional motion honours `prefers-reduced-motion`.
 

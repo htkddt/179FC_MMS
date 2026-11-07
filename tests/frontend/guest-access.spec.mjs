@@ -42,3 +42,21 @@ test('Guest routes protect Organization and authenticated logout restores the gu
   await page.goto('/organization');
   await expect(page).toHaveURL(/\/sign-in$/);
 });
+
+test('Demo sign-in rejects unsafe return targets without leaving the Sign-in flow', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  const unsafeReturnTo = String.fromCharCode(47, 92, 92) + 'example.test/qa';
+
+  await page.goto('/sign-in');
+  await page.evaluate((returnTo) => {
+    const currentState = window.history.state || {};
+    window.history.replaceState({ ...currentState, usr: { returnTo } }, '', '/sign-in');
+  }, unsafeReturnTo);
+  await page.reload();
+  await page.getByRole('button', { name: 'Sign in to 179FC' }).click();
+
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect.poll(() => page.evaluate(() => sessionStorage.getItem('179fc-demo-session'))).toBe('active');
+  expect(pageErrors).toEqual([]);
+});
