@@ -26,7 +26,8 @@ export function TopBar({ onMenuClick }) {
     : pathname === '/settings/password' ? { title: 'Change password' }
     : pathname === '/settings/two-factor' ? { title: 'Two-factor authentication' }
     : pathname === '/settings/sessions' ? { title: 'Manage sessions' }
-    : pathname.startsWith('/help/') ? { title: pathname === '/help/support' ? 'Contact support' : 'Help article', subtitle: 'Help Center' }
+    : pathname === '/help/support' ? { title: 'Contact support' }
+    : pathname.startsWith('/help/articles/') ? { title: 'Help Center' }
     : { title: 'Employee profile', subtitle: 'Member details' });
   const go = (to) => { setMenuOpen(false); navigate(to); };
 
