@@ -406,6 +406,9 @@ h1, h2, h3, p { margin-top: 0; }
 .help-related { padding: clamp(1.2rem, 2vw, 1.75rem); }
 .help-related h2 { margin: 0 0 .8rem; color: #111827; font-size: clamp(1.15rem, 1.55vw, 1.45rem); letter-spacing: -.03em; }
 .help-related > div { border-top: 1px solid var(--border); }
+.help-related__state { display: flex; align-items: center; gap: .9rem; min-height: 44px; margin: 0; padding: .8rem .2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .9rem; line-height: 1.45; }
+.help-related__state p { margin: 0; }
+.help-related__state .button { min-height: 44px; }
 .help-related a { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; min-height: 44px; align-items: center; gap: .85rem; padding: .65rem .2rem; border-bottom: 1px solid var(--border); color: var(--text); text-decoration: none; }
 .help-related a:last-child { border-bottom: 0; }
 .help-related a > span { display: grid; width: 2.3rem; height: 2.3rem; place-items: center; border-radius: 50%; color: #606a7d; background: #f2f4f7; }

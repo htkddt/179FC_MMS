@@ -26,6 +26,8 @@ Run `npm run test:browser`. Playwright starts a local Vite server on `127.0.0.1:
 
 These checks cover the local mock-data workflow; they do not verify backend authorization or shared persistence. Extend coverage when those contracts become available.
 
+Help page components use `helpApi.js` for overview, article detail with related records, and Support related links. `help-retry.spec.mjs` also verifies the Support related-articles Retry state through a route-fulfilled adapter; no production test hook is added.
+
 ## Settings product checks
 
 - `settings.test.mjs` is included in `npm test`: absent versus malformed/denied storage, typed patches, name normalization, saved Vietnamese/notification preferences, unrelated/legacy key preservation, snapshot conflicts, failed writes without success events, timezone conversion, event rollover and date-only stability.

@@ -1,12 +1,45 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '../../../components/ui/Card.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
-import { articles } from '../../../mocks/help.js';
+import { getHelpRelatedArticles } from '../api/helpApi.js';
 
 const relatedArticleIds = ['club-profile', 'member-roles'];
 
+function RelatedArticles({ articles, error, isLoading, retry }) {
+  return <Card className="help-related" aria-busy={isLoading}>
+    <h2>Related articles</h2>
+    {isLoading ? <p className="help-related__state" role="status">Loading related articles.</p> : null}
+    {!isLoading && error ? <div className="help-related__state"><p role="alert">Could not load related articles. Please try again.</p><button className="button button--outline" type="button" onClick={retry}>Retry</button></div> : null}
+    {!isLoading && !error ? <div>{articles.map((article) => <Link to={'/help/articles/' + article.id} key={article.id}><span><Icon name="file" size={20} /></span><strong>{article.title}</strong><Icon className="help-related__arrow" name="chevronDown" size={22} /></Link>)}</div> : null}
+  </Card>;
+}
+
 export function HelpSupportPage() {
-  const relatedArticles = relatedArticleIds.map((id) => articles.find((article) => article.id === id)).filter(Boolean);
+  const [relatedArticles, setRelatedArticles] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    setIsLoading(true);
+    setError(false);
+    getHelpRelatedArticles(relatedArticleIds)
+      .then((articles) => {
+        if (!active) return;
+        setRelatedArticles(articles);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setRelatedArticles([]);
+        setError(true);
+        setIsLoading(false);
+      });
+    return () => { active = false; };
+  }, [attempt]);
+
   return <section className="help-support-page">
     <nav className="help-breadcrumb" aria-label="Breadcrumb"><Link to="/help">Help Center</Link><span aria-hidden="true">/</span><span>Contact support</span></nav>
     <header className="help-support__heading"><h2>Tell us how we can help</h2><p>Share enough context for a club administrator to understand the issue.</p></header>
@@ -20,7 +53,7 @@ export function HelpSupportPage() {
       </form></Card>
       <Card className="help-support__guidance"><h3>Before you contact support</h3><ul><li><span><Icon name="search" size={24} /></span>Try searching Help Center</li><li><span><Icon name="file" size={24} /></span>Include the page and steps</li><li><span><Icon name="lock" size={24} /></span>Do not include passwords or personal data</li></ul></Card>
     </div>
-    <Card className="help-related"><h2>Related articles</h2><div>{relatedArticles.map((article) => <Link to={'/help/articles/' + article.id} key={article.id}><span><Icon name="file" size={20} /></span><strong>{article.title}</strong><Icon className="help-related__arrow" name="chevronDown" size={22} /></Link>)}</div></Card>
+    <RelatedArticles articles={relatedArticles} error={error} isLoading={isLoading} retry={() => setAttempt((value) => value + 1)} />
     <Link className="help-back-link" to="/help"><span aria-hidden="true">←</span> Back to Help Center</Link>
   </section>;
 }

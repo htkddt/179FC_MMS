@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { articleDetails, articles, guides } from '../../frontend/src/mocks/help.js';
 import { filterHelpContent, normalizeHelpQuery } from '../../frontend/src/features/help/helpFilters.js';
-import { getHelpArticle } from '../../frontend/src/features/help/api/helpApi.js';
+import { getHelpArticle, getHelpRelatedArticles } from '../../frontend/src/features/help/api/helpApi.js';
 
 test('help filters normalize queries and preserve matching guide and article records', () => {
   assert.equal(normalizeHelpQuery('  MEMBER  '), 'member');
@@ -20,9 +20,16 @@ test('help article adapter returns an isolated shared article contract', async (
   assert.equal(article.category, 'Member management');
   assert.deepEqual(article.steps.map((step) => step.id), ['open-employees', 'prepare-member-details', 'review-the-invitation']);
   assert.deepEqual(article.relatedIds, ['club-profile', 'member-roles']);
+  assert.deepEqual(article.relatedArticles.map((related) => related.id), ['club-profile', 'member-roles']);
   article.steps[0].heading = 'Changed locally';
   article.relatedIds.pop();
+  article.relatedArticles[0].title = 'Changed locally';
   assert.equal(articleDetails[0].steps[0].heading, 'Open Employees');
   assert.deepEqual(articleDetails[0].relatedIds, ['club-profile', 'member-roles']);
+  assert.equal(articles.find((item) => item.id === 'club-profile').title, 'How to update your club profile');
+  const supportRelated = await getHelpRelatedArticles(['club-profile', 'member-roles']);
+  assert.deepEqual(supportRelated.map((related) => related.id), ['club-profile', 'member-roles']);
+  supportRelated[0].searchTerms.pop();
+  assert.ok(articles.find((item) => item.id === 'club-profile').searchTerms.length > supportRelated[0].searchTerms.length);
   assert.equal(await getHelpArticle('missing-article'), null);
 });

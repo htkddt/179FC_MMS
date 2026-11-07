@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Card } from '../../../components/ui/Card.jsx';
 import { Icon } from '../../../components/ui/Icon.jsx';
-import { articles } from '../../../mocks/help.js';
 import { getHelpArticle } from '../api/helpApi.js';
 
 function ArticleLoading() {
@@ -54,7 +53,6 @@ export function HelpArticlePage() {
   if (error) return <section className="help-article-page"><ArticleRecovery title="Could not load this help article" description="Please try again or return to Help Center." onRetry={() => setAttempt((value) => value + 1)} /></section>;
   if (!article) return <section className="help-article-page"><ArticleRecovery title="Help article not found" description="This article may have moved or the link may be incorrect." /></section>;
 
-  const relatedArticles = article.relatedIds.map((id) => articles.find((item) => item.id === id)).filter(Boolean);
   return <section className="help-article-page">
     <nav className="help-breadcrumb" aria-label="Breadcrumb"><Link to="/help">Help Center</Link><span aria-hidden="true">/</span><span>{article.breadcrumb}</span></nav>
     <Card className="help-article__header"><p>{article.category}</p><h2>{article.title}</h2><span>{article.description}</span></Card>
@@ -62,7 +60,7 @@ export function HelpArticlePage() {
       <Card className="help-article__toc"><nav aria-label="On this page"><h3>On this page</h3><div>{article.steps.map((step) => <a href={'#' + step.id} key={step.id} aria-current={currentStep === step.id ? 'location' : undefined} onClick={() => setCurrentStep(step.id)}>{step.heading}</a>)}</div></nav></Card>
       <Card className="help-article__steps"><ol>{article.steps.map((step, index) => <li id={step.id} key={step.id}><span aria-hidden="true">{index + 1}</span><div><h3>{step.heading}</h3><p>{step.description}</p></div></li>)}</ol><aside className="help-boundary" aria-label="Demo service boundary"><Icon name="alert" size={23} /><p>{article.boundary}</p></aside></Card>
     </div>
-    <Card className="help-related"><h2>Related articles</h2><div>{relatedArticles.map((related) => <Link to={'/help/articles/' + related.id} key={related.id}><span><Icon name="file" size={20} /></span><strong>{related.title}</strong><Icon className="help-related__arrow" name="chevronDown" size={22} /></Link>)}</div></Card>
+    <Card className="help-related"><h2>Related articles</h2><div>{article.relatedArticles.map((related) => <Link to={'/help/articles/' + related.id} key={related.id}><span><Icon name="file" size={20} /></span><strong>{related.title}</strong><Icon className="help-related__arrow" name="chevronDown" size={22} /></Link>)}</div></Card>
     <Link className="help-back-link" to="/help"><span aria-hidden="true">←</span> Back to Help Center</Link>
   </section>;
 }
