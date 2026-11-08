@@ -91,7 +91,7 @@ test('validation focuses the field; cancel and discard protect tab, profile, sid
   await page.getByRole('button', { name: 'Open user menu' }).click();
   await page.getByRole('button', { name: 'Log out', exact: true }).click();
   await page.getByRole('button', { name: 'Discard changes', exact: true }).click();
-  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page).toHaveURL(/\/dashboard$/);
   expect(await page.evaluate(() => sessionStorage.getItem('179fc-demo-session'))).toBeNull();
 });
 

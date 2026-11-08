@@ -48,7 +48,7 @@
 ### Temporary frontend demo access
 
 - The GitHub Pages URL is a public static **demo/preview** of the frontend, not an operational production service.
-- The frontend currently bypasses account authentication so a reviewer without an account can enter the portal. Clicking Sign in to 179FC creates a mock Club Admin session in the browser tab?s `sessionStorage`; email and password values are not validated or transmitted.
+- Guest access is the default: `/dashboard`, Posts, Settings, Help, and 179 Assist remain visible without a session. `/employees`, `/employees/:memberId`, and `/organization` redirect guests to Sign-in and retain the intended internal destination. Clicking **Sign in to 179FC** creates a mock Club Admin session in the browser tab?s `sessionStorage`; email and password values are not validated or transmitted. Logout clears that session and returns to the guest Dashboard.
 - The Pages demo has no real authentication, authorization, backend persistence, or access boundary. Do not enter real account credentials, member data, or other personal/sensitive information there.
 - Before using the application operationally or with real accounts/member data, replace demo access with real account lookup, credential verification, session handling, authorization, role/permission enforcement, and server-side persistence.
 
@@ -144,7 +144,7 @@
 
 | Workstream | Planning | Foundation | Feature Development | Test Coverage | Current Result |
 | --- | --- | --- | --- | --- | --- |
-| Frontend | Complete | Complete | In progress | Initial coverage | Responsive React portal with temporary demo sign-in, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
+| Frontend | Complete | Complete | In progress | Initial coverage | Responsive guest-capable React portal with mock sign-in for protected Employees/Organization, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
 | Backend | Complete | Complete | Not started | Planned | NestJS API shell with `GET /health` |
 | Chatbot | Complete | Not started | Not started | Planned | FastAPI delivery plan |
 | Designs | Complete | Not started | Not started | Not started | Asset and handoff plan |

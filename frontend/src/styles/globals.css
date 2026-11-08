@@ -10,6 +10,11 @@ a { color: inherit; }
 h1, h2, h3, p { margin-top: 0; }
 
 .auth-layout { display: grid; min-height: 100svh; grid-template-columns: minmax(22rem, .79fr) minmax(0, 1fr); }
+@media (prefers-reduced-motion: no-preference) {
+  .auth-layout { animation: auth-page-arrive 350ms cubic-bezier(.2, .7, .2, 1) both; }
+}
+@keyframes auth-page-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .auth-layout { animation: none; } }
 .auth-promo { position: relative; overflow: hidden; padding: clamp(2.25rem, 5vw, 5.25rem); color: #fff; background: var(--sidebar); }
 .auth-brand, .brand { display: flex; align-items: center; gap: 11px; }
 .auth-brand > span:last-child, .brand > span:last-child { display: grid; gap: 0; }
@@ -65,6 +70,12 @@ h1, h2, h3, p { margin-top: 0; }
 .top-bar p { margin: .25rem 0 0; color: var(--muted); font-size: clamp(.68rem, .85vw, .8rem); }
 .menu-toggle { display: none; margin-top: 2px; padding: 3px; border: 0; color: var(--text); background: none; }
 .user-trigger { display: flex; align-items: center; gap: 5px; padding: 0; border: 0; color: var(--text); background: transparent; }
+.guest-auth-actions { display: flex; align-items: center; gap: .5rem; }
+.guest-auth-actions a { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; padding: 0 .85rem; border-radius: var(--radius-sm); font-size: .8rem; font-weight: 750; text-decoration: none; }
+.guest-auth-actions__sign-up { color: #84162a; }
+.guest-auth-actions__sign-up:hover { background: var(--surface-subtle); }
+.guest-auth-actions__log-in { color: #fff; background: var(--primary); }
+.guest-auth-actions__log-in:hover { background: #bf1730; }
 .avatar { display: inline-grid; flex: 0 0 auto; place-items: center; overflow: hidden; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 750; }
 .avatar--sm { width: 31px; height: 31px; }
 .avatar--md { width: 37px; height: 37px; }
@@ -80,9 +91,10 @@ h1, h2, h3, p { margin-top: 0; }
 .user-menu__identity strong { font-size: 11px; }
 .user-menu__identity small { color: var(--muted); font-size: 10px; }
 .user-menu__divider { height: 1px; margin: 0 0 7px; background: var(--border); }
-.user-menu button { padding: 6px 7px; border: 0; border-radius: 5px; text-align: left; color: var(--text); background: transparent; font-size: 11px; }
+.user-menu button { display: flex; width: 100%; min-height: 44px; align-items: center; padding: 6px 7px; border: 0; border-radius: 5px; text-align: left; color: var(--text); background: transparent; font-size: 11px; }
 .user-menu button:hover { background: var(--surface-subtle); }
-.user-menu .user-menu__logout { justify-self: end; margin-top: -4px; color: #6f4c55; font-weight: 700; }
+.user-menu__divider--section { margin: 7px 0 4px; }
+.user-menu .user-menu__logout { margin: 0; color: #6f4c55; font-weight: 700; }
 .portal-content { padding: clamp(.75rem, 1.5vw, 1.5rem) var(--page-gutter) clamp(3rem, 7vw, 6rem); }
 .dashboard-layout { display: grid; grid-template-columns: minmax(0, 2.75fr) minmax(14rem, 1fr); gap: var(--section-gap); width: 100%; }
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: clamp(.75rem, 1.4vw, 1.25rem); }
@@ -334,7 +346,7 @@ h1, h2, h3, p { margin-top: 0; }
 .account-card__email { padding-top: clamp(1.15rem, 2vw, 1.8rem); }
 
 .help-page { display: grid; gap: clamp(1.5rem, 2vw, 2.25rem); }
-.help-search { display: flex; width: min(100%, 54rem); align-items: center; gap: .6rem; padding: 0 .8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--muted); background: var(--surface); }
+.help-search { display: flex; width: 100%; align-items: center; gap: .6rem; padding: 0 .8rem; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--muted); background: var(--surface); }
 .help-search:focus-within { border-color: #ca7183; box-shadow: 0 0 0 3px rgb(220 30 56 / .12); }
 .help-search input { min-width: 0; width: 100%; height: 2.8rem; border: 0; outline: 0; color: var(--text); background: transparent; font-size: .8rem; }
 .help-search input::placeholder { color: #7b8190; }
@@ -453,6 +465,7 @@ h1, h2, h3, p { margin-top: 0; }
   .help-guide-card, .popular-article-link { transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
   .help-guide-card__action, .popular-articles__arrow { transition: transform .18s ease, background .18s ease; }
   .help-article__toc a, .help-related a, .help-back-link, .help-support__form-card input, .help-support__form-card select, .help-support__form-card textarea { transition: color .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+  .help-article__steps li.help-step--active { animation: help-step-arrive 240ms cubic-bezier(.2, .7, .2, 1) both; }
   .help-skeleton-card > span, .help-skeleton-card > strong, .help-skeleton-card > small, .help-skeleton-panel > span, .help-skeleton-panel > strong, .help-skeleton-panel > small, .help-article__skeleton > span, .help-article__skeleton > strong, .help-article__skeleton > small { animation: help-skeleton-pulse 1100ms ease-in-out infinite alternate; }
   @media (hover: hover) {
     .help-guide-card:hover { border-color: #e7b3bd; box-shadow: 0 13px 26px rgb(86 34 46 / .13); transform: translateY(-3px); }
@@ -466,6 +479,7 @@ h1, h2, h3, p { margin-top: 0; }
 }
 @keyframes help-page-arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes help-subpage-arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes help-step-arrive { from { background: #fff0f3; transform: translateY(5px); } to { background: transparent; transform: translateY(0); } }
 @keyframes help-guide-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes help-lower-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes help-skeleton-pulse { from { opacity: .55; } to { opacity: 1; } }

@@ -16,7 +16,7 @@ Securely access the 179FC member portal with minimal friction.
 - Password input supports show/hide control and password-manager compatibility.
 - Loading prevents duplicate submissions.
 - Failed authentication does not indicate whether a particular account exists.
-- Successful authentication sends the user to Dashboard, or their intended protected destination.
+- Successful fake authentication sends the user to Dashboard, or their valid intended protected destination. Protocol-relative, backslash-containing, malformed, and encoded external-like return targets are rejected and use Dashboard instead.
 
 ## Navigation
 

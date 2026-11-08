@@ -2,7 +2,7 @@
 
 ## Scope
 
-`Help.png` is the revised desktop reference for authenticated `/help` in 179MMS-9. It now normalizes the full Help text hierarchy and introduces the companion article and Support references in this folder. The PNG was revised locally on 2026-11-06; no Figma source or export date was supplied.
+`Help.png` is the revised desktop reference for `/help` in 179MMS-9, synchronized for guest access in 179MMS-10. It now normalizes the full Help text hierarchy and introduces the companion article and Support references in this folder. Its 179MMS-10 guest/header revision was created through an image-generation workflow on 2026-11-08; no Figma source URL is supplied.
 
 ## Typography and hierarchy
 
@@ -13,7 +13,7 @@
 
 ## Shared nested-route contract
 
-- `Help.png`, all article references, and `Help_Support.png` reuse one identical authenticated shell: the existing sidebar width, 179FC logo, navigation/icon set, active Help item, TopBar alignment, TK avatar trigger, page gutter, and 179 Assist launcher. Nested routes change only the content region.
+- `Help.png`, all article references, and `Help_Support.png` reuse one identical guest-capable shell: the existing sidebar width, 179FC logo, navigation/icon set, active Help item, TopBar alignment, page gutter, and 179 Assist launcher. Guests see Sign up and Log in instead of the avatar trigger; the avatar menu appears only after mock sign-in. Nested routes change only the content region.
 - The nested article routes use one layout template: burgundy **Help Center** breadcrumb; simple white article header card with an ordinary uppercase-gray category label (never a pill); narrow **On this page** card; numbered step card with its boundary callout inside it after the last divider; full-width two-row **Related articles** card; and burgundy **Back to Help Center**. Category text, article title, steps, callout copy, and related routes are the only content variants.
 - Heading ownership is explicit. On `/help` and `/help/articles/*`, the shared TopBar **Help Center** is the sole page `h1`; an article title is a content `h2`. On `/help/support`, the shared TopBar **Contact support** is the sole `h1`; content starts with the `h2` **Tell us how we can help**, never a second `Contact support` heading.
 - Every desktop article reference shows the first TOC target as the current location: a pale-pink row background and burgundy leading indicator. This common active state is used for `Open Employees`, `Open Settings`, and `Review the member role`.
@@ -30,8 +30,8 @@ The primary Help journey is search → quick guide or popular article. **Need mo
 
 ## Content, states, and navigation
 
-- Search filters the three quick guides and article records by task/keyword. Guide and article targets remain unambiguous and whole rows/actions are keyboard accessible.
-- Popular articles route to `/help/articles/invite-members`, `/help/articles/club-profile`, and `/help/articles/member-roles`. Their references are `Help_Invite_Members.*`, `Help_Club_Profile.*`, and `Help_Member_Roles.*`.
+- Search spans the available Help content width and filters the three quick guides and article records by task/keyword. Guide and article targets remain unambiguous and whole rows/actions are keyboard accessible.
+- Popular articles route to `/help/articles/invite-members`, `/help/articles/club-profile`, and `/help/articles/member-roles` with the shared 350 ms page reveal. Their references are `Help_Invite_Members.*`, `Help_Club_Profile.*`, and `Help_Member_Roles.*`.
 - Loading keeps the title/search stable and uses card/row skeletons without layout shift. Search is disabled only while filtering cannot be evaluated, with a concise assistive status.
 - Empty results preserve search and the support recovery route, with: **No help articles match your search. Try another keyword or contact support.**
 - Error preserves the title/search and provides an explicit **Retry** action. Focus stays predictable: on an unsuccessful retry it returns to Retry; after a successful retry it returns to the enabled search field.
@@ -40,7 +40,7 @@ The primary Help journey is search → quick guide or popular article. **Need mo
 
 - Desktop uses three quick-guide cards and a lower two-column section. At medium width, guides use two columns and the lower section stacks; at narrow width, the existing sidebar drawer and one-column content layout apply.
 - Interactive targets are at least 44 px. Visible `:focus-visible` treatment is required for search, guide actions, article rows, support action, menu toggle, and assistant launcher.
-- Use the portal’s 350 ms opacity/8–10 px page arrival; quick guides may enter in DOM order with a 40–50 ms stagger. Query edits must not replay entrance motion.
+- Use the portal’s 350 ms opacity/8–10 px page arrival; quick guides may enter in DOM order with a 40–50 ms stagger. Each article route rekeys the reveal. A TOC selection retains the current article layout, writes its valid hash to browser history, smoothly scrolls to the existing step, and changes the active indicator rather than opening a sub-page. Query edits must not replay entrance motion.
 - `prefers-reduced-motion: reduce` removes page, card, hover-transform, and skeleton movement without removing focus or controls.
 
 ## Implementation boundary

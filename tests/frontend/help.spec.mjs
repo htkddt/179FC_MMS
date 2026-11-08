@@ -109,6 +109,25 @@ test('Help matches Organization search dimensions and animates nested routes whe
   await expect(articlePage).toHaveClass(/help-route-transition/);
   await expect(articlePage).toHaveCSS('animation-name', 'help-subpage-arrive');
 
+  const prepareMemberDetails = page.getByRole('link', { name: 'Prepare member details', exact: true });
+  await prepareMemberDetails.click();
+  await expect(page).toHaveURL(/\/help\/articles\/invite-members#prepare-member-details$/);
+  await expect(prepareMemberDetails).toHaveAttribute('aria-current', 'location');
+  await expect(page.locator('#prepare-member-details')).toHaveClass(/help-step--active/);
+  await expect(page.locator('#prepare-member-details')).toHaveCSS('animation-name', 'help-step-arrive');
+
+  await page.goBack();
+  await expect(page).toHaveURL(/\/help\/articles\/invite-members$/);
+  await expect(page.getByRole('link', { name: 'Open Employees', exact: true })).toHaveAttribute('aria-current', 'location');
+  await expect(page.locator('#open-employees')).toHaveClass(/help-step--active/);
+  await expect(prepareMemberDetails).not.toHaveAttribute('aria-current', 'location');
+  await expect(page.locator('#prepare-member-details')).not.toHaveClass(/help-step--active/);
+
+  await page.goForward();
+  await expect(page).toHaveURL(/\/help\/articles\/invite-members#prepare-member-details$/);
+  await expect(prepareMemberDetails).toHaveAttribute('aria-current', 'location');
+  await expect(page.locator('#prepare-member-details')).toHaveClass(/help-step--active/);
+
   await page.getByRole('link', { name: 'How to update your club profile' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'How to update your club profile' })).toBeVisible();
   await expect(articlePage).toHaveClass(/help-route-transition/);

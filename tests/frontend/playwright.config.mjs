@@ -8,7 +8,7 @@ const { defineConfig } = require('@playwright/test');
 
 export default defineConfig({
   testDir: '.',
-  testMatch: ['organization.spec.mjs', 'settings.spec.mjs', 'help.spec.mjs', 'help-retry.spec.mjs'],
+  testMatch: ['organization.spec.mjs', 'settings.spec.mjs', 'help.spec.mjs', 'help-retry.spec.mjs', 'guest-access.spec.mjs'],
   outputDir: join(tmpdir(), '179fc-organization-test-results'),
   workers: 1,
   reporter: 'list',

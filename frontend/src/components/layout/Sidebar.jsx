@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { NAV_ITEMS } from '../../app/routes.js';
+import { useAuth } from '../../features/auth/authStore.jsx';
 import { useCurrentAccount } from '../../features/auth/CurrentAccountProvider.jsx';
 import { useSavedSettings } from '../../features/settings/SettingsProvider.jsx';
 import { Avatar } from '../ui/Avatar.jsx';
@@ -8,6 +9,7 @@ import { Icon } from '../ui/Icon.jsx';
 
 export function Sidebar({ open, onClose }) {
   const { settings } = useSavedSettings();
+  const { user } = useAuth();
   const account = useCurrentAccount();
   const drawer = useRef(null);
   useEffect(() => {
@@ -33,7 +35,7 @@ export function Sidebar({ open, onClose }) {
       <nav className="sidebar__nav" aria-label="Main navigation">
         {NAV_ITEMS.map(item => <NavLink key={item.to} to={item.to} aria-label={item.label} className={({ isActive }) => 'nav-item' + (isActive ? ' nav-item--active' : '')} onClick={onClose}><Icon name={item.icon} size={15} /><span>{item.label}</span></NavLink>)}
       </nav>
-      <div className="sidebar__user"><Avatar initials={account.initials} tone={account.tone} image={account.avatar} size="sm" label={account.name} /><span><strong>{account.name || 'Account'}</strong><small>{account.role || 'Member'}</small></span></div>
+      {user ? <div className="sidebar__user"><Avatar initials={account.initials} tone={account.tone} image={account.avatar} size="sm" label={account.name} /><span><strong>{account.name || 'Account'}</strong><small>{account.role || 'Member'}</small></span></div> : null}
     </aside>
     {open && <button className="sidebar-scrim" aria-label="Close navigation" onClick={onClose} />}
   </>;

@@ -9,6 +9,7 @@ This directory contains desktop design references and their accompanying UX desc
 | Screen or state | Image | UX description | Route or state |
 | --- | --- | --- | --- |
 | Sign-in | [PNG](Sign-in/Sign-in.png) | [UX](Sign-in/Sign-in.md) | `/sign-in` |
+| Guest header states | [PNG](Guest/Guest_Header_States.png) | [UX](Guest/Guest_Header_States.md) | Guest default and signed-in TopBar states |
 | Dashboard | [PNG](Dashboard/Dashboard.png) | [UX](Dashboard/Dashboard.md) | `/dashboard` |
 | Employees | [PNG](Employees/Employees.png) | [UX](Employees/Employees.md) | `/employees` |
 | Organization | [PNG](Organization/Organization.png) | [UX](Organization/Organization.md) | `/organization` |
@@ -37,6 +38,7 @@ This directory contains desktop design references and their accompanying UX desc
 designs/
 |-- Assist/           Assist.png, Assist.md
 |-- Dashboard/        Dashboard.png, Dashboard.md
+|-- Guest/            Guest_Header_States.png, Guest_Header_States.md
 |-- Employees/        Employees.png, Employees.md
 |-- Help/             Help.png, Help_Invite_Members, Help_Club_Profile,
 |                     Help_Member_Roles, Help_Support (.png and .md)
@@ -53,23 +55,23 @@ designs/
 
 The Posts and Settings tab files represent states of their respective pages, not separate sidebar destinations. The active tab must be represented in the URL so that refresh, browser navigation, and a copied link restore the same view. Post details, creation, and editing are separate screens reached from the posts list or details page.
 
-Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from a local browser rendering on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. Per the owner's request, `Settings/` retains only `.png` UI references and `.md` UX documents; authoring/export scripts and separate handoff documents are not retained. Other PNGs remain desktop references. Read design intent alongside the frontend README for actual implementation status.
+Historical exports do not include a Figma source URL or known export date. The Settings revision for **179MMS-6** was exported from a local browser rendering on **2026-11-03**, including responsive/state boards; no Figma edits are claimed. The **179MMS-10** `Guest_Header_States.png`, refreshed `Help.png`, and refreshed `Help_Invite_Members.png` assets were created through an image-generation workflow on **2026-11-08**; they have no Figma source URL. Per the owner's request, `Settings/` retains only `.png` UI references and `.md` UX documents; authoring/export scripts and separate handoff documents are not retained. Other PNGs remain desktop references. Read design intent alongside the frontend README for actual implementation status.
 
 ## UI and component overview
 
-### Shared authenticated shell
+### Shared portal shell
 
-`AppShell` wraps all private pages and owns the desktop layout: a fixed sidebar, page header, and content area. Dashboard, Employees, and Organization all share this shell.
+`AppShell` wraps every default portal page and owns the desktop layout: a fixed sidebar, page header, and content area. Dashboard, Posts, Settings, Help, and 179 Assist render for guests; Employees, member profiles, and Organization use the mock-session route guard.
 
 | Component | Responsibility | Used by |
 | --- | --- | --- |
-| `AppShell` | Composes `Sidebar`, `TopBar`, page content, and the assistant launcher; handles shared responsive/layout behavior. | Every private page |
-| `Sidebar` | Brand/logo, `NavItem`s, bottom user summary, and the active navigation state derived from the URL. | `AppShell` |
-| `TopBar` | Page title, optional context, and avatar-based `UserMenu`. Settings revision removes its subtitle. Open menus in historical references are interaction states, not permanent cards. | `AppShell` |
-| `PageHeader` | Standardizes titles, subtitles, and page actions. | Private pages |
+| `AppShell` | Composes `Sidebar`, `TopBar`, page content, and the assistant launcher; handles shared responsive/layout behavior. | Every default portal page |
+| `Sidebar` | Brand/logo, `NavItem`s, active navigation state, and a signed-in-only bottom user summary. | `AppShell` |
+| `TopBar` | Page title, optional context, guest Sign up/Log in actions, or the signed-in avatar-based `UserMenu`. Settings revision removes its subtitle. Open menus in historical references are interaction states, not permanent cards. | `AppShell` |
+| `PageHeader` | Standardizes titles, subtitles, and page actions. | Portal pages |
 | `Tabs` | Accessible tab list with an active underline. Keeps its selected value in the page URL, supports keyboard navigation, and becomes horizontally scrollable rather than wrapping on narrow screens. | Posts, Settings |
 | `Avatar` | Renders an image or colored-initials fallback. | Header, cards, organization nodes |
-| User menu | Toggleable account popover implemented within `TopBar`, with Profile, Settings, Help center, and Log out actions. Closes on outside click, Escape, and navigation. | `TopBar` |
+| User menu | Signed-in-only account popover implemented within `TopBar`, with Profile, Settings, Help center, a divider, and left-aligned Log out. Closes on outside click, Escape, and navigation. | `TopBar` |
 | `AssistantLauncher` | Persistent icon button with an accessible name, plus an expandable chat panel with a close action, message history, prompt suggestion, and submit input. The launcher tooltip has been removed. | `AppShell` |
 | Loading, empty, and error states | Required for integration; Settings now includes a state board. Use shared `EmptyState` and appropriate page-level states. | Per feature |
 
@@ -156,7 +158,7 @@ Read every PNG/Markdown pair directly, including the [responsive](Settings/Setti
 
 The Help article PNG/Markdown pairs share one nested-route reference: ordinary uppercase-gray category text, **On this page** with a pale-pink current row and burgundy leading indicator, a boundary callout inside the step card, and burgundy Help Center breadcrumb/Back links. Read `Help/Help.md` with each article pair before implementation.
 
-The circular assistant trigger is present in the authenticated shell. It expands to the `AssistantPanel` reference: a header with availability message and close button, a conversation area, suggested question, and labelled text input with submit button. Opening the panel must move focus into it; closing returns focus to the launcher. Messages need their own loading/error state and must be announced accessibly.
+The circular assistant trigger is present in the shared guest-capable shell. It expands to the `AssistantPanel` reference: a header with availability message and close button, a conversation area, suggested question, and labelled text input with submit button. Opening the panel must move focus into it; closing returns focus to the launcher. Messages need their own loading/error state and must be announced accessibly.
 
 ## Minimal design system
 
@@ -310,7 +312,7 @@ The frontend uses feature-based folders under `src/features/`; shared layout and
 - Tab values are validated by a page-level parser. Invalid or missing values canonicalize to `all` for Posts and `general` for Settings without creating a duplicate history entry. Browser Back/Forward restores the appropriate tab and its data request.
 - Do not mix post, settings, help, and assistant data in a global page store. Each feature owns its loading/error/cache state; `authStore` remains limited to identity/session data and shared user-menu data.
 - Production settings, post publication/editing, password and session management, and support require server-authorized feature APIs. The current mock workflows do not provide server-side authorization or shared persistence.
-- The auth guard redirects unauthenticated users to `/sign-in`; `authStore` retains the current user and session. Confirm the admin permission model with the backend before restricting “Add member” or administration routes.
+- The auth guard redirects unauthenticated users only from Employees, member profiles, and Organization to `/sign-in`; `authStore` retains the current user and session. Confirm the admin permission model with the backend before restricting “Add member” or administration routes.
 - Keep labels/content in constants or data models instead of duplicating strings across components; this also keeps the door open for i18n if needed.
 
 ## Current implementation and remaining integration
@@ -327,4 +329,4 @@ The shell, demo sign-in, Dashboard, post list and workflow, Settings, Employees 
 - Keep the image and UX description for each screen or state together in its feature folder, using matching base names. Existing exports retain their current names; use English, lowercase kebab-case for new assets where practical. Use SVG for icons and vectors, and optimized PNG/WebP for raster assets.
 - Do not store credentials, real member data, or unlicensed assets.
 - When a design changes, update its image and UX description together, and record its Figma/source link, export date, and any route/component impact here when available. For a tabbed page, record every tab state and whether it changes the shared component/API contract. Also update `frontend/README.md` when the architecture, dependency set, routes, or data flow changes.
-- The Help package was revised locally for **179MMS-9** on 2026-11-06. It now contains `Help.png` plus Invite Members, Club Profile, Member Roles, and Support references, each as a `.png` and matching `.md`. No Figma source or export date was supplied. All nested Help references share the existing authenticated shell and one article-template/typography contract; their Markdown defines TopBar `h1` ownership, matching TOC anchors, responsive behavior, states, motion, accessibility, and the Support unavailable-service boundary.
+- The Help package was revised locally for **179MMS-9** on 2026-11-06 and synchronized for **179MMS-10** guest access. It contains `Help.png` plus Invite Members, Club Profile, Member Roles, and Support references, each as a `.png` and matching `.md`. No Figma source or export date was supplied. All nested Help references share the guest-capable shell and one article-template/typography contract; their Markdown defines TopBar `h1` ownership, matching TOC anchors, responsive behavior, states, motion, accessibility, and the Support unavailable-service boundary.
