@@ -10,6 +10,11 @@ a { color: inherit; }
 h1, h2, h3, p { margin-top: 0; }
 
 .auth-layout { display: grid; min-height: 100svh; grid-template-columns: minmax(22rem, .79fr) minmax(0, 1fr); }
+@media (prefers-reduced-motion: no-preference) {
+  .auth-layout { animation: auth-page-arrive 350ms cubic-bezier(.2, .7, .2, 1) both; }
+}
+@keyframes auth-page-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .auth-layout { animation: none; } }
 .auth-promo { position: relative; overflow: hidden; padding: clamp(2.25rem, 5vw, 5.25rem); color: #fff; background: var(--sidebar); }
 .auth-brand, .brand { display: flex; align-items: center; gap: 11px; }
 .auth-brand > span:last-child, .brand > span:last-child { display: grid; gap: 0; }

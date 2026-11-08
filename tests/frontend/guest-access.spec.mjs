@@ -4,6 +4,7 @@ const require = createRequire(new URL('../../frontend/package.json', import.meta
 const { test, expect } = require('@playwright/test');
 
 test('Guest access keeps public routes open and returns to a protected destination after demo sign-in', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/dashboard');
   await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Sign up', exact: true })).toBeVisible();
@@ -18,14 +19,17 @@ test('Guest access keeps public routes open and returns to a protected destinati
 
   await page.goto('/employees');
   await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page.locator('.auth-layout')).toHaveCSS('animation-name', 'auth-page-arrive');
   await page.getByRole('button', { name: 'Sign in to 179FC' }).click();
   await expect(page).toHaveURL(/\/employees$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Employees' })).toBeVisible();
 });
 
 test('Guest routes protect Organization and authenticated logout restores the guest dashboard', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/organization');
   await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page.locator('.auth-layout')).toHaveCSS('animation-name', 'auth-page-arrive');
   await page.getByRole('button', { name: 'Sign in to 179FC' }).click();
   await expect(page).toHaveURL(/\/organization$/);
 
@@ -41,6 +45,21 @@ test('Guest routes protect Organization and authenticated logout restores the gu
   await expect(page.getByRole('link', { name: 'Log in', exact: true })).toBeVisible();
   await page.goto('/organization');
   await expect(page).toHaveURL(/\/sign-in$/);
+});
+
+test('Guest TopBar Log in transition respects reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/dashboard');
+  await page.getByRole('link', { name: 'Log in', exact: true }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page.locator('.auth-layout')).toHaveCSS('animation-name', 'auth-page-arrive');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+
+  await page.goto('/dashboard');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.getByRole('link', { name: 'Log in', exact: true }).click();
+  await expect(page).toHaveURL(/\/sign-in$/);
+  await expect(page.locator('.auth-layout')).toHaveCSS('animation-name', 'none');
 });
 
 test('Demo sign-in rejects unsafe return targets without leaving the Sign-in flow', async ({ page }) => {
