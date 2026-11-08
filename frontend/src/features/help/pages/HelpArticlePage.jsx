@@ -53,9 +53,11 @@ export function HelpArticlePage() {
   }, [articleId, attempt]);
 
   useEffect(() => {
+    if (!article) return undefined;
     const stepId = location.hash.slice(1);
-    if (!article || !stepId || !article.steps.some((step) => step.id === stepId)) return undefined;
-    setCurrentStep(stepId);
+    const selectedStepId = article.steps.some((step) => step.id === stepId) ? stepId : (article.steps[0]?.id || '');
+    setCurrentStep(selectedStepId);
+    if (!stepId || selectedStepId !== stepId) return undefined;
     const frame = requestAnimationFrame(() => {
       document.getElementById(stepId)?.scrollIntoView({
         behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
