@@ -24,7 +24,7 @@ tests/
 ## Implemented backend checks
 
 - From `backend/`, run `npm run test:unit` for the isolated `AppService` health payload check.
-- Run `npm run test:integration` for the in-memory Nest application, `GET /health` response contract, and the production `ValidationPipe` success/failure behavior. This suite does not bind a network port or require MongoDB.
+- Run `npm run test:integration` for the Nest application, `GET /health` response contract, and the production `ValidationPipe` success/failure behavior. Supertest temporarily uses an OS-assigned loopback port and teardown closes it; the suite never uses port `3000` or requires MongoDB.
 - Run `npm test` to execute both categories, or `npm run test:ci` to build then execute both categories. These commands use Node's test runner with `ts-node/register` and return non-zero on failure.
 - Backend test source is under `tests/backend/`; its [runner, lifecycle, synthetic-data, artifact, and MongoDB-extension policy](backend/README.md) describes the implemented boundary. No GitHub Actions backend check is added by this ticket.
 

@@ -52,13 +52,13 @@ npm run test:ci
 ~~~
 
 - `test:unit` runs isolated service checks without an HTTP server or external service.
-- `test:integration` creates a Nest application in memory and checks `GET /health` plus the production `ValidationPipe` behavior through its HTTP server. It does not call `listen`, so it does not reserve port `3000` or require MongoDB.
+- `test:integration` creates a Nest application and checks `GET /health` plus the production `ValidationPipe` behavior through its HTTP server. The test code does not call production `app.listen`; Supertest temporarily binds an OS-assigned loopback port for its requests and never uses the fixed production port `3000` or requires MongoDB.
 - `npm test` runs both categories and returns a non-zero exit code when either suite fails.
 - `test:ci` runs `npm run build` followed by the complete test suite. It is the stable command for a future CI job; this ticket does not add a GitHub Actions workflow.
 
-Tests use Node's built-in test runner with `ts-node/register` in transpile-only runtime mode, using the test-only compiler configuration. `test:ci` still runs the Nest production build before the suites. The integration script uses `cross-env` to expose `backend/node_modules` to the centralized test directory on Windows and CI. `supertest` sends requests to Nest's in-memory HTTP server. The production bootstrap and integration suite share `src/app.config.ts`, preventing the test from silently using a different `ValidationPipe` setup.
+Tests use Node's built-in test runner with `ts-node/register` in transpile-only runtime mode, using the test-only compiler configuration. `test:ci` still runs the Nest production build before the suites. The integration script uses `cross-env` to expose `backend/node_modules` to the centralized test directory on Windows and CI. `supertest` sends requests to the Nest HTTP server through a temporary OS-assigned loopback port. The production bootstrap and integration suite share `src/app.config.ts`, preventing the test from silently using a different `ValidationPipe` setup.
 
-The integration suite has a ten-second suite timeout and always calls `app.close()` after its cases. No fixed test port, database, production credential, or member record is used. Node's runner writes failures to standard output and creates no repository artifact. There is no coverage threshold or coverage claim yet because no coverage baseline has been established.
+The integration suite has a ten-second suite timeout and always calls `app.close()` after its cases. Supertest's temporary loopback port and remaining Nest handles are released during teardown; no fixed test port, database, production credential, or member record is used. Node's runner writes failures to standard output and creates no repository artifact. There is no coverage threshold or coverage claim yet because no coverage baseline has been established.
 
 ## Planned Flow
 
