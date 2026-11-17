@@ -118,7 +118,7 @@
 
 - Backend
 
-   From `backend/`, run `npm test` for the Node/`ts-node` unit and Nest integration checks, or `npm run test:ci` to build then run both suites. The integration test checks `GET /health` and the global `ValidationPipe`; Supertest temporarily uses an OS-assigned loopback port and teardown closes its handle, so it never uses the fixed production port `3000` or MongoDB. A failed check returns a non-zero exit code.
+   From `backend/`, run `npm test` for the Node/`ts-node` unit and Nest integration checks, or `npm run test:ci` to build then run both suites. The integration test checks `GET /health` and the global `ValidationPipe`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The `after` hook calls `app.close()` to close the Nest application and remaining handles, so the suite never uses the fixed production port `3000` or MongoDB. A failed check returns a non-zero exit code.
 
    To manually inspect a running API, `Invoke-WebRequest http://127.0.0.1:3000/health -UseBasicParsing` returns status `200` and JSON `{"service":"179fc-mms-backend","status":"ok"}`.
 
