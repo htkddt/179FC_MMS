@@ -87,6 +87,7 @@
    cd backend
    npm ci
    npm run build
+   npm run test:ci
    ~~~
 
 ### Run
@@ -117,11 +118,9 @@
 
 - Backend
 
-   ~~~powershell
-   Invoke-WebRequest http://127.0.0.1:3000/health -UseBasicParsing
-   ~~~
+   From `backend/`, run `npm test` for the Node/`ts-node` unit and in-memory Nest integration checks, or `npm run test:ci` to build then run both suites. The integration test checks `GET /health` and the global `ValidationPipe` without binding a port or needing MongoDB. A failed check returns a non-zero exit code.
 
-   A healthy API returns status `200` and the JSON body `{"service":"179fc-mms-backend","status":"ok"}`.
+   To manually inspect a running API, `Invoke-WebRequest http://127.0.0.1:3000/health -UseBasicParsing` returns status `200` and JSON `{"service":"179fc-mms-backend","status":"ok"}`.
 
 ### Local development
 
@@ -145,7 +144,7 @@
 | Workstream | Planning | Foundation | Feature Development | Test Coverage | Current Result |
 | --- | --- | --- | --- | --- | --- |
 | Frontend | Complete | Complete | In progress | Initial coverage | Responsive guest-capable React portal with mock sign-in for protected Employees/Organization, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
-| Backend | Complete | Complete | Not started | Planned | NestJS API shell with `GET /health` |
+| Backend | Complete | Complete | Not started | Initial unit/integration coverage | NestJS API shell with `GET /health`, isolated ValidationPipe contract checks, and no MongoDB coverage |
 | Chatbot | Complete | Not started | Not started | Planned | FastAPI delivery plan |
 | Designs | Complete | Not started | Not started | Not started | Asset and handoff plan |
 | Scripts | Complete | Not started | Not started | Not started | Automation plan and component folders |
