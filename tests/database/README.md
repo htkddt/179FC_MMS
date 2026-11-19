@@ -1,5 +1,5 @@
 # Database Tests
 
-Reserved for future database migration, integrity, repository, and query test source. The exact test plan will be finalized after selecting the persistence technology.
+This directory is reserved for future database migration, integrity, repository, and query test source. MongoDB and a database runner are not configured yet; no database tests or database coverage are implemented.
 
-Keep all database test code and fixtures in this directory. Document the selected runner, command, environment requirements, and test database lifecycle here once implemented.
+When persistence is selected, keep all database test source, fixtures, and test-only configuration here. Use a dedicated disposable test database or equivalent isolated service, synthetic records only, explicit connection/test timeouts, and teardown that closes all handles. Document the selected runner, commands, environment requirements, artifact policy, and lifecycle before claiming database coverage.

@@ -23,7 +23,7 @@
 | Web client | React, React Router, JavaScript, JSX, CSS, Vite | Feature development |
 | API | NestJS, TypeScript | Initial scaffold |
 | Virtual assistant | Python, FastAPI | Planned |
-| Testing | Node logic checks and Playwright Organization flows under `tests/frontend/` | Initial coverage |
+| Testing | Node test-runner checks under `tests/frontend/` and `tests/backend/`, plus Playwright Organization flows under `tests/frontend/` | Initial coverage; backend checks run locally and backend CI is not configured |
 | Automation | PowerShell and/or Node.js scripts | Planned |
 
 ## References
@@ -87,6 +87,7 @@
    cd backend
    npm ci
    npm run build
+   npm run test:ci
    ~~~
 
 ### Run
@@ -117,11 +118,9 @@
 
 - Backend
 
-   ~~~powershell
-   Invoke-WebRequest http://127.0.0.1:3000/health -UseBasicParsing
-   ~~~
+   From `backend/`, run `npm test` for the Node/`ts-node` unit and Nest integration checks, or `npm run test:ci` to build then run both suites. The integration test checks `GET /health` and the global `ValidationPipe`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The `after` hook calls `app.close()` to close the Nest application and remaining handles, so the suite never uses the fixed production port `3000` or MongoDB. A failed check returns a non-zero exit code.
 
-   A healthy API returns status `200` and the JSON body `{"service":"179fc-mms-backend","status":"ok"}`.
+   To manually inspect a running API, `Invoke-WebRequest http://127.0.0.1:3000/health -UseBasicParsing` returns status `200` and JSON `{"service":"179fc-mms-backend","status":"ok"}`.
 
 ### Local development
 
@@ -145,7 +144,7 @@
 | Workstream | Planning | Foundation | Feature Development | Test Coverage | Current Result |
 | --- | --- | --- | --- | --- | --- |
 | Frontend | Complete | Complete | In progress | Initial coverage | Responsive guest-capable React portal with mock sign-in for protected Employees/Organization, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
-| Backend | Complete | Complete | Not started | Planned | NestJS API shell with `GET /health` |
+| Backend | Complete | Complete | Not started | Initial unit/integration coverage | NestJS API shell with `GET /health`, isolated ValidationPipe contract checks, and no MongoDB coverage |
 | Chatbot | Complete | Not started | Not started | Planned | FastAPI delivery plan |
 | Designs | Complete | Not started | Not started | Not started | Asset and handoff plan |
 | Scripts | Complete | Not started | Not started | Not started | Automation plan and component folders |

@@ -21,13 +21,18 @@ tests/
 - Pull requests to `main` run these checks in the **Test** job after the frontend **Build** job succeeds. The GitHub Actions runner installs Playwright Chromium before browser checks; the **Deploy** job publishes to GitHub Pages only after both jobs succeed.
 - Test source and configuration remain under `tests/frontend/`; browser artifacts go to the operating system's temporary directory. See [frontend runner setup and scope](frontend/README.md).
 
+## Implemented backend checks
+
+- From `backend/`, run `npm run test:unit` for the isolated `AppService` health payload check.
+- Run `npm run test:integration` for the Nest application, `GET /health` response contract, and the production `ValidationPipe` success/failure behavior. Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles; the `after` hook calls `app.close()` for the Nest application and remaining handles. The suite never uses port `3000` or requires MongoDB.
+- Run `npm test` to execute both categories, or `npm run test:ci` to build then execute both categories. These commands use Node's test runner with `ts-node/register` and return non-zero on failure.
+- Backend test source is under `tests/backend/`; its [runner, lifecycle, synthetic-data, artifact, and MongoDB-extension policy](backend/README.md) describes the implemented boundary. No GitHub Actions backend check is added by this ticket.
+
 ## Remaining plan
 
-1. Select backend, chatbot, and database runners and define the coverage policy for each component.
-2. Establish shared test-data, fixture, and environment conventions without coupling suites to production data.
-3. Add smoke tests for frontend availability and backend `GET /health`.
-4. Add feature tests as member-management flows are implemented.
-5. Add contract tests for backend-chatbot integration and CI reporting.
+1. Select chatbot and database runners, then define their coverage policies.
+2. Add feature tests as member-management flows and persistence are implemented.
+3. Add contract tests for backend-chatbot integration and CI reporting.
 
 ## Conventions
 
