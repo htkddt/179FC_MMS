@@ -35,6 +35,8 @@ Use English file names and test descriptions. Keep fixtures, test-only modules, 
 
 There is no coverage threshold or coverage report yet: a baseline has not been established. Node test output is emitted to standard output; no test artifact is written inside the repository. A failing test makes its `node --test` command, and therefore `npm test` and `npm run test:ci`, exit non-zero.
 
-## MongoDB Extension (Not Implemented)
+## MongoDB test boundary
 
-MongoDB is not configured and the current suites have no database coverage. When persistence is introduced, place database-specific tests, fixtures, and test-only configuration in `tests/database/`. Those suites must use a dedicated disposable test database or equivalent isolated service, create only synthetic records, set explicit connection and test timeouts, and close all database/app handles in teardown. Do not treat this guidance as implemented MongoDB coverage.
+MongoDB local connectivity is implemented for the application, but database integration testing is explicitly deferred. The existing `test:unit` and `test:integration` scripts set `DATABASE_ENABLED=false`, so they retain their isolated lifecycle and do not contact a local database.
+
+When database coverage is scheduled, place database-specific tests, fixtures, and test-only configuration in `tests/database/`. Those suites must use a dedicated disposable test database or equivalent isolated service, create only synthetic records, set explicit connection and test timeouts, and close all database/app handles in teardown. Do not treat the current backend test commands as MongoDB coverage.

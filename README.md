@@ -21,7 +21,7 @@
 | Area | Technology | Status |
 | --- | --- | --- |
 | Web client | React, React Router, JavaScript, JSX, CSS, Vite | Feature development |
-| API | NestJS, TypeScript | Initial scaffold |
+| API | NestJS, TypeScript, official MongoDB Node.js driver | Local MongoDB foundation; feature APIs not implemented |
 | Virtual assistant | Python, FastAPI | Planned |
 | Testing | Node test-runner checks under `tests/frontend/` and `tests/backend/`, plus Playwright Organization flows under `tests/frontend/` | Initial coverage; backend checks run locally and backend CI is not configured |
 | Automation | PowerShell and/or Node.js scripts | Planned |
@@ -44,6 +44,39 @@
 - Current persistence is browser-local: canonical profile/team fields, chart offsets and personal team-view preferences are stored separately. Resetting/hiding/zooming the chart never reverses membership changes. The assistant remains a labelled icon and chat panel without a launcher tooltip.
 - The [Organization implementation and proposed backend contracts](frontend/README.md#organization-implementation) document all interactions, state keys, the shared transfer adapter, proposed APIs, concurrency/error handling and required cache updates for future integration. No membership API has been implemented on the backend yet.
 - Run `npm test` and `npm run test:browser` from `frontend/`. See [frontend test setup](tests/frontend/README.md) and [Organization UX](designs/Organization/Organization.md).
+
+### Local MongoDB, backend, and frontend
+
+The repository includes a local-only MongoDB Compose service in `docker-compose.mongodb.yml`. It pins `mongo:8.0.5`, publishes `27017` only on `127.0.0.1`, has a healthcheck, and stores data in the named `179fc-mongodb-data` volume. It is development infrastructure, not a production database deployment.
+
+From the repository root, start MongoDB and wait for it to become healthy:
+
+~~~powershell
+docker compose -f docker-compose.mongodb.yml up -d
+docker compose -f docker-compose.mongodb.yml ps
+~~~
+
+Then create the ignored local backend environment file, import the current synthetic frontend mocks, start the backend, and start the frontend in separate terminals:
+
+~~~powershell
+Copy-Item backend/.env.example backend/.env
+cd backend
+npm ci
+npm run database:import-mocks
+npm run start:dev
+~~~
+
+~~~powershell
+cd frontend
+npm ci
+npm run dev -- --host 127.0.0.1 --port 5173
+~~~
+
+Verify the API liveness at `GET http://127.0.0.1:3000/health` and database readiness at `GET http://127.0.0.1:3000/health/ready`. The former shows the Nest process is up; the latter returns `200` only when MongoDB can be pinged and otherwise returns `503` without exposing connection information.
+
+The import copies synthetic mock datasets into local collections with guarded, repeatable upserts. It does not connect the frontend to the backend: the frontend remains mock/localStorage-based until a future API integration feature changes it. See `backend/README.md` and `scripts/database/README.md` for the complete environment contract, collection mapping, stop command, and destructive volume-reset warning.
+
+To stop the local container while retaining data, run `docker compose -f docker-compose.mongodb.yml down`. To destructively remove only the Compose-declared local volume, verify the target and run `docker compose -f docker-compose.mongodb.yml down -v`; start it again and rerun the importer afterward.
 
 ### Temporary frontend demo access
 
@@ -118,7 +151,7 @@
 
 - Backend
 
-   From `backend/`, run `npm test` for the Node/`ts-node` unit and Nest integration checks, or `npm run test:ci` to build then run both suites. The integration test checks `GET /health` and the global `ValidationPipe`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The `after` hook calls `app.close()` to close the Nest application and remaining handles, so the suite never uses the fixed production port `3000` or MongoDB. A failed check returns a non-zero exit code.
+   From `backend/`, run `npm test` for the Node/`ts-node` unit and Nest integration checks, or `npm run test:ci` to build then run both suites. The integration test checks `GET /health` and the global `ValidationPipe`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The scripts set `DATABASE_ENABLED=false`, and the `after` hook calls `app.close()` to close the Nest application and remaining handles, so the suite never uses the fixed production port `3000` or MongoDB. A failed check returns a non-zero exit code. Database integration testing is deferred.
 
    To manually inspect a running API, `Invoke-WebRequest http://127.0.0.1:3000/health -UseBasicParsing` returns status `200` and JSON `{"service":"179fc-mms-backend","status":"ok"}`.
 
@@ -144,10 +177,10 @@
 | Workstream | Planning | Foundation | Feature Development | Test Coverage | Current Result |
 | --- | --- | --- | --- | --- | --- |
 | Frontend | Complete | Complete | In progress | Initial coverage | Responsive guest-capable React portal with mock sign-in for protected Employees/Organization, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
-| Backend | Complete | Complete | Not started | Initial unit/integration coverage | NestJS API shell with `GET /health`, isolated ValidationPipe contract checks, and no MongoDB coverage |
+| Backend | Complete | MongoDB local foundation complete | Feature APIs not started | Initial unit/integration coverage; database integration deferred | NestJS API with liveness/readiness endpoints, guarded local MongoDB lifecycle, and a synthetic mock importer; frontend is not yet wired to API data |
 | Chatbot | Complete | Not started | Not started | Planned | FastAPI delivery plan |
 | Designs | Complete | Not started | Not started | Not started | Asset and handoff plan |
-| Scripts | Complete | Not started | Not started | Not started | Automation plan and component folders |
+| Scripts | Complete | Local mock importer complete | In progress | No script test runner | Guarded local MongoDB mock-data import script and component folders |
 | Tests | Complete | In progress | In progress | Initial coverage | Centralized Node logic checks and Playwright Organization/profile interaction coverage |
 
 ## Next Actions

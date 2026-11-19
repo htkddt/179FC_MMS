@@ -9,6 +9,13 @@ This directory contains the NestJS HTTP API for 179FC_MMS. The initial scaffold 
 - NestJS
 - TypeScript
 - Node.js
+- Official MongoDB Node.js driver
+
+## MongoDB foundation
+
+The backend now has a local MongoDB connection foundation. It uses the official MongoDB Node.js driver in `src/database/` instead of an ODM because this ticket does not introduce a member schema, collection model, or repository contract. The driver provides one small Nest provider for connection lifecycle and leaves future domain-model choices open.
+
+`DatabaseConfigModule` loads `backend/.env`, validates the database contract before providers are created, and reports only variable names in validation errors. `DatabaseClientService` connects with an explicit timeout, pings the configured database during startup, and closes its client when Nest shuts down. Startup fails with a safe, generic message if MongoDB is unavailable; no URI or credential is written to application logs.
 
 ## Directory Structure
 
@@ -28,13 +35,23 @@ backend/
 
 ## Run Locally
 
-~~~bash
+Start the local MongoDB container from the repository root. The Compose file publishes MongoDB on loopback only and uses the named volume `179fc-mongodb-data`.
+
+~~~powershell
+docker compose -f docker-compose.mongodb.yml up -d
+docker compose -f docker-compose.mongodb.yml ps
+Copy-Item backend/.env.example backend/.env
+cd backend
 npm ci
 npm run build
+npm run database:import-mocks
 npm run start:dev
 ~~~
 
-- The development server listens on `http://localhost:3000` by default, confirm availability at `GET /health`.
+- The development server listens on `http://localhost:3000` by default. `GET /health` is a liveness response and returns `200` when the Nest process is up. `GET /health/ready` pings MongoDB and returns `200` with `database: "ready"` only when the database is usable; it returns `503` with `database: "not_ready"` or `"disabled"` otherwise. Neither response includes a URI, topology, or credential.
+- `backend/.env` is intentionally ignored. Do not add secrets to `.env.example`; its local URI is `mongodb://127.0.0.1:27017` and its local-only database name is `179fc_mms_local`.
+- `npm run database:import-mocks` imports all current synthetic exports under `frontend/src/mocks/`. It is idempotent for imported records and refuses non-loopback URIs or a database name not ending in `_local`. See [`../scripts/database/README.md`](../scripts/database/README.md) for collection mapping and reset behavior.
+- The frontend is not connected to backend APIs by this ticket. It continues to read browser/module mocks even after those same synthetic datasets are imported into local MongoDB.
 - The scaffold requires Node.js 20.11 or newer.
 - The Nest CLI currently requires TypeScript 6, which is pinned in `package.json`.
 - Use the committed `package-lock.json` for repeatable installs.
@@ -52,19 +69,33 @@ npm run test:ci
 ~~~
 
 - `test:unit` runs isolated service checks without an HTTP server or external service.
-- `test:integration` creates a Nest application and checks `GET /health` plus the production `ValidationPipe` behavior through its HTTP server. The test code does not call production `app.listen`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The suite never uses the fixed production port `3000` or requires MongoDB.
+- `test:integration` creates a Nest application and checks `GET /health` plus the production `ValidationPipe` behavior through its HTTP server. The test code does not call production `app.listen`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The scripts set `DATABASE_ENABLED=false`, so the existing suite never uses the fixed production port `3000` or requires MongoDB.
 - `npm test` runs both categories and returns a non-zero exit code when either suite fails.
 - `test:ci` runs `npm run build` followed by the complete test suite. It is the stable command for a future CI job; this ticket does not add a GitHub Actions workflow.
 
 Tests use Node's built-in test runner with `ts-node/register` in transpile-only runtime mode, using the test-only compiler configuration. `test:ci` still runs the Nest production build before the suites. The integration script uses `cross-env` to expose `backend/node_modules` to the centralized test directory on Windows and CI. `supertest` sends requests through a temporary OS-assigned loopback listener and releases that listener when each request settles. The production bootstrap and integration suite share `src/app.config.ts`, preventing the test from silently using a different `ValidationPipe` setup.
 
-The integration suite has a ten-second suite timeout and always calls `app.close()` after its cases. Supertest releases each temporary loopback listener when its request settles; the `after` hook's `app.close()` call closes the Nest application and remaining Nest handles. No fixed test port, database, production credential, or member record is used. Node's runner writes failures to standard output and creates no repository artifact. There is no coverage threshold or coverage claim yet because no coverage baseline has been established.
+The integration suite has a ten-second suite timeout and always calls `app.close()` after its cases. Supertest releases each temporary loopback listener when its request settles; the `after` hook's `app.close()` call closes the Nest application and remaining Nest handles. No fixed test port, database, production credential, or member record is used. Node's runner writes failures to standard output and creates no repository artifact. There is no coverage threshold or coverage claim yet because no coverage baseline has been established. Database integration testing is intentionally deferred and is not represented as passing by these commands.
+
+## Stop and reset local MongoDB
+
+Run these commands from the repository root:
+
+~~~powershell
+# Stop containers but preserve the named local volume.
+docker compose -f docker-compose.mongodb.yml down
+
+# Destructive: removes only the named volume declared by docker-compose.mongodb.yml.
+docker compose -f docker-compose.mongodb.yml down -v
+~~~
+
+The second command removes all data in `179fc-mongodb-data`. Recreate it with `up -d`, then rerun `npm run database:import-mocks` from `backend/` when a fresh synthetic dataset is needed.
 
 ## Planned Flow
 
 1. Define the member domain model, authentication model, and permissions.
-2. Add versioned modules for members, roles, and organization administration.
-3. Integrate persistence, request validation, observability, and OpenAPI documentation.
+2. Add versioned modules for members, roles, and organization administration on the MongoDB foundation.
+3. Integrate request validation, observability, and OpenAPI documentation.
 4. Expose an authenticated integration boundary for the chatbot service.
 
 ## Organization and Employees integration handoff
