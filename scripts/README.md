@@ -16,7 +16,7 @@ scripts/
 
 ## Implemented database automation
 
-- `database/import-frontend-mocks.mjs` imports the synthetic exports in `frontend/src/mocks/` into the guarded local MongoDB target from `backend/.env`. Run `npm run database:import-mocks` from `backend/` after the Compose service is healthy. Its [database script documentation](database/README.md) lists mapping, input, safety guard, idempotency, and recovery behavior.
+- `database/import-frontend-mocks.mjs` imports the synthetic exports in `frontend/src/mocks/` into the guarded local MongoDB target from `backend/.env`. Run `npm run database:import-mocks` from `backend/` only after Kiet Huynh has started the local MongoDB service manually. Its [database script documentation](database/README.md) lists mapping, input, safety guard, idempotency, and recovery behavior.
 
 ## Plan
 
@@ -29,7 +29,7 @@ scripts/
 ## Conventions
 
 - Use English names and lowercase kebab-case filenames.
-- Prefer PowerShell for Windows-first local workflows; use Node.js or Python when portability requires it.
+- New or modified automation scripts must use Python with a `.py` filename.
 - Scripts must be idempotent where practical and must not embed secrets.
 
 ## Documentation Rule

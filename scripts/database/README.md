@@ -4,7 +4,7 @@
 
 `import-frontend-mocks.mjs` imports every current synthetic dataset exported from `frontend/src/mocks/` into the local MongoDB database configured by `backend/.env`.
 
-Run it from `backend/` after MongoDB is healthy:
+Run it from `backend/` only after Kiet Huynh has started and verified the local MongoDB service manually:
 
 ~~~powershell
 npm run database:import-mocks
@@ -38,7 +38,7 @@ Each document has a stable `mockId` plus `_mockImport.source`. Running the impor
 - The importer refuses a URI other than `mongodb://` on `localhost`, `127.0.0.1`, or `::1`.
 - The target database name must end in `_local`. This rejects the normal production-like name space before any write begins.
 - It imports the repository's synthetic frontend mock data only. It must never be pointed at real member data.
-- To stop MongoDB while retaining its local volume, run `docker compose -f docker-compose.mongodb.yml down` from the repository root.
-- To discard all contents of the named local volume, run the destructive command `docker compose -f docker-compose.mongodb.yml down -v`, then start the container and rerun the importer. Confirm that `docker-compose.mongodb.yml` is the intended target before using `-v`.
+- Stop MongoDB with the service manager or console process selected during manual installation; this repository does not manage its lifecycle.
+- To discard trial data, first confirm the local `DATABASE_NAME`, then use the MongoDB shell or administration tool to run `db.dropDatabase()` against that database. This is destructive; start MongoDB manually again before rerunning the importer.
 
 This script is an import foundation, not a frontend-backend integration. The frontend continues to use its existing mock/localStorage adapters until a later feature connects it to APIs.

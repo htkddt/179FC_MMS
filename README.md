@@ -24,7 +24,7 @@
 | API | NestJS, TypeScript, official MongoDB Node.js driver | Local MongoDB foundation; feature APIs not implemented |
 | Virtual assistant | Python, FastAPI | Planned |
 | Testing | Node test-runner checks under `tests/frontend/` and `tests/backend/`, plus Playwright Organization flows under `tests/frontend/` | Initial coverage; backend checks run locally and backend CI is not configured |
-| Automation | PowerShell and/or Node.js scripts | Planned |
+| Automation | Python scripts for new or modified automation | Planned |
 
 ## References
 
@@ -45,24 +45,16 @@
 - The [Organization implementation and proposed backend contracts](frontend/README.md#organization-implementation) document all interactions, state keys, the shared transfer adapter, proposed APIs, concurrency/error handling and required cache updates for future integration. No membership API has been implemented on the backend yet.
 - Run `npm test` and `npm run test:browser` from `frontend/`. See [frontend test setup](tests/frontend/README.md) and [Organization UX](designs/Organization/Organization.md).
 
-### Local MongoDB, backend, and frontend
+### MongoDB local trial, backend, and frontend
 
-The repository includes a local-only MongoDB Compose service in `docker-compose.mongodb.yml`. It pins `mongo:8.0.5`, publishes `27017` only on `127.0.0.1`, has a healthcheck, and stores data in the named `179fc-mongodb-data` volume. It is development infrastructure, not a production database deployment.
+MongoDB local is a trial foundation. This repository does not provide a container configuration or another managed database runtime. Kiet Huynh must install or start a local MongoDB instance using the method appropriate to the machine, keep it local to the machine, and configure `backend/.env` before starting the backend.
 
-From the repository root, start MongoDB and wait for it to become healthy:
-
-~~~powershell
-docker compose -f docker-compose.mongodb.yml up -d
-docker compose -f docker-compose.mongodb.yml ps
-~~~
-
-Then create the ignored local backend environment file, import the current synthetic frontend mocks, start the backend, and start the frontend in separate terminals:
+Create the ignored backend environment file, review its local-only values, and start the backend and frontend in separate terminals:
 
 ~~~powershell
 Copy-Item backend/.env.example backend/.env
 cd backend
 npm ci
-npm run database:import-mocks
 npm run start:dev
 ~~~
 
@@ -74,9 +66,9 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 Verify the API liveness at `GET http://127.0.0.1:3000/health` and database readiness at `GET http://127.0.0.1:3000/health/ready`. The former shows the Nest process is up; the latter returns `200` only when MongoDB can be pinged and otherwise returns `503` without exposing connection information.
 
-The import copies synthetic mock datasets into local collections with guarded, repeatable upserts. It does not connect the frontend to the backend: the frontend remains mock/localStorage-based until a future API integration feature changes it. See `backend/README.md` and `scripts/database/README.md` for the complete environment contract, collection mapping, stop command, and destructive volume-reset warning.
+After Kiet Huynh has started MongoDB manually and reviewed the target database name, the optional `npm run database:import-mocks` command from `backend/` copies synthetic mock datasets into local collections with guarded, repeatable upserts. It does not connect the frontend to the backend: the frontend remains mock/localStorage-based until a future API integration feature changes it. See `backend/README.md` and `scripts/database/README.md` for the complete environment contract, collection mapping, and manual cleanup warning.
 
-To stop the local container while retaining data, run `docker compose -f docker-compose.mongodb.yml down`. To destructively remove only the Compose-declared local volume, verify the target and run `docker compose -f docker-compose.mongodb.yml down -v`; start it again and rerun the importer afterward.
+Stop MongoDB with the service manager or console process used for Kiet Huynh's manual installation. To destroy trial data, first confirm the intended local `DATABASE_NAME`, then use the MongoDB shell or administration tool to run `db.dropDatabase()` against that database. This operation is destructive and is not performed by this repository.
 
 ### Temporary frontend demo access
 
@@ -157,7 +149,7 @@ To stop the local container while retaining data, run `docker compose -f docker-
 
 ### Local development
 
-- Use a supported Node.js release: 20.19+ (or 22.12+) for the React JavaScript client, and 20.11+ for the NestJS API. Reopen the terminal after upgrading Node.js so that `node --version` reports the new release.
+- Use a supported Node.js release: 20.19+ (or 22.12+) for the React JavaScript client, and 20.19+ for the NestJS API. Reopen the terminal after upgrading Node.js so that `node --version` reports the new release.
 - The frontend development server uses port `5173`, the backend uses port `3000`. Make sure both ports are available before starting the services.
 - The chatbot service is intentionally not runnable yet, its delivery plan is in `chatbot/README.md`.
 
@@ -177,7 +169,7 @@ To stop the local container while retaining data, run `docker compose -f docker-
 | Workstream | Planning | Foundation | Feature Development | Test Coverage | Current Result |
 | --- | --- | --- | --- | --- | --- |
 | Frontend | Complete | Complete | In progress | Initial coverage | Responsive guest-capable React portal with mock sign-in for protected Employees/Organization, dashboard, member directory/profile, interactive organization chart, posts, settings, help, and 179 Assist |
-| Backend | Complete | MongoDB local foundation complete | Feature APIs not started | Initial unit/integration coverage; database integration deferred | NestJS API with liveness/readiness endpoints, guarded local MongoDB lifecycle, and a synthetic mock importer; frontend is not yet wired to API data |
+| Backend | Complete | MongoDB local trial foundation | Feature APIs not started | Initial unit/integration coverage; database integration deferred | NestJS API with liveness/readiness endpoints, guarded local MongoDB lifecycle, and a synthetic mock importer; frontend is not yet wired to API data |
 | Chatbot | Complete | Not started | Not started | Planned | FastAPI delivery plan |
 | Designs | Complete | Not started | Not started | Not started | Asset and handoff plan |
 | Scripts | Complete | Local mock importer complete | In progress | No script test runner | Guarded local MongoDB mock-data import script and component folders |

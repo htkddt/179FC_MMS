@@ -35,24 +35,21 @@ backend/
 
 ## Run Locally
 
-Start the local MongoDB container from the repository root. The Compose file publishes MongoDB on loopback only and uses the named volume `179fc-mongodb-data`.
+MongoDB local is a trial dependency. Install or start MongoDB manually using the method appropriate to the local machine, keep the service local to the machine, and ensure the URI and database name in `backend/.env` target that local instance. This repository does not provide a container configuration or manage the MongoDB process.
 
 ~~~powershell
-docker compose -f docker-compose.mongodb.yml up -d
-docker compose -f docker-compose.mongodb.yml ps
 Copy-Item backend/.env.example backend/.env
 cd backend
 npm ci
 npm run build
-npm run database:import-mocks
 npm run start:dev
 ~~~
 
 - The development server listens on `http://localhost:3000` by default. `GET /health` is a liveness response and returns `200` when the Nest process is up. `GET /health/ready` pings MongoDB and returns `200` with `database: "ready"` only when the database is usable; it returns `503` with `database: "not_ready"` or `"disabled"` otherwise. Neither response includes a URI, topology, or credential.
 - `backend/.env` is intentionally ignored. Do not add secrets to `.env.example`; its local URI is `mongodb://127.0.0.1:27017` and its local-only database name is `179fc_mms_local`.
-- `npm run database:import-mocks` imports all current synthetic exports under `frontend/src/mocks/`. It is idempotent for imported records and refuses non-loopback URIs or a database name not ending in `_local`. See [`../scripts/database/README.md`](../scripts/database/README.md) for collection mapping and reset behavior.
+- After Kiet Huynh has started MongoDB manually and reviewed the target database name, `npm run database:import-mocks` imports all current synthetic exports under `frontend/src/mocks/`. It is idempotent for imported records and refuses non-loopback URIs or a database name not ending in `_local`. See [`../scripts/database/README.md`](../scripts/database/README.md) for collection mapping and manual cleanup behavior.
 - The frontend is not connected to backend APIs by this ticket. It continues to read browser/module mocks even after those same synthetic datasets are imported into local MongoDB.
-- The scaffold requires Node.js 20.11 or newer.
+- The backend requires Node.js 20.19.0 or newer because the committed MongoDB driver dependency requires that runtime baseline.
 - The Nest CLI currently requires TypeScript 6, which is pinned in `package.json`.
 - Use the committed `package-lock.json` for repeatable installs.
 - The API uses Nest's `ValidationPipe`, so `class-transformer` and `class-validator` are runtime dependencies.
@@ -77,19 +74,11 @@ Tests use Node's built-in test runner with `ts-node/register` in transpile-only 
 
 The integration suite has a ten-second suite timeout and always calls `app.close()` after its cases. Supertest releases each temporary loopback listener when its request settles; the `after` hook's `app.close()` call closes the Nest application and remaining Nest handles. No fixed test port, database, production credential, or member record is used. Node's runner writes failures to standard output and creates no repository artifact. There is no coverage threshold or coverage claim yet because no coverage baseline has been established. Database integration testing is intentionally deferred and is not represented as passing by these commands.
 
-## Stop and reset local MongoDB
+## Stop and clean up local MongoDB
 
-Run these commands from the repository root:
+Stop MongoDB using the service manager or console process selected during manual installation. The repository does not manage this lifecycle.
 
-~~~powershell
-# Stop containers but preserve the named local volume.
-docker compose -f docker-compose.mongodb.yml down
-
-# Destructive: removes only the named volume declared by docker-compose.mongodb.yml.
-docker compose -f docker-compose.mongodb.yml down -v
-~~~
-
-The second command removes all data in `179fc-mongodb-data`. Recreate it with `up -d`, then rerun `npm run database:import-mocks` from `backend/` when a fresh synthetic dataset is needed.
+To destructively clear trial data, first verify that the local `DATABASE_NAME` is the intended target. Then use the MongoDB shell or administration tool to run `db.dropDatabase()` against that database. This removes all data in the selected database; start MongoDB manually again and optionally rerun `npm run database:import-mocks` when a fresh synthetic dataset is needed.
 
 ## Planned Flow
 
