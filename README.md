@@ -23,7 +23,7 @@
 | Web client | React, React Router, JavaScript, JSX, CSS, Vite | Feature development |
 | API | NestJS, TypeScript, official MongoDB Node.js driver | Local MongoDB foundation; feature APIs not implemented |
 | Virtual assistant | Python, FastAPI | Planned |
-| Testing | Node test-runner checks under `tests/frontend/` and `tests/backend/`, plus Playwright Organization flows under `tests/frontend/` | Initial coverage; backend checks run locally and backend CI is not configured |
+| Testing | Node test-runner checks under `tests/frontend/`, `tests/backend/`, and `tests/deployment/`, plus Playwright Organization flows under `tests/frontend/` | Initial coverage; frontend and backend CI run on pull requests |
 | Automation | Python scripts for new or modified automation | Planned |
 
 ## References
@@ -105,6 +105,14 @@ Stop MongoDB with the service manager or console process used for Kiet Huynh's m
 - Build installs from `frontend/package-lock.json`, receives the repository-aware base path from `actions/configure-pages`, builds `frontend/dist`, and uploads it as the GitHub Pages artifact. Test runs `npm test`, installs Playwright Chromium, then runs `npm run test:browser`.
 - The deploy job publishes the Pages artifact through the `github-pages` environment. The repository Pages source must remain set to **GitHub Actions**. Each passed qualifying PR refreshes the default public Pages demo URL; hosting a build there does not make the mock authentication or browser-local data production-ready.
 - The current public Pages demo URL is `https://htkddt.github.io/179FC_MMS/`. Its project-site base path is supplied to CI by `actions/configure-pages`; do not substitute the former `/Vibe_Coding/` path in workflow configuration.
+
+### Vercel Services and Backend CI (Stage 1 implemented)
+
+- `vercel.json` configures the repository as a Vercel Services deployment (a Vercel Beta capability) with independent `frontend` Vite and `backend` NestJS services. The public `/api/(.*)` rewrite is evaluated before the frontend catch-all. The backend service uses a service-scoped `request.path` transform to strip `/api`, so public `GET /api/health` reaches the implemented NestJS `GET /health` route; the frontend service rewrites deep links to `index.html` for SPA refreshes.
+- No service binding is configured: the frontend currently uses browser-local mocks and contains no runtime request to the backend. Browser traffic must continue through the public `/api` route; a binding may be added only when a service-to-service caller exists.
+- `.github/workflows/backend-ci.yml` runs on active pull requests to `main`, installs from `backend/package-lock.json`, runs `npm run test:ci`, and validates the Vercel/CI deployment contract with `npm run test:deployment`. It contains no deployment token, secret, or production environment variable.
+- GitHub Pages remains active in `.github/workflows/frontend-pages.yml` during Stage 1. It is still a public demo/preview and not a production-ready system. Stage 2 alone may remove its deploy job after the Stage 1 Pull Request is merged and Kiet Huynh explicitly authorizes the cutover.
+- Before final merge, Kiet Huynh must confirm Vercel service names, public/internal paths, the `/api` prefix decision, any future bindings, production data/secrets readiness, and the release strategy. This commit provides configuration and CI only; it does not create a Vercel production deployment.
 
 - Backend
 

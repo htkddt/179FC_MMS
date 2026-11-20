@@ -157,6 +157,12 @@ The application requires Node.js 20.19 or newer (or Node.js 22.12 or newer).
 - **Public GitHub Pages demo**: `https://htkddt.github.io/179FC_MMS/` hosts the static demo/preview build. Its current project-site subpath is `/179FC_MMS/`; CI obtains that path from `actions/configure-pages` rather than hard-coding it in the workflow. “Production” in the Vite build mode and base-path configuration does not mean this public demo has production authentication, authorization, backend persistence, or real-data safeguards.
 - Copy the documented value in `.env.example` only when a local production build needs to emulate the GitHub Pages subpath. Do not commit an environment file containing credentials or other secrets.
 
+## Vercel Services Stage 1 configuration
+
+`../vercel.json` now declares a Vercel Services (Beta) `frontend` service rooted at this directory and a separate `backend` NestJS service. Public `/api/(.*)` traffic is selected before the frontend catch-all; the backend service uses a `request.path` transform to remove that prefix because its implemented routes start at `/health`, while the frontend service falls back to `index.html` for SPA deep links.
+
+The frontend remains browser-local and does not make a runtime API request, so it has no Vercel service binding. A future browser API integration must use the public `/api` route; a Vercel binding is only for an actual server-side caller. GitHub Pages remains the public demo/preview during Stage 1 and receives its existing deployment workflow unchanged. The Vercel configuration is not a production deployment or an authorization/data-readiness claim; Kiet Huynh must confirm the final service, path, binding, environment, and release decisions before merge.
+
 ## Implemented routes and flow
 
 - Guest is the default portal state. `/dashboard`, Posts, Settings, Help (including articles and Support), and 179 Assist render in the shared shell without a session. The TopBar replaces the account avatar with **Sign up** and **Log in**; both intentionally lead to `/sign-in` because registration is not implemented.
