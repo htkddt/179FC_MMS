@@ -2,7 +2,13 @@
 
 ## Implemented importer
 
-`import-frontend-mocks.mjs` imports every current synthetic dataset exported from `frontend/src/mocks/` into the local MongoDB database configured by `backend/.env`.
+`import-frontend-mocks.py` imports every current synthetic dataset exported from `frontend/src/mocks/` into the local MongoDB database configured by `backend/.env`. It uses Python's `pymongo` driver for the local database and `quickjs` to read the existing frontend JavaScript mock modules without adding a JavaScript automation script.
+
+Install the importer dependencies before using either mode:
+
+~~~powershell
+python -m pip install pymongo quickjs
+~~~
 
 Run it from `backend/` only after Kiet Huynh has started and verified the local MongoDB service manually:
 
@@ -13,7 +19,7 @@ npm run database:import-mocks
 To validate source mapping and document IDs without reading `.env` or connecting to MongoDB, run this command from the repository root:
 
 ~~~powershell
-node scripts/database/import-frontend-mocks.mjs --dry-run
+python scripts/database/import-frontend-mocks.py --dry-run
 ~~~
 
 The importer reads `backend/.env` without printing its URI, connects with a five-second timeout, pings the target, imports the documents below, and closes its MongoDB client before exiting.
