@@ -55,6 +55,18 @@ describe('HTTP bootstrap', { timeout: 10_000 }, () => {
     });
   });
 
+  it('reports database readiness without contacting MongoDB in the isolated suite', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health/ready')
+      .expect(503);
+
+    assert.deepEqual(response.body, {
+      service: '179fc-mms-backend',
+      status: 'not_ready',
+      database: 'disabled',
+    });
+  });
+
   it('uses the production ValidationPipe for valid payloads', async () => {
     const response = await request(app.getHttpServer())
       .post('/test-validation')
