@@ -1,0 +1,41 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Build and test backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request revision
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend build and tests
+        working-directory: backend
+        run: npm run test:ci
+
+      - name: Validate Vercel Services configuration
+        working-directory: backend
+        run: npm run test:deployment

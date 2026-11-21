@@ -14,6 +14,8 @@ tests/
 └── frontend/   # React component, interaction, and end-to-end tests
 ~~~
 
+`deployment/` contains repository-level deployment and CI configuration checks.
+
 ## Implemented frontend checks
 
 - From `frontend/`, run `npm test` for Node-based post, settings, dashboard, and Organization logic checks.
@@ -26,7 +28,12 @@ tests/
 - From `backend/`, run `npm run test:unit` for the isolated `AppService` health payload check.
 - Run `npm run test:integration` for the Nest application, `GET /health` response contract, and the production `ValidationPipe` success/failure behavior. Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles; the `after` hook calls `app.close()` for the Nest application and remaining handles. The scripts set `DATABASE_ENABLED=false`, so the suite never uses port `3000` or requires MongoDB.
 - Run `npm test` to execute both categories, or `npm run test:ci` to build then execute both categories. These commands use Node's test runner with `ts-node/register` and return non-zero on failure.
-- Backend test source is under `tests/backend/`; its [runner, lifecycle, synthetic-data, artifact, and MongoDB test boundary](backend/README.md) describes the implemented boundary. No GitHub Actions backend check is added by this ticket. No database integration suite is implemented yet.
+- Backend test source is under `tests/backend/`; its [runner, lifecycle, synthetic-data, artifact, and MongoDB test boundary](backend/README.md) describes the implemented boundary. `.github/workflows/backend-ci.yml` runs `npm run test:ci` on active pull requests to `main`. No database integration suite is implemented yet.
+
+## Implemented deployment checks
+
+- From `backend/`, run `npm run test:deployment` to parse and verify the committed `vercel.json`, backend CI trigger/lockfile commands, and the continued Stage 1 GitHub Pages deploy job.
+- Test source lives under `tests/deployment/`; it uses no credentials, Vercel account, live deployment, or member data. The check validates the committed configuration contract only and does not claim a Vercel deployment succeeded.
 
 ## Remaining plan
 

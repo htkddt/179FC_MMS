@@ -11,7 +11,8 @@
     "test:unit": "cross-env DATABASE_ENABLED=false NODE_PATH=./node_modules TS_NODE_PROJECT=../tests/backend/tsconfig.json TS_NODE_TRANSPILE_ONLY=true node --require ts-node/register --test ../tests/backend/unit/app.service.test.ts",
     "test:integration": "cross-env DATABASE_ENABLED=false NODE_PATH=./node_modules TS_NODE_PROJECT=../tests/backend/tsconfig.json TS_NODE_TRANSPILE_ONLY=true node --require ts-node/register --test ../tests/backend/integration/http-bootstrap.test.ts",
     "test": "npm run test:unit && npm run test:integration",
-    "test:ci": "npm run build && npm run test"
+    "test:ci": "npm run build && npm run test",
+    "test:deployment": "node --test ../tests/deployment/vercel-config.test.mjs"
   },
   "engines": {
     "node": ">=20.19.0"
