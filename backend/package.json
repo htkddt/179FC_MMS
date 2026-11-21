@@ -15,7 +15,7 @@
     "test:deployment": "node --test ../tests/deployment/vercel-config.test.mjs"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": "26.x"
   },
   "dependencies": {
     "@nestjs/common": "latest",

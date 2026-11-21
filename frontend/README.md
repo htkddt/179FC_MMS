@@ -148,7 +148,7 @@ npm run dev
 
 Use npm run build for a production build and npm run preview to preview it locally.
 
-The application requires Node.js 20.19 or newer (or Node.js 22.12 or newer).
+The application requires Node.js 26.x. This major is pinned in `package.json` and the pull-request workflow so local, CI, and Vercel builds use the same major while Vercel applies minor and security patch updates.
 
 ## Environments and GitHub Pages base path
 
