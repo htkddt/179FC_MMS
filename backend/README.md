@@ -70,17 +70,17 @@ npm run test:deployment
 - `test:integration` creates a Nest application and checks `GET /health` plus the production `ValidationPipe` behavior through its HTTP server. The test code does not call production `app.listen`; Supertest temporarily binds an OS-assigned loopback listener for each request and releases it when that request settles. The scripts set `DATABASE_ENABLED=false`, so the existing suite never uses the fixed production port `3000` or requires MongoDB.
 - `npm test` runs both categories and returns a non-zero exit code when either suite fails.
 - `test:ci` runs `npm run build` followed by the complete test suite. It is the stable command used by the Backend CI workflow.
-- `test:deployment` validates the committed `vercel.json`, the Backend CI workflow, and retention of the Stage 1 GitHub Pages deploy workflow. Its source is centralized in `../tests/deployment/`.
+- `test:deployment` validates the committed `vercel.json`, the Backend and Frontend CI workflows, and the absence of GitHub Pages deployment actions and permissions. Its source is centralized in `../tests/deployment/`.
 
 Tests use Node's built-in test runner with `ts-node/register` in transpile-only runtime mode, using the test-only compiler configuration. `test:ci` still runs the Nest production build before the suites. The integration script uses `cross-env` to expose `backend/node_modules` to the centralized test directory on Windows and CI. `supertest` sends requests through a temporary OS-assigned loopback listener and releases that listener when each request settles. The production bootstrap and integration suite share `src/app.config.ts`, preventing the test from silently using a different `ValidationPipe` setup.
 
 The integration suite has a ten-second suite timeout and always calls `app.close()` after its cases. Supertest releases each temporary loopback listener when its request settles; the `after` hook's `app.close()` call closes the Nest application and remaining Nest handles. No fixed test port, database, production credential, or member record is used. Node's runner writes failures to standard output and creates no repository artifact. There is no coverage threshold or coverage claim yet because no coverage baseline has been established. Database integration testing is intentionally deferred and is not represented as passing by these commands.
 
-## Vercel Services and Backend CI (Stage 1 implemented)
+## Vercel Services and CI configuration
 
 `../vercel.json` defines this directory as the `backend` NestJS Vercel service. Its public ingress is `/api/(.*)`, and a service-scoped `request.path` transform removes that prefix before NestJS receives the request. Therefore `/api/health` maps to the implemented `GET /health` route and `/api/health/ready` maps to `GET /health/ready`. No service binding is declared because this backend does not make a runtime call to another Vercel service, and the frontend has no API integration yet.
 
-`.github/workflows/backend-ci.yml` runs for active pull requests to `main`. It installs only from `backend/package-lock.json`, then runs `npm run test:ci` and `npm run test:deployment`; it has no production deployment, secret, or environment-variable setup. GitHub Pages remains active separately during Stage 1. Vercel Services is Beta, and Kiet Huynh must confirm the final service names, public/internal paths, `/api` contract, bindings, production data/secrets readiness, and release strategy before merge.
+`.github/workflows/backend-ci.yml` runs for active pull requests to `main`. It installs only from `backend/package-lock.json`, then runs `npm run test:ci` and `npm run test:deployment`; it has no production deployment, secret, or environment-variable setup. GitHub Pages deployment has been removed in Stage 2 while Frontend CI remains active. Vercel Services is Beta, and Kiet Huynh must confirm the final service names, public/internal paths, `/api` contract, bindings, production data/secrets readiness, and release strategy before operational use.
 
 ## Stop and clean up local MongoDB
 
