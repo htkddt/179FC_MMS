@@ -111,6 +111,7 @@ Stop MongoDB with the service manager or console process used for Kiet Huynh's m
 - `vercel.json` configures the repository as a Vercel Services deployment (a Vercel Beta capability) with independent `frontend` Vite and `backend` NestJS services. The public `/api/(.*)` rewrite is evaluated before the frontend catch-all. The backend service uses a service-scoped `request.path` transform to strip `/api`, so public `GET /api/health` reaches the implemented NestJS `GET /health` route; the frontend service rewrites deep links to `index.html` for SPA refreshes.
 - No service binding is configured: the frontend currently uses browser-local mocks and contains no runtime request to the backend. Browser traffic must continue through the public `/api` route; a binding may be added only when a service-to-service caller exists.
 - `.github/workflows/backend-ci.yml` runs on active pull requests to `main`, installs from `backend/package-lock.json`, runs `npm run test:ci`, and validates the Vercel/CI deployment contract with `npm run test:deployment`. It contains no deployment token, secret, or production environment variable.
+- Both service `engines.node` values and all pull-request workflow Node versions are pinned to `26.x`/`26`, preventing Vercel from automatically moving a deployment to a new Node major. The Vercel builder's `Unknown env config "cache-dir"` warning has no source in this repository (`.npmrc`, project environment variables, and Build/Install Commands are absent), so no speculative repository workaround is applied.
 - GitHub Pages remains active in `.github/workflows/frontend-pages.yml` during Stage 1. It is still a public demo/preview and not a production-ready system. Stage 2 alone may remove its deploy job after the Stage 1 Pull Request is merged and Kiet Huynh explicitly authorizes the cutover.
 - Before final merge, Kiet Huynh must confirm Vercel service names, public/internal paths, the `/api` prefix decision, any future bindings, production data/secrets readiness, and the release strategy. This commit provides configuration and CI only; it does not create a Vercel production deployment.
 
@@ -157,7 +158,7 @@ Stop MongoDB with the service manager or console process used for Kiet Huynh's m
 
 ### Local development
 
-- Use a supported Node.js release: 20.19+ (or 22.12+) for the React JavaScript client, and 20.19+ for the NestJS API. Reopen the terminal after upgrading Node.js so that `node --version` reports the new release.
+- Use Node.js 26.x for the React JavaScript client and NestJS API. Both service `package.json` files and pull-request workflows pin this major so Vercel cannot silently move a build to a later major; Vercel continues to provide minor and security patch updates within 26.x. Reopen the terminal after upgrading Node.js so that `node --version` reports the 26.x release.
 - The frontend development server uses port `5173`, the backend uses port `3000`. Make sure both ports are available before starting the services.
 - The chatbot service is intentionally not runnable yet, its delivery plan is in `chatbot/README.md`.
 

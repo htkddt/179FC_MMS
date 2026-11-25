@@ -32,7 +32,7 @@ tests/
 
 ## Implemented deployment checks
 
-- From `backend/`, run `npm run test:deployment` to parse and verify the committed `vercel.json`, backend CI trigger/lockfile commands, and the continued Stage 1 GitHub Pages deploy job.
+- From `backend/`, run `npm run test:deployment` to parse and verify the committed `vercel.json`, Node.js 26 pins across both services and pull-request workflows, backend CI trigger/lockfile commands, and the continued Stage 1 GitHub Pages deploy job.
 - Test source lives under `tests/deployment/`; it uses no credentials, Vercel account, live deployment, or member data. The check validates the committed configuration contract only and does not claim a Vercel deployment succeeded.
 
 ## Remaining plan

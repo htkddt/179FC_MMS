@@ -49,7 +49,7 @@ npm run start:dev
 - `backend/.env` is intentionally ignored. Do not add secrets to `.env.example`; its local URI is `mongodb://127.0.0.1:27017` and its local-only database name is `179fc_mms_local`.
 - After Kiet Huynh has started MongoDB manually and reviewed the target database name, install the Python importer dependencies with `python -m pip install pymongo quickjs`, then run `npm run database:import-mocks` to import all current synthetic exports under `frontend/src/mocks/`. It is idempotent for imported records and refuses non-loopback URIs or a database name not ending in `_local`. See [`../scripts/database/README.md`](../scripts/database/README.md) for collection mapping and manual cleanup behavior.
 - The frontend is not connected to backend APIs by this ticket. It continues to read browser/module mocks even after those same synthetic datasets are imported into local MongoDB.
-- The backend requires Node.js 20.19.0 or newer because the committed MongoDB driver dependency requires that runtime baseline.
+- The backend requires Node.js 26.x. This major exceeds the MongoDB driver's minimum baseline and is pinned in `package.json` and the pull-request workflow so local, CI, and Vercel builds use the same major while Vercel applies minor and security patch updates.
 - The Nest CLI currently requires TypeScript 6, which is pinned in `package.json`.
 - Use the committed `package-lock.json` for repeatable installs.
 - The API uses Nest's `ValidationPipe`, so `class-transformer` and `class-validator` are runtime dependencies.
