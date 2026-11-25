@@ -9,8 +9,8 @@ Run `npm test` (Node's built-in test runner).
 - `portal.test.mjs`: existing post, settings, and dashboard workflows.
 - `organization.test.mjs`: member slots below team headers, responsive/scaled layouts, collapse/hide/empty states, drop hit testing, normalized offsets, independent layout/view persistence, invalid storage, canonical team transfers, preserved profile fields and failed-write rejection.
 - `help.test.mjs`: normalized guide/article filtering and the isolated shared article-data contract with synthetic mock content.
-- `vite-config.test.mjs`: LocalHost root-path behavior and Production GitHub Pages base-path normalization, including the current `/179FC_MMS/` project-site sample. The workflow itself receives its path from `actions/configure-pages`, so a future repository rename does not require a workflow constant.
-- `ci-workflow.test.mjs`: active pull-request trigger, Build → Test → Deploy dependency, GitHub Pages deploy action configuration, and LF/CRLF-compatible workflow parsing.
+- `vite-config.test.mjs`: LocalHost/Production environment labeling and the absence of a Pages-only `VITE_BASE_PATH` or explicit Vite base override, so Vite uses its root-path default for Vercel.
+- `ci-workflow.test.mjs`: active pull-request trigger, Build → Test dependency, retained build/logic/browser checks, absence of GitHub Pages actions/permissions/environment, and LF/CRLF-compatible workflow parsing.
 
 ## Help, Organization and Settings browser checks
 

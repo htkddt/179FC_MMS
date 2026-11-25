@@ -150,24 +150,23 @@ Use npm run build for a production build and npm run preview to preview it local
 
 The application requires Node.js 26.x. This major is pinned in `package.json` and the pull-request workflow so local, CI, and Vercel builds use the same major while Vercel applies minor and security patch updates.
 
-## Environments and GitHub Pages base path
+## Environments and Vercel deployment target
 
-- **LocalHost**: `npm run dev` serves the application from `/`. `vite.config.js` always uses this root path outside Production, so the local Vite and Playwright URLs remain `http://127.0.0.1:<port>/`.
-- **Production**: `npm run build` uses `VITE_BASE_PATH` when set. The GitHub Actions workflow receives the repository-aware value from `actions/configure-pages`, which produces a GitHub Pages-compatible build for this project site, then deploys it after Build and Test succeed for a qualifying pull request. The router uses Vite's `BASE_URL` as its basename, so app routes stay relative to that production path.
-- **Public GitHub Pages demo**: `https://htkddt.github.io/179FC_MMS/` hosts the static demo/preview build. Its current project-site subpath is `/179FC_MMS/`; CI obtains that path from `actions/configure-pages` rather than hard-coding it in the workflow. “Production” in the Vite build mode and base-path configuration does not mean this public demo has production authentication, authorization, backend persistence, or real-data safeguards.
-- Copy the documented value in `.env.example` only when a local production build needs to emulate the GitHub Pages subpath. Do not commit an environment file containing credentials or other secrets.
+- **LocalHost**: `npm run dev` serves the application from `/`, so local Vite and Playwright URLs remain `http://127.0.0.1:<port>/`.
+- **Production build**: `npm run build` relies on Vite's root-path default. `vite.config.js` has no `VITE_BASE_PATH` or GitHub Pages-specific base override; the router therefore uses Vite's root `BASE_URL` on Vercel.
+- **Vercel target**: `../vercel.json` is the implemented deployment configuration for the `frontend` service. Its SPA fallback serves deep links from `index.html`; GitHub Actions retains CI quality checks only and no longer deploys GitHub Pages. A Vercel Preview or Production URL is not an authorization, persistence, or real-data readiness claim.
 
-## Vercel Services Stage 1 configuration
+## Vercel Services configuration
 
 `../vercel.json` now declares a Vercel Services (Beta) `frontend` service rooted at this directory and a separate `backend` NestJS service. Public `/api/(.*)` traffic is selected before the frontend catch-all; the backend service uses a `request.path` transform to remove that prefix because its implemented routes start at `/health`, while the frontend service falls back to `index.html` for SPA deep links.
 
-The frontend remains browser-local and does not make a runtime API request, so it has no Vercel service binding. A future browser API integration must use the public `/api` route; a Vercel binding is only for an actual server-side caller. GitHub Pages remains the public demo/preview during Stage 1 and receives its existing deployment workflow unchanged. The Vercel configuration is not a production deployment or an authorization/data-readiness claim; Kiet Huynh must confirm the final service, path, binding, environment, and release decisions before merge.
+The frontend remains browser-local and does not make a runtime API request, so it has no Vercel service binding. A future browser API integration must use the public `/api` route; a Vercel binding is only for an actual server-side caller. GitHub Pages deployment has been removed from the repository workflow; Vercel is the configured production deployment target. The configuration does not make the application authorization- or data-ready: Kiet Huynh must still confirm the final service, path, binding, environment, and release decisions before operational use.
 
 ## Implemented routes and flow
 
 - Guest is the default portal state. `/dashboard`, Posts, Settings, Help (including articles and Support), and 179 Assist render in the shared shell without a session. The TopBar replaces the account avatar with **Sign up** and **Log in**; both intentionally lead to `/sign-in` because registration is not implemented.
 - `/employees`, `/employees/:memberId`, and `/organization` are the only protected routes. A direct guest visit replaces the history entry with `/sign-in`, retaining only its internal destination. The guarded redirect and the guest TopBar **Log in** action use the same 350 ms opacity/8 px Sign-in arrival transition; it changes no layout dimensions and is disabled by `prefers-reduced-motion: reduce`. **Sign in to 179FC** accepts a slash-prefixed internal destination only; protocol-relative, backslash-containing, malformed, or encoded external-like values fall back to Dashboard without a client error. Logout clears the mock session, removes the avatar menu, and returns to guest Dashboard.
-- `/sign-in` uses an explicit demo-access flow. Any sign-in creates a mock Club Admin session in `sessionStorage`; credentials are neither validated nor sent. The session survives refresh in the same browser tab and is cleared on logout. This is also true on the public GitHub Pages demo, so it must not be used with real account credentials or member/personal data.
+- `/sign-in` uses an explicit demo-access flow. Any sign-in creates a mock Club Admin session in `sessionStorage`; credentials are neither validated nor sent. The session survives refresh in the same browser tab and is cleared on logout. This must not be used with real account credentials or member/personal data on any Vercel deployment.
 - `/employees` is a responsive directory of 30 mock members. It has Total, Online, Offline, and Team summary statistics; instant search across name, role, team, and email; and sorting by name, team, or most recently joined. Each member card has an accessible profile link plus entrance and hover motion that respects the user's reduced-motion preference.
 - `/employees/:memberId` provides a working member profile. Users can upload or remove a PNG, JPG, or WebP avatar (up to 1.5 MB), select a team, and edit date of birth and phone number. Changes are stored only in the current browser's `localStorage` and are reflected in the directory; they are mock data, not server-side member records.
 - `/dashboard` includes a mock team feed with updates, likes and comments, plus an upcoming session list. Users can add feed updates and scheduled sessions; these changes and interactions are stored in the current browser's `localStorage` and are not shared with other users.
@@ -309,7 +308,7 @@ From `frontend/`, run `npm ci`, `npm test`, `npm run test:browser` and `npm run 
 
 ## Temporary demo-access workaround
 
-Guest users may browse the public portal routes, but Employees, member profiles, and Organization use the mock session gate. Clicking Sign in to 179FC creates a mock Club Admin session without checking credentials. The session is stored in the browser tab's `sessionStorage` and is not an authentication or authorization boundary. The public GitHub Pages URL is a demo/preview host only: do not enter real credentials, member records, or other personal/sensitive data. Replace this flow with real authentication, authorization, server-side persistence, and data protections before operational production use.
+Guest users may browse the public portal routes, but Employees, member profiles, and Organization use the mock session gate. Clicking Sign in to 179FC creates a mock Club Admin session without checking credentials. The session is stored in the browser tab's `sessionStorage` and is not an authentication or authorization boundary. Vercel is the configured deployment target, but do not enter real credentials, member records, or other personal/sensitive data in this mock application. Replace this flow with real authentication, authorization, server-side persistence, and data protections before operational production use.
 
 ## Test Location
 

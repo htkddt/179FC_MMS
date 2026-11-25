@@ -72,7 +72,7 @@ test('does not declare a binding without a runtime service-to-service caller', a
   assert.equal(config.services.frontend.bindings, undefined);
 });
 
-test('runs backend CI from the committed lockfile without replacing GitHub Pages deploy', async () => {
+test('runs backend and frontend CI from committed lockfiles without a GitHub Pages deploy', async () => {
   const [backendWorkflow, frontendPagesWorkflow] = await Promise.all([
     readNormalizedFile(backendWorkflowUrl),
     readNormalizedFile(frontendPagesWorkflowUrl),
@@ -86,7 +86,18 @@ test('runs backend CI from the committed lockfile without replacing GitHub Pages
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm ci/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm run test:ci/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm run test:deployment/);
-  assert.match(frontendPagesWorkflow, /uses: actions\/deploy-pages@v4/);
+  assert.match(frontendPagesWorkflow, /cache-dependency-path: frontend\/package-lock\.json/);
+  assert.match(frontendPagesWorkflow, /working-directory: frontend\n        run: npm ci/);
+  assert.match(frontendPagesWorkflow, /working-directory: frontend\n        run: npm run build/);
+  assert.match(frontendPagesWorkflow, /working-directory: frontend\n        run: npm test/);
+  assert.match(
+    frontendPagesWorkflow,
+    /working-directory: frontend\n        env:\n          PLAYWRIGHT_CHANNEL: chromium\n        run: npm run test:browser/,
+  );
+  assert.doesNotMatch(frontendPagesWorkflow, /actions\/(configure-pages|upload-pages-artifact|deploy-pages)@/);
+  assert.doesNotMatch(frontendPagesWorkflow, /\n      pages: write/);
+  assert.doesNotMatch(frontendPagesWorkflow, /github-pages/);
+  assert.doesNotMatch(frontendPagesWorkflow, /VITE_BASE_PATH/);
 });
 
 test('pins Node.js 26 across Vercel services, lockfiles, and pull-request CI', async () => {

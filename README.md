@@ -72,9 +72,9 @@ Stop MongoDB with the service manager or console process used for Kiet Huynh's m
 
 ### Temporary frontend demo access
 
-- The GitHub Pages URL is a public static **demo/preview** of the frontend, not an operational production service.
+- Vercel is the configured production deployment target for the frontend and backend services. This configuration does not make the application an operational production service.
 - Guest access is the default: `/dashboard`, Posts, Settings, Help, and 179 Assist remain visible without a session. `/employees`, `/employees/:memberId`, and `/organization` redirect guests to Sign-in and retain the intended internal destination. Clicking **Sign in to 179FC** creates a mock Club Admin session in the browser tab?s `sessionStorage`; email and password values are not validated or transmitted. Logout clears that session and returns to the guest Dashboard.
-- The Pages demo has no real authentication, authorization, backend persistence, or access boundary. Do not enter real account credentials, member data, or other personal/sensitive information there.
+- The Vercel target has no real authentication, authorization, backend persistence, or access boundary yet. Do not enter real account credentials, member data, or other personal/sensitive information there.
 - Before using the application operationally or with real accounts/member data, replace demo access with real account lookup, credential verification, session handling, authorization, role/permission enforcement, and server-side persistence.
 
 ### Where Post Create is implemented
@@ -98,22 +98,20 @@ Stop MongoDB with the service manager or console process used for Kiet Huynh's m
    npm run build
    ~~~
 
-### Frontend CI/CD and GitHub Pages
+### Frontend CI
 
 - `.github/workflows/frontend-pages.yml` runs only for active pull requests targeting `main` (opened, synchronized, and reopened).
-- The workflow has sequential **Build**, **Test**, and **Deploy** jobs. Test requires a successful Build; Deploy requires successful Build and Test and then publishes the qualifying pull-request revision to the public GitHub Pages demo. Its `github-pages` environment exposes the Pages URL from `steps.deployment.outputs.page_url` in the workflow run.
-- Build installs from `frontend/package-lock.json`, receives the repository-aware base path from `actions/configure-pages`, builds `frontend/dist`, and uploads it as the GitHub Pages artifact. Test runs `npm test`, installs Playwright Chromium, then runs `npm run test:browser`.
-- The deploy job publishes the Pages artifact through the `github-pages` environment. The repository Pages source must remain set to **GitHub Actions**. Each passed qualifying PR refreshes the default public Pages demo URL; hosting a build there does not make the mock authentication or browser-local data production-ready.
-- The current public Pages demo URL is `https://htkddt.github.io/179FC_MMS/`. Its project-site base path is supplied to CI by `actions/configure-pages`; do not substitute the former `/Vibe_Coding/` path in workflow configuration.
+- The workflow has sequential **Build** and **Test** jobs. Test requires a successful Build. Build installs from `frontend/package-lock.json` and produces the root-path Vite production build; Test runs `npm test`, installs Playwright Chromium, then runs `npm run test:browser`.
+- The workflow is CI-only: It contains no GitHub Pages action, Pages permission, `github-pages` environment, artifact upload, deployment job, or `VITE_BASE_PATH` assumption. It does not modify GitHub Pages site, custom-domain, or repository settings outside this codebase.
 
-### Vercel Services and Backend CI (Stage 1 implemented)
+### Vercel Services and CI configuration
 
 - `vercel.json` configures the repository as a Vercel Services deployment (a Vercel Beta capability) with independent `frontend` Vite and `backend` NestJS services. The public `/api/(.*)` rewrite is evaluated before the frontend catch-all. The backend service uses a service-scoped `request.path` transform to strip `/api`, so public `GET /api/health` reaches the implemented NestJS `GET /health` route; the frontend service rewrites deep links to `index.html` for SPA refreshes.
 - No service binding is configured: the frontend currently uses browser-local mocks and contains no runtime request to the backend. Browser traffic must continue through the public `/api` route; a binding may be added only when a service-to-service caller exists.
 - `.github/workflows/backend-ci.yml` runs on active pull requests to `main`, installs from `backend/package-lock.json`, runs `npm run test:ci`, and validates the Vercel/CI deployment contract with `npm run test:deployment`. It contains no deployment token, secret, or production environment variable.
 - Both service `engines.node` values and all pull-request workflow Node versions are pinned to `26.x`/`26`, preventing Vercel from automatically moving a deployment to a new Node major. The Vercel builder's `Unknown env config "cache-dir"` warning has no source in this repository (`.npmrc`, project environment variables, and Build/Install Commands are absent), so no speculative repository workaround is applied.
-- GitHub Pages remains active in `.github/workflows/frontend-pages.yml` during Stage 1. It is still a public demo/preview and not a production-ready system. Stage 2 alone may remove its deploy job after the Stage 1 Pull Request is merged and Kiet Huynh explicitly authorizes the cutover.
-- Before final merge, Kiet Huynh must confirm Vercel service names, public/internal paths, the `/api` prefix decision, any future bindings, production data/secrets readiness, and the release strategy. This commit provides configuration and CI only; it does not create a Vercel production deployment.
+- GitHub Pages deployment has been removed from `.github/workflows/frontend-pages.yml` in Stage 2. Frontend CI remains active, while `vercel.json` remains the implemented Vercel Services deployment configuration. This code change does not remove a GitHub Pages site, custom domain, or repository setting outside the codebase.
+- Before operational use, Kiet Huynh must confirm Vercel service names, public/internal paths, the `/api` prefix decision, any future bindings, production data/secrets readiness, and the release strategy. The committed configuration does not itself prove a Vercel deployment or establish authentication/data readiness.
 
 - Backend
 

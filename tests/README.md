@@ -20,7 +20,7 @@ tests/
 
 - From `frontend/`, run `npm test` for Node-based post, settings, dashboard, and Organization logic checks.
 - Run `npm run test:browser` for Playwright coverage of guest/public and protected-route demo access, protected-route and TopBar Sign-in transition with reduced-motion fallback, safe fallback from malformed return state, Help overview/article/adapter-backed Support related routes, full-width Help Search, Popular article/TOC motion plus Back/Forward active-state synchronization and reduced-motion behavior, Organization, Employees profile synchronization, responsive layouts, keyboard interactions, and the assistant launcher. The configuration starts Vite on port 5180 and uses installed Edge on Windows by default.
-- Pull requests to `main` run these checks in the **Test** job after the frontend **Build** job succeeds. The GitHub Actions runner installs Playwright Chromium before browser checks; the **Deploy** job publishes to GitHub Pages only after both jobs succeed.
+- Pull requests to `main` run these checks in the **Test** job after the frontend **Build** job succeeds. The GitHub Actions runner installs Playwright Chromium before browser checks. The workflow is CI-only and does not publish a GitHub Pages artifact or deployment.
 - Test source and configuration remain under `tests/frontend/`; browser artifacts go to the operating system's temporary directory. See [frontend runner setup and scope](frontend/README.md).
 
 ## Implemented backend checks
@@ -32,7 +32,7 @@ tests/
 
 ## Implemented deployment checks
 
-- From `backend/`, run `npm run test:deployment` to parse and verify the committed `vercel.json`, Node.js 26 pins across both services and pull-request workflows, backend CI trigger/lockfile commands, and the continued Stage 1 GitHub Pages deploy job.
+- From `backend/`, run `npm run test:deployment` to parse and verify the committed `vercel.json`, Node.js 26 pins across both services and pull-request workflows, backend/frontend CI trigger and lockfile commands, plus the absence of GitHub Pages deployment actions and permissions.
 - Test source lives under `tests/deployment/`; it uses no credentials, Vercel account, live deployment, or member data. The check validates the committed configuration contract only and does not claim a Vercel deployment succeeded.
 
 ## Remaining plan

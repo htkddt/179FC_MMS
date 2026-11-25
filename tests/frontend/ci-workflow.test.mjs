@@ -11,19 +11,27 @@ function normalizeWorkflowLineEndings(source) {
   return source.replace(/\r\n/g, "\n");
 }
 
-test("deploys GitHub Pages after Build and Test for an active pull request", async () => {
+test("keeps frontend quality checks for active pull requests without deploying GitHub Pages", async () => {
   const workflow = normalizeWorkflowLineEndings(
     await readFile(workflowUrl, "utf8"),
   );
-  const deployJob = workflow.split("\n  deploy:")[1];
 
   assert.match(
     workflow,
     /pull_request:\n    branches:\n      - main\n    types: \[opened, synchronize, reopened\]/,
   );
+  assert.match(workflow, /\n  build:\n    name: Build/);
   assert.match(workflow, /\n  test:\n    name: Test\n    needs: build/);
-  assert.match(deployJob, /name: Deploy\n    needs: \[build, test\]/);
-  assert.match(deployJob, /uses: actions\/deploy-pages@v4/);
+  assert.match(workflow, /working-directory: frontend\n        run: npm run build/);
+  assert.match(workflow, /working-directory: frontend\n        run: npm test/);
+  assert.match(
+    workflow,
+    /working-directory: frontend\n        env:\n          PLAYWRIGHT_CHANNEL: chromium\n        run: npm run test:browser/,
+  );
+  assert.doesNotMatch(workflow, /actions\/(configure-pages|upload-pages-artifact|deploy-pages)@/);
+  assert.doesNotMatch(workflow, /\n      pages: write/);
+  assert.doesNotMatch(workflow, /github-pages/);
+  assert.doesNotMatch(workflow, /VITE_BASE_PATH/);
   assert.doesNotMatch(workflow, /github\.event\.pull_request\.merged/);
 });
 
@@ -35,6 +43,6 @@ test("reads workflow rules from CRLF source files", async () => {
 
   assert.match(
     workflow,
-    /\n  deploy:\n    name: Deploy\n    needs: \[build, test\]/,
+    /\n  test:\n    name: Test\n    needs: build/,
   );
 });
