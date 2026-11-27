@@ -4,6 +4,7 @@
     "backend": {
       "root": "backend",
       "framework": "nestjs",
+      "outputDirectory": ".",
       "routes": [
         {
           "src": "/api/(.*)",
