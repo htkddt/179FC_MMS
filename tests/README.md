@@ -32,8 +32,9 @@ tests/
 
 ## Implemented deployment checks
 
-- From `backend/`, run `npm run test:deployment` to parse and verify the committed `vercel.json`, Node.js 26 pins across both services and pull-request workflows, backend CI trigger/lockfile commands, and the continued Stage 1 GitHub Pages deploy job.
-- Test source lives under `tests/deployment/`; it uses no credentials, Vercel account, live deployment, or member data. The check validates the committed configuration contract only and does not claim a Vercel deployment succeeded.
+- Từ `backend/`, chạy `npm run test:deployment` để build rồi kiểm tra `vercel.json`, Node.js 26 pins, Backend CI và việc giữ GitHub Pages. `vercel-packaging.test.mjs` còn gọi builder Vercel `28.0.0` trên fixture cô lập, kiểm tra cả 9 production dependencies resolve từ handler trong artifact. Khi bỏ fix packaging, test phải FAIL với `MODULE_NOT_FOUND: @nestjs/common`.
+- Trên Linux, artifact được khởi động với `--no-require-module` và preload `fixtures/ephemeral-listener.cjs` tại port loopback do OS cấp; `/health` phải trả `200` với payload hiện hành, `/health/ready` trả `503` khi `DATABASE_ENABLED=false`. Loader mode này phải bắt `ERR_REQUIRE_ESM` trên cấu hình CJS của SHA `84ef59f3ff799dd0496d643a9a0574c43d0b4a86`; entrypoint Vercel `.mjs` mới phải hoạt động với ESM imports. Windows chạy kiểm tra layout và skip riêng smoke-test do CJS shim của builder upstream sai separator; chạy WSL hoặc Backend CI để xác minh phần Linux. Test dừng child process và dọn fixture tạm sau khi hoàn tất.
+- Source nằm dưới `tests/deployment/`; fixture chỉ sao chép source/compiled output và production packages từ lockfile, không sao chép `.env`, credentials hoặc member data. Test không cần Vercel account hay live deployment và không xác nhận Preview đã thành công; QA/CI vẫn phải kiểm tra Preview URL cùng full head SHA.
 
 ## Remaining plan
 

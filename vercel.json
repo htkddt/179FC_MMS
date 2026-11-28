@@ -4,6 +4,8 @@
     "backend": {
       "root": "backend",
       "framework": "nestjs",
+      "entrypoint": "vercel.mjs",
+      "outputDirectory": ".",
       "routes": [
         {
           "src": "/api/(.*)",
