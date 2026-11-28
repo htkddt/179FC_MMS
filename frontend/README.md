@@ -314,6 +314,8 @@ Guest users may browse the public portal routes, but Employees, member profiles,
 
 ## Test Location
 
+Shared frontend/backend CI orchestration tests live in `../tests/deployment/ci-workflow.test.mjs` and run through backend `npm run test:deployment`, rather than frontend `npm test`.
+
 Do not add test source to this directory. Frontend tests live in `../tests/frontend/`. Run logic checks with `npm test`, and Help/Settings/Organization/guest-access browser checks with `npm run test:browser`. Playwright is a development dependency; its config starts Vite automatically on port 5180. Windows uses installed Microsoft Edge by default. See [runner setup and coverage](../tests/frontend/README.md).
 
 ## Documentation Rule

@@ -10,7 +10,8 @@ Run `npm test` (Node's built-in test runner).
 - `organization.test.mjs`: member slots below team headers, responsive/scaled layouts, collapse/hide/empty states, drop hit testing, normalized offsets, independent layout/view persistence, invalid storage, canonical team transfers, preserved profile fields and failed-write rejection.
 - `help.test.mjs`: normalized guide/article filtering and the isolated shared article-data contract with synthetic mock content.
 - `vite-config.test.mjs`: LocalHost/Production environment labeling and the absence of a Pages-only `VITE_BASE_PATH` or explicit Vite base override, so Vite uses its root-path default for Vercel.
-- `ci-workflow.test.mjs`: `runs.yml` as the single PR entrypoint calling reusable `backend-ci.yml`/`frontend-ci.yml`, child `workflow_call` triggers, caller-only concurrency, read-only permissions, retained Build → Test/logic/browser checks, absence of GitHub Pages configuration, and LF/CRLF-compatible workflow parsing.
+
+Shared frontend/backend CI orchestration checks live in `../deployment/ci-workflow.test.mjs` and run once through `npm run test:deployment` from `backend/`. They are not part of the frontend `npm test` command.
 
 ## Help, Organization and Settings browser checks
 
