@@ -7,8 +7,12 @@ const backendWorkflowUrl = new URL(
   '../../.github/workflows/backend-ci.yml',
   import.meta.url,
 );
-const frontendPagesWorkflowUrl = new URL(
-  '../../.github/workflows/frontend-pages.yml',
+const frontendWorkflowUrl = new URL(
+  '../../.github/workflows/frontend-ci.yml',
+  import.meta.url,
+);
+const runsWorkflowUrl = new URL(
+  '../../.github/workflows/runs.yml',
   import.meta.url,
 );
 const backendPackageUrl = new URL('../../backend/package.json', import.meta.url);
@@ -73,31 +77,39 @@ test('does not declare a binding without a runtime service-to-service caller', a
 });
 
 test('runs backend and frontend CI from committed lockfiles without a GitHub Pages deploy', async () => {
-  const [backendWorkflow, frontendPagesWorkflow] = await Promise.all([
+  const [caller, backendWorkflow, frontendWorkflow] = await Promise.all([
+    readNormalizedFile(runsWorkflowUrl),
     readNormalizedFile(backendWorkflowUrl),
-    readNormalizedFile(frontendPagesWorkflowUrl),
+    readNormalizedFile(frontendWorkflowUrl),
   ]);
 
   assert.match(
-    backendWorkflow,
+    caller,
     /pull_request:\n    branches:\n      - main\n    types: \[opened, synchronize, reopened\]/,
   );
+  assert.match(caller, /\n    uses: \.\/\.github\/workflows\/backend-ci\.yml/);
+  assert.match(caller, /\n    uses: \.\/\.github\/workflows\/frontend-ci\.yml/);
+  for (const callee of [backendWorkflow, frontendWorkflow]) {
+    assert.match(callee, /on:\n  workflow_call:\n\n/);
+    assert.doesNotMatch(callee, /\n  pull_request:|\bconcurrency:/);
+  }
   assert.match(backendWorkflow, /cache-dependency-path: backend\/package-lock\.json/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm ci/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm run test:ci/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm run test:deployment/);
-  assert.match(frontendPagesWorkflow, /cache-dependency-path: frontend\/package-lock\.json/);
-  assert.match(frontendPagesWorkflow, /working-directory: frontend\n        run: npm ci/);
-  assert.match(frontendPagesWorkflow, /working-directory: frontend\n        run: npm run build/);
-  assert.match(frontendPagesWorkflow, /working-directory: frontend\n        run: npm test/);
+  assert.match(frontendWorkflow, /cache-dependency-path: frontend\/package-lock\.json/);
+  assert.match(frontendWorkflow, /working-directory: frontend\n        run: npm ci/);
+  assert.match(frontendWorkflow, /working-directory: frontend\n        run: npm run build/);
+  assert.match(frontendWorkflow, /working-directory: frontend\n        run: npm test/);
   assert.match(
-    frontendPagesWorkflow,
+    frontendWorkflow,
     /working-directory: frontend\n        env:\n          PLAYWRIGHT_CHANNEL: chromium\n        run: npm run test:browser/,
   );
-  assert.doesNotMatch(frontendPagesWorkflow, /actions\/(configure-pages|upload-pages-artifact|deploy-pages)@/);
-  assert.doesNotMatch(frontendPagesWorkflow, /\n      pages: write/);
-  assert.doesNotMatch(frontendPagesWorkflow, /github-pages/);
-  assert.doesNotMatch(frontendPagesWorkflow, /VITE_BASE_PATH/);
+  for (const workflow of [caller, backendWorkflow, frontendWorkflow]) {
+    assert.doesNotMatch(workflow, /actions\/(configure-pages|upload-pages-artifact|deploy-pages)@/);
+    assert.doesNotMatch(workflow, /\bpages:\s*write|github-pages|VITE_BASE_PATH/);
+    assert.match(workflow, /permissions:\n  contents: read\n\n/);
+  }
 });
 
 test('pins Node.js 26 across Vercel services, lockfiles, and pull-request CI', async () => {
@@ -107,7 +119,7 @@ test('pins Node.js 26 across Vercel services, lockfiles, and pull-request CI', a
     readPackageJson(backendPackageLockUrl),
     readPackageJson(frontendPackageLockUrl),
     readNormalizedFile(backendWorkflowUrl),
-    readNormalizedFile(frontendPagesWorkflowUrl),
+    readNormalizedFile(frontendWorkflowUrl),
   ]);
 
   assert.equal(backendPackage.engines.node, '26.x');

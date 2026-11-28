@@ -158,6 +158,8 @@ The application requires Node.js 26.x. This major is pinned in `package.json` an
 
 ## Vercel Services configuration
 
+Pull requests to `main` enter `.github/workflows/runs.yml`, which calls the reusable `frontend-ci.yml` and `backend-ci.yml` workflows. The frontend workflow accepts only `workflow_call` and keeps Build → Test with lockfile install, production build, logic checks and Playwright Chromium checks. PR cancellation is owned by `runs.yml`; all workflows use `contents: read` and have no Pages deploy job.
+
 `../vercel.json` now declares a Vercel Services (Beta) `frontend` service rooted at this directory and a separate `backend` NestJS service. Public `/api/(.*)` traffic is selected before the frontend catch-all; the backend service uses a `request.path` transform to remove that prefix because its implemented routes start at `/health`, while the frontend service falls back to `index.html` for SPA deep links.
 
 The frontend remains browser-local and does not make a runtime API request, so it has no Vercel service binding. A future browser API integration must use the public `/api` route; a Vercel binding is only for an actual server-side caller. GitHub Pages deployment has been removed from the repository workflow; Vercel is the configured production deployment target. The configuration does not make the application authorization- or data-ready: Kiet Huynh must still confirm the final service, path, binding, environment, and release decisions before operational use.
