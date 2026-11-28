@@ -24,11 +24,15 @@ test('Vercel artifact resolves production dependencies from its handler', { time
     readJson(join(backend, 'package.json')),
     readJson(join(backend, 'package-lock.json')),
   ]);
+  const service = config.services.backend;
 
   // Copy only synthetic application code, compiled output and locked production
   // packages. Never copy local env files, credentials or the rest of the repo.
   await Promise.all(['src', 'dist'].map(path => cp(join(backend, path), join(fixture, path), { recursive: true })));
   await cp(join(backend, 'tsconfig.json'), join(fixture, 'tsconfig.json'));
+  if (service.entrypoint) {
+    await cp(join(backend, service.entrypoint), join(fixture, service.entrypoint));
+  }
   await writeFile(join(fixture, 'package.json'), JSON.stringify({
     name: pkg.name, private: true, engines: pkg.engines, dependencies: pkg.dependencies,
   }));
@@ -42,7 +46,6 @@ test('Vercel artifact resolves production dependencies from its handler', { time
 
   // The build has already run via test:deployment. Mark it successful so the
   // real builder selects its normal user-build-output path, without reinstalling.
-  const service = config.services.backend;
   const result = await build({
     files: {},
     entrypoint: service.entrypoint ?? 'src/main.ts',
@@ -75,7 +78,7 @@ test('Vercel artifact resolves production dependencies from its handler', { time
   }
   t.diagnostic(`handler=${lambda.handler}; ${Object.keys(pkg.dependencies).length} production dependencies resolve inside artifact`);
 
-  await t.test('isolated Linux function serves the current health payload', {
+  await t.test('isolated Linux function serves health without require(ESM)', {
     // Vercel runs Linux. Upstream 28.0.0 emits malformed CJS shim separators on
     // Windows; the dependency-layout assertion above still runs on every OS.
     skip: process.platform === 'win32' && 'Upstream Vercel CJS shims require Linux; run in WSL or Backend CI',
@@ -83,7 +86,9 @@ test('Vercel artifact resolves production dependencies from its handler', { time
   }, async () => {
     const child = fork(handler, [], {
       cwd: artifact,
-      execArgv: ['--require', fileURLToPath(new URL('./fixtures/ephemeral-listener.cjs', import.meta.url))],
+      // Reproduce ERR_REQUIRE_ESM instead of silently relying on local Node's
+      // default support for synchronous ESM loading from CommonJS.
+      execArgv: ['--no-require-module', '--require', fileURLToPath(new URL('./fixtures/ephemeral-listener.cjs', import.meta.url))],
       env: { ...process.env, DATABASE_ENABLED: 'false', NODE_PATH: '', NODE_ENV: 'production' },
       silent: true,
     });
