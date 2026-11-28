@@ -50,6 +50,37 @@ test("keeps reusable frontend Build and Test gates without duplicate PR triggers
   assert.equal((frontend.match(/node-version: 26\n/g) ?? []).length, 2);
 });
 
+test("gates backend tests on Build and prepares each runner independently", async () => {
+  const backend = await readWorkflow("backend-ci.yml");
+  const jobs = [...backend.matchAll(/^  (\w+):\n    name: (.+)\n/gm)];
+  assert.deepEqual(jobs.map(([, id, name]) => [id, name]), [
+    ["build", "Build"], ["test", "Test"],
+  ]);
+  const build = backend.slice(jobs[0].index, jobs[1].index);
+  const testJob = backend.slice(jobs[1].index);
+  assert.match(testJob, /^  test:\n    name: Test\n    needs: build\n/);
+  // Default success gating must not be bypassed at job or step level.
+  assert.doesNotMatch(backend, /^\s+(if|continue-on-error):/m);
+  for (const job of [build, testJob]) {
+    assert.match(job, /runs-on: ubuntu-latest/);
+    assert.match(job, /uses: actions\/checkout@v6/);
+    assert.match(job, /uses: actions\/setup-node@v6/);
+    assert.match(job, /node-version: 26\n/);
+    assert.match(job, /cache-dependency-path: backend\/package-lock\.json/);
+    assert.match(job, /working-directory: backend\n        run: npm ci\n/);
+  }
+  assert.match(build, /working-directory: backend\n        run: npm run build\n/);
+  assert.doesNotMatch(build, /run: npm (?:test|run test:)/);
+  assert.match(testJob, /working-directory: backend\n        run: npm test\n/);
+  assert.match(testJob, /working-directory: backend\n        run: npm run test:deployment\n/);
+  assert.doesNotMatch(testJob, /run: npm run test:ci/);
+  const scripts = JSON.parse(await readFile(
+    new URL("../../backend/package.json", import.meta.url), "utf8",
+  )).scripts;
+  assert.equal(scripts.test, "npm run test:unit && npm run test:integration");
+  assert.equal(scripts["test:deployment"], "npm run build && node --test ../tests/deployment/*.test.mjs");
+});
+
 test("owns cancellation in the caller and grants only read permission to callees", async () => {
   const [caller, frontend, backend] = await Promise.all([
     readWorkflow("runs.yml"),

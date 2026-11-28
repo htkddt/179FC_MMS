@@ -95,7 +95,8 @@ test('runs backend and frontend CI from committed lockfiles without a GitHub Pag
   }
   assert.match(backendWorkflow, /cache-dependency-path: backend\/package-lock\.json/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm ci/);
-  assert.match(backendWorkflow, /working-directory: backend\n        run: npm run test:ci/);
+  assert.match(backendWorkflow, /working-directory: backend\n        run: npm run build/);
+  assert.match(backendWorkflow, /working-directory: backend\n        run: npm test/);
   assert.match(backendWorkflow, /working-directory: backend\n        run: npm run test:deployment/);
   assert.match(frontendWorkflow, /cache-dependency-path: frontend\/package-lock\.json/);
   assert.match(frontendWorkflow, /working-directory: frontend\n        run: npm ci/);
